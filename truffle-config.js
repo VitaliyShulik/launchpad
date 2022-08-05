@@ -89,4 +89,9 @@ module.exports = {
       },
     },
   },
+
+  plugins: ['truffle-plugin-verify'],
+  api_keys: {
+    etherscan: 'X88AP9B52SENYPTR31W5SGRK5EGJZD2BJC'
+  },
 };

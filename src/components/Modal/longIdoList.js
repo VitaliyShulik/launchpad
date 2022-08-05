@@ -31,7 +31,7 @@ const LongIdoList = (props) => {
               return null;
             }
             return (
-              <s.Container style={{ padding: 10 }}>
+              <s.Container key={index} style={{ padding: 10 }}>
                 <LongIdo idoAddress={item} />
               </s.Container>
             );

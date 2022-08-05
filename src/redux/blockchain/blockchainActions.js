@@ -119,3 +119,9 @@ export const updateAccount = (account) => {
     dispatch(fetchData(account));
   };
 };
+
+export const checkConnection = (dispatch) => {
+  if (web3Modal.cachedProvider) {
+    dispatch(connect())
+  }
+}

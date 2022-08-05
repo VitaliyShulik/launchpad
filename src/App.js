@@ -9,12 +9,13 @@ import { usePoolContext } from "./context/poolContext";
 import Account from "./pages/account";
 import Home from "./pages/home.js";
 import Launchpad from "./pages/launchpad.js";
-import LaunchpadInFo from "./pages/launchpadInfo";
+import LaunchpadInfo from "./pages/launchpadInfo";
 import Locker from "./pages/locker";
 import LockerInfo from "./pages/lockerInfo";
 import LockToken from "./pages/lockToken";
 import Publish from "./pages/publish";
 import { fetchContract } from "./redux/contract/contractAction";
+import { checkConnection } from "./redux/blockchain/blockchainActions";
 import { fetchData } from "./redux/data/dataActions";
 import * as s from "./styles/global";
 function App() {
@@ -33,6 +34,7 @@ function App() {
 
   useEffect(() => {
     dispatch(fetchContract());
+    checkConnection(dispatch)
   }, []);
 
   return (
@@ -62,7 +64,7 @@ function App() {
               element={<Home blockchain={blockchain} data={data} />}
             />
             <Route path="/launchpad" element={<Launchpad />} />
-            <Route path="/launchpad/:idoAddress" element={<LaunchpadInFo />} />
+            <Route path="/launchpad/:idoAddress" element={<LaunchpadInfo />} />
             <Route path="/publish" element={<Publish />} />
             <Route path="/lock" element={<LockToken />} />
             <Route path="/account" element={<Account />} />
@@ -78,11 +80,5 @@ function App() {
     </s.Screen>
   );
 }
-
-// function Home() {
-
-//   const dispatch = useDispatch();
-
-//   return (
 
 export default App;

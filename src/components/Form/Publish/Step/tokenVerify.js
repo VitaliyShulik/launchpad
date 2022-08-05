@@ -1,0 +1,52 @@
+import { TextField } from "@mui/material";
+import BigNumber from "bignumber.js";
+import React, { useEffect } from "react";
+import { useStoreContext } from "../../../../context/store";
+import * as s from "../../../../styles/global";
+import { utils } from "../../../../utils";
+export default function TokenVerify({ formProps, blockchain }) {
+  const context = useStoreContext();
+  const data = context.tokenInformation;
+  const address = context.address;
+  useEffect(async () => {
+    if (address !== "") {
+      let token = await utils.getTokenData(address[0], blockchain.web3);
+      data[1](token);
+    }
+  }, [address[0]]);
+
+  return (
+    <s.Container flex={1} ai="center">
+      <s.TextTitle>Token Verify</s.TextTitle>
+      <s.SpacerSmall />
+      <TextField
+        id="tokenAddress"
+        onChange={(e) => {
+          e.preventDefault();
+          address[1](e.target.value);
+        }}
+        value={address[0]}
+        defaultValue={data[0] ? data[0].tokenAddress : ""}
+        name={"tokenAddress"}
+        label={"Token address"}
+        fullWidth
+      />
+      <s.TextIDWarning fullWidth>{context.tokenError["token"]}</s.TextIDWarning>
+      {data[0] ? (
+        <s.Container style={{}}>
+          <s.SpacerSmall />
+          <s.TextID>Name</s.TextID>
+          <s.TextDescription>{data[0].tokenName}</s.TextDescription>
+          <s.TextID>Decimals</s.TextID>
+          <s.TextDescription>{data[0].tokenDecimals}</s.TextDescription>
+          <s.TextID>Total supply</s.TextID>
+          <s.TextDescription>
+            {BigNumber(data[0].totalSupply)
+              .dividedBy(10 ** data[0].tokenDecimals)
+              .toFixed(0)}
+          </s.TextDescription>
+        </s.Container>
+      ) : null}
+    </s.Container>
+  );
+}

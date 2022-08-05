@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Modak&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Modak&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+:root {
+  --clr-neon: hsl(56, 100%, 52%, 1);
+  --clr-bg: hsl(56, 100%, 40%);
+  --primary: #27C498;
+  --secondary: #004e38;
+  --search: #2D2D2D;
+  --card: #232227;
+  --upper-card: #151516;
+  --unfocus: #6F2232;
+  --disable: #6D6E71;
+  --background: #151516;
+  /* --background: #006FB9; */
+  --blue: #1e90ff;
+  --white: #ffffff;
+  --text: #FFFFFF;
+  --text-secondary: #232227;
+  --button: #005987;
+
+  --globalRadius: "20px";
+}
+
+.alignRight{
+  float: right;
+}
+.alignLeft{
+  float: right;
+}
+
+.m-5{
+  margin: 5px;
+}
+
+.ml-5{
+  margin-left: 5px;
+}
+
+.mr-5{
+  margin-right: 5px;
+}
+
+.mr-10{
+  margin-right: 10px;
+}
+
+.main {
+  margin: 10%;
+}
+.text-collapse{
+  overflow: hidden;
+  width: 100%;
+  text-overflow: ellipsis;
+  max-width: 100vw;
+  text-align: center;
+}
+
+.address {
+  overflow: hidden;
+  width: 100%;
+  padding-right: 32px;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+
+.home {
+  position: relative;
+  z-index: 1;
+}
+
+
+.home::before{
+  content: " ";
+  z-index: -1;
+  opacity: .4;
+  width: 100%; 
+  position: absolute;
+}
+
+.MuiOutlinedInput-root{
+  color: var(--text)
+}
+
+.read-more-button{
+  color: var(--primary)
+}
+
+input[type=number] {
+  -webkit-outer-spin-button: 'none';
+}
+
+
+.dropdown-menu{
+  background-color: var(--background);
+}
+
+
+.image-cover {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+
+  object-fit: cover;
+  object-position: center right;
+}
+
+.addButton{
+  max-width: 150px;
+}
+
+.dropdown-item{
+  color: var(--text);
+}
+
+.Fontcard > .dropdown{
+  margin: 10px;
+
+}
+
+.Fontcard {
+  box-shadow: 6px 6px 2px 1px rgba(0,0,0,0.4);
+  transition: 0.3s;
+  border-radius: 5px;
+  background-color: var(--background);
+  border: 1px solid var(--disable);
+}
+
+.Fontcard:hover {
+  box-shadow: 3px 3px 2px 1px rgba(0,0,0,0.6);
+}
+
+.right {
+  float: right;
+}
+
+
+.navbar-collapse{
+  text-align: center;
+}
+
+.text-collapse{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 0; /* number of lines to show */
+          line-clamp: 0;
+  -webkit-box-orient: vertical;
+}
+
+
+button:disabled {
+  background: var(--unfocus);
+}
+
+
+.navbar-dark .navbar-toggler-icon {
+  color: var(--secondary);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text);
+}
+
+* {
+  /* font-family: 'VT323', monospace; */
+  /* font-family: 'Roboto', sans-serif; */
+  font-family: 'Poppins', sans-serif;
+  /* font-family: 'Barlow', sans-serif; */
+  letter-spacing: 0em;
+  font-size: 20px;
+  line-height: 2;
+}
+
+p {
+  margin: 0;
+}
+
+.btn-success{
+  color: var(--primary);
+  background-color: transparent;
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em currentColor;
+  box-shadow: inset 0 0 0.5em 0 var(--primary), 0 0 0.5em 0 var(--primary);
+  border: var(--primary) 0.125em solid;
+  
+}
+
+.btn-success:focus{
+  color: var(--primary);
+  background-color: transparent;
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em currentColor;
+  box-shadow: inset 0 0 0.5em 0 var(--primary), 0 0 0.5em 0 var(--primary);
+  border: var(--primary) 0.125em solid;
+}
+.btn-success:hover{
+  color: var(--primary);
+  background-color: transparent;
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em currentColor;
+  box-shadow: inset 0 0 0.5em 0 var(--primary), 0 0 0.5em 0 var(--primary);
+  border: var(--primary) 0.125em solid;
+}
+
+.show>.btn-success.dropdown-toggle:focus{
+  box-shadow: inset 0 0 0.5em 0 var(--primary), 0 0 0.5em 0 var(--primary);
+}
+
+.show>.btn-success.dropdown-toggle{
+  color: var(--primary);
+  background-color: transparent;
+  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em currentColor;
+  box-shadow: inset 0 0 0.5em 0 var(--primary), 0 0 0.5em 0 var(--primary);
+  border: var(--primary) 0.125em solid;
+}
+
+.show>.btn-success.dropdown-toggle:disabled{
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--disable);
+  border: var(--disable) 0.125em solid;
+  text-shadow: none;
+}

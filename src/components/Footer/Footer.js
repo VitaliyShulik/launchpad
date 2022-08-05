@@ -51,13 +51,13 @@ const Footer = () => {
           </Column>
           <Column fd="row" jc="space-evenly">
             <SocialIcon
-              url="https://twitter.com/crypto_font"
+              url="https://twitter.com/nextsmartchain"
               target="_blank"
               bgColor="#fff"
               fgColor="#000000"
             />
             <SocialIcon
-              url="https://discord.gg/TVEqbECMUt"
+              url="https://discord.gg/sbcbVKsdMd"
               target="_blank"
               bgColor="#fff"
               fgColor="#000000"

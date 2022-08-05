@@ -84,7 +84,6 @@ export default function Preview() {
   };
 
   const createIDO = async () => {
-    console.log(chainRouter[process.env.REACT_APP_networkID][0]);
     setLoading(true);
     const iconAdded = await ipfs.add(icon);
     let iconURL = `https://ipfs.infura.io/ipfs/${iconAdded.path}`;
@@ -104,7 +103,6 @@ export default function Preview() {
       };
     }
     const tokenURI = pinataResponse.pinataUrl;
-    console.log('context', context.start[0].getTime() / 1000, BigNumber(context.start[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber())
 
     blockchain.IDOFactory.methods
       .createIDO(

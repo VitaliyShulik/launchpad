@@ -28,6 +28,7 @@ export const fetchContract = () => {
     dispatch(fetchContractRequest());
 
     let web3 = new Web3(process.env.REACT_APP_WS);
+    console.log('web3', web3)
     const networkId = process.env.REACT_APP_networkID;
     try {
       const IDOFactoryNetworkData = await IDOFactory.networks[networkId];
@@ -40,6 +41,7 @@ export const fetchContract = () => {
         LockerFactory.abi,
         LockerFactoryNetworkData.address
       );
+      console.log('IDOFactoryContract', IDOFactoryContract)
 
       dispatch(
         fetchContractSuccess({

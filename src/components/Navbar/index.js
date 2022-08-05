@@ -44,16 +44,16 @@ const Navigation = () => {
             <LinkContainer to="/account">
               <Nav.Link>Account</Nav.Link>
             </LinkContainer>
-            <NavDropdown title="Resources" id="collasible-nav-dropdown">
+            {/* <NavDropdown title="Resources" id="collasible-nav-dropdown">
               <Nav.Link
                 href="https://jarupak-sri.gitbook.io/cfont-documents/"
                 target="_blank"
               >
                 Whitepaper
               </Nav.Link>
-              {/* <NavDropdown.Item href="#action/3.3"></NavDropdown.Item> */}
+              <NavDropdown.Item href="#action/3.3"></NavDropdown.Item>
               <NavDropdown.Divider />
-            </NavDropdown>
+            </NavDropdown>*/}
           </Nav>
           <Nav>
             <Nav.Link>{process.env.REACT_APP_networkID}</Nav.Link>

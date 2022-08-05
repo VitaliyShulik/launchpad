@@ -15,6 +15,14 @@ export const chainRouter = {
       ROUTER: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
     },
   ],
+  96: [
+    {
+      name: "UniswapX DEX",
+      FACTORY: "0x4b81A5610968B79EFC5dC12CA98264DeFcd3f778",
+      WETH: "0x2E27E20Da584bE8349Db668d2C85c16fab560B20",
+      ROUTER: "0x429368f41d8a2B256EA2Dc4F3D2Ae42935010F78",
+    },
+  ],
   3: [
     {
       name: "Uniswap",

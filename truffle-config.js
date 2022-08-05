@@ -67,6 +67,18 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true,
     },
+    nsc: {
+      provider: function () {
+        return new HDWalletProvider(
+          mnemonic,
+          `https://rpc.nextsmartchain.com`
+        );
+      },
+      network_id: 96,
+      networkCheckTimeoutnetworkCheckTimeout: 10000,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+    },
   },
 
   // Set default mocha options here, use special reporters etc.

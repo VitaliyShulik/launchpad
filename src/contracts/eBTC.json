@@ -10190,6 +10190,12 @@
       "address": "0x4C509e8BDc46e2747D41C67dfA723255C23A135A",
       "transactionHash": "0xf43834bdddd4e0bff58a9fcb815df3a84d4afb5ee101611669b43de42f985fe2"
     },
+    "96": {
+      "events": {},
+      "links": {},
+      "address": "0x01038Cb2440507d36c7A9568fB01dc2Eac122200",
+      "transactionHash": "0x03ff4fdf16558f2836ba5ef044598c47420363de938619a18987edfdf9eaec16"
+    },
     "1337": {
       "events": {
         "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925": {

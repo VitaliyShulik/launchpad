@@ -48,6 +48,8 @@ export const PoolContextProvider = ({ children }) => {
         fromBlock: 0,
       },
       async function (error, event) {
+        console.log('error', error)
+        console.log('event', event)
         if (event) {
           setAllPoolAddress((p) => [...p, event.returnValues.idoPool]);
         }

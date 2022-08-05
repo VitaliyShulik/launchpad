@@ -3,7 +3,7 @@ const tokenLockerFactory = artifacts.require("TokenLockerFactory");
 
 module.exports = function (deployer) {
   deployer.then(async () => {
-    let EBTCAddress = "0x4C509e8BDc46e2747D41C67dfA723255C23A135A";
+    let EBTCAddress = "0x01038Cb2440507d36c7A9568fB01dc2Eac122200";
     await deployer.deploy(idoFactory, EBTCAddress, "0", "0");
     await deployer.deploy(tokenLockerFactory);
   });

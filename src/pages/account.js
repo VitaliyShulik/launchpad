@@ -24,8 +24,6 @@ const Account = (props) => {
     setShowZero(!showZero);
   };
 
-  let filter = { owner: blockchain.account };
-
   return (
     <s.Container ai="center">
       <s.TextTitle>Account</s.TextTitle>
@@ -38,7 +36,7 @@ const Account = (props) => {
             </s.TextTitle>
             <CreateLaunchpad />
           </s.Container>
-          <LongIdoList filter={filter} />
+          <LongIdoList />
         </s.Container>
 
         <s.Container flex={1}>
@@ -55,7 +53,7 @@ const Account = (props) => {
               <Checkbox value={showZero} onChange={handleShowZero} />
             </s.Container>
           </s.Container>
-          <LockerList showZero={showZero} filter={filter} />
+          <LockerList showZero={showZero} />
         </s.Container>
       </s.Container>
     </s.Container>

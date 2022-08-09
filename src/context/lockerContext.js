@@ -9,11 +9,12 @@ export const PoolContextProvider = ({ children }) => {
   const [allPools, setAllPools] = useState(new Array());
   const dispatch = useDispatch();
   const contract = useSelector((state) => state.contract);
+  const { account } = useSelector((state) => state.blockchain);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       allPoolAddress.map(async (address, index) => {
-        await utils.loadPoolData(address, contract.web3, "").then((e) => {
+        await utils.loadPoolData(address, contract.web3, account).then((e) => {
           setAllPools((p) => ({ ...p, ...{ [address]: e } }));
         });
       });

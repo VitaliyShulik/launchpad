@@ -103,12 +103,9 @@ export const loadPoolData = async (idoAddress, web3, account) => {
     let metadata = await getTokenURI(uri);
     let owner = await idoPool.methods.owner().call();
 
-    let userData = new Object();
-
-    if (account !== "") {
-      userData = await idoPool.methods.userInfo(account).call();
-    } else {
-    }
+    const userData = account && account !== ""
+      ? await idoPool.methods.userInfo(account).call()
+      : null;
 
     let tokenName = await token.methods.name().call();
     let tokenSymbol = await token.methods.symbol().call();
@@ -195,13 +192,10 @@ export const loadUserData = async (idoAddress, web3, account) => {
   try {
     const idoPool = await new web3.eth.Contract(IDOPool.abi, idoAddress);
 
-    let userData = new Object();
+    const userData = account && account !== ""
+      ? await idoPool.methods.userInfo(account).call()
+      : null;
 
-    if (account !== "") {
-      userData = await idoPool.methods.userInfo(account).call();
-    } else {
-      return null;
-    }
     return userData;
   } catch (e) {
     console.log(e);

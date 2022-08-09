@@ -9,13 +9,15 @@ export const PoolContextProvider = ({ children }) => {
   const [allLockerAddress, setAllLockerAddress] = useState([]);
   const [allPools, setAllPools] = useState(new Object());
   const [allLocker, setAllLocker] = useState(new Object());
+  const [userPoolAddresses, setUserPoolAddresses] = useState([]);
   const dispatch = useDispatch();
   const contract = useSelector((state) => state.contract);
+  const { account } = useSelector((state) => state.blockchain);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       allPoolAddress.map(async (address, index) => {
-        await utils.loadPoolData(address, contract.web3, "").then((e) => {
+        await utils.loadPoolData(address, contract.web3, account).then((e) => {
           setAllPools((p) => ({ ...p, ...{ [address]: e } }));
         });
       });
@@ -23,6 +25,27 @@ export const PoolContextProvider = ({ children }) => {
 
     return () => clearTimeout(delayDebounceFn);
   }, [allPoolAddress]);
+
+  useEffect(() => {
+    setUserPoolAddresses([])
+    const delayDebounceFn = setTimeout(() => {
+      Object.values(allPools).map(async (IDOPoolData, index) => {
+        const { idoAddress, owner } = IDOPoolData;
+        await utils.loadUserData(idoAddress, contract.web3, account).then((userData) => {
+          IDOPoolData.userData = userData
+          setAllPools((prevAllPools) => ({ ...prevAllPools, ...{ [idoAddress]: IDOPoolData } }));
+
+          if (
+            owner?.toLowerCase() === account?.toLowerCase()
+            || (userData?.totalInvestedETH && userData?.totalInvestedETH !== "0")
+          ) setUserPoolAddresses((prevUserPoolAddresses) => [ ...prevUserPoolAddresses, idoAddress ])
+
+        });
+      });
+    }, 3000);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [account])
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
@@ -77,10 +100,11 @@ export const PoolContextProvider = ({ children }) => {
   }, [dispatch, contract]);
 
   const value = {
-    allPools: allPools,
-    allPoolAddress: allPoolAddress,
-    allLocker: allLocker,
-    allLockerAddress: allLockerAddress,
+    allPools,
+    allPoolAddress,
+    userPoolAddresses,
+    allLocker,
+    allLockerAddress,
   };
   return <PoolContext.Provider value={value}>{children}</PoolContext.Provider>;
 };

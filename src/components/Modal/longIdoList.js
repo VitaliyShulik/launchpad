@@ -1,22 +1,17 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import LongIdo from "../Card/longIdo";
 
 const LongIdoList = (props) => {
-  const [totalInvested, setTotalInvested] = useState(0);
   const [limit, setLimit] = useState(5);
   const [loading, setLoading] = useState(false);
-  const blockchain = useSelector((state) => state.blockchain);
-  const contract = useSelector((state) => state.contract);
 
-  const { filter = {} } = props;
-  const allPools = usePoolContext().allPoolAddress;
+  const { userPoolAddresses } = usePoolContext();
 
   const loadmore = (amount) => {
-    setLimit((p) => (p < allPools.length ? p + amount : p));
+    setLimit((p) => (p < userPoolAddresses.length ? p + amount : p));
   };
 
   return (
@@ -26,20 +21,20 @@ const LongIdoList = (props) => {
           jc="space-around"
           style={{ flexWrap: "wrap", marginTop: 20 }}
         >
-          {allPools.map((item, index) => {
+          {userPoolAddresses.map((poolAddress, index) => {
             if (index >= limit) {
               return null;
             }
             return (
               <s.Container key={index} style={{ padding: 10 }}>
-                <LongIdo idoAddress={item} />
+                <LongIdo idoAddress={poolAddress} />
               </s.Container>
             );
           })}
         </s.Container>
       </s.Container>
       <s.SpacerSmall />
-      {limit >= allPools.length ? null : (
+      {limit >= userPoolAddresses.length ? null : (
         <s.button
           onClick={async (e) => {
             e.preventDefault();

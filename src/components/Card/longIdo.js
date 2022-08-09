@@ -20,7 +20,7 @@ const LongIdo = (props) => {
     if (idoInfo) {
       setImage(idoInfo.metadata.image);
     }
-  }, [idoInfo]);
+  }, [idoInfo.metadata.image]);
 
   if (!idoInfo) {
     return (
@@ -71,9 +71,7 @@ const LongIdo = (props) => {
             <PoolCountdown start={idoInfo.start} end={idoInfo.end} />
           </s.Container>
           <ProgressBar
-            now={BigNumber(idoInfo.currentDistributed)
-              .times(100)
-              .dividedBy(BigNumber(idoInfo.maxDistributed))}
+            now={idoInfo.progress}
           />
         </s.Card>
       </s.Container>

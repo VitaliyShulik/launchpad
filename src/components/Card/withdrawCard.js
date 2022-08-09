@@ -60,6 +60,8 @@ const WithdrawETH = (props) => {
     }
   };
 
+  const isEnded = parseInt(idoInfo.end) < parseInt(Date.now() / 1000);
+
   return (
     <s.Card
       style={{
@@ -71,13 +73,17 @@ const WithdrawETH = (props) => {
       <s.TextTitle>WITHDRAW</s.TextTitle>
       <s.TextID>(Pool owner only)</s.TextID>
       <s.SpacerSmall />
-      <s.Container fd="row" ai="center" jc="space-between">
-        <s.Container flex={3}>
-          <s.TextID>Can withdraw in</s.TextID>
-        </s.Container>
+      {
+        !isEnded && (
+          <s.Container fd="row" ai="center" jc="space-between">
+            <s.Container flex={3}>
+              <s.TextID>Can withdraw in</s.TextID>
+            </s.Container>
 
-        <Countdown date={idoInfo.end * 1000} />
-      </s.Container>
+            <Countdown date={idoInfo.end * 1000} />
+          </s.Container>
+        )
+      }
       <s.SpacerMedium />
       <s.Container fd="row" ai="center" jc="space-between">
         <s.Container flex={2}>
@@ -90,7 +96,7 @@ const WithdrawETH = (props) => {
         </s.Container>
         <s.button
           disabled={
-            parseInt(Date.now() / 1000) < parseInt(idoInfo.end) ||
+            isEnded ||
             BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap))
           }
           onClick={(e) => {
@@ -115,7 +121,7 @@ const WithdrawETH = (props) => {
         {BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap)) ? (
           <s.button
             disabled={
-              parseInt(Date.now() / 1000) < parseInt(idoInfo.end) ||
+              isEnded ||
               BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap))
             }
             onClick={(e) => {
@@ -128,7 +134,7 @@ const WithdrawETH = (props) => {
         ) : (
           <s.button
             disabled={
-              parseInt(Date.now() / 1000) < parseInt(idoInfo.end) ||
+              isEnded ||
               BigNumber(idoInfo.totalInvestedETH).gte(
                 BigNumber(idoInfo.softCap)
               )

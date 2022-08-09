@@ -12,15 +12,14 @@ const IDOList = (props) => {
   const [loading, setLoading] = useState(false);
   const blockchain = useSelector((state) => state.blockchain);
   const contract = useSelector((state) => state.contract);
-  const poolContext = usePoolContext();
 
-  const allPools = poolContext.allPools;
+  const { allPools } = usePoolContext();
   const poolKeys = Object.keys(allPools);
 
   const { owner, tokenAddress } = props;
 
   useEffect(() => {
-    console.log(allPools);
+    console.log("allPools", allPools);
   }, [allPools]);
 
   const loadmore = (amount) => {

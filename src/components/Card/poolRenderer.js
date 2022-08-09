@@ -18,6 +18,9 @@ const PoolRenderer = (props) => {
 
   const card = useRef(null);
 
+  const isStarted = parseInt(idoInfo.start) < (parseInt(Date.now() / 1000));
+  const isEnded = parseInt(idoInfo.end) < (parseInt(Date.now() / 1000));
+
   useEffect(async () => {
     setImage(idoInfo.metadata.image);
   }, [idoInfo]);
@@ -67,9 +70,9 @@ const PoolRenderer = (props) => {
         </s.UpperCard>
         <s.SpacerSmall />
         <s.Container fd="row" jc="flex-start">
-          {parseInt(idoInfo.end) < parseInt(Date.now() / 1000) ? (
+          {isEnded ? (
             <Badge bg="secondary">Ended</Badge>
-          ) : parseInt(idoInfo.start) < parseInt(Date.now() / 1000) ? (
+          ) : isStarted ? (
             <Badge bg="success">Started</Badge>
           ) : (
             <Badge bg="secondary">Not started</Badge>
@@ -101,19 +104,24 @@ const PoolRenderer = (props) => {
           </s.Container>
         </s.Container>
         <s.SpacerSmall />
-        <s.TextID>
-          {parseInt(idoInfo.start) < new Date(Date.now() / 1000)
-            ? "End in"
-            : "Start in"}
-        </s.TextID>
-        {/* {console.log(totalInvested)} */}
-        <Countdown
-          date={
-            parseInt(idoInfo.start) < new Date(Date.now() / 1000)
-              ? parseInt(idoInfo.end) * 1000
-              : parseInt(idoInfo.start) * 1000
-          }
-        />
+        {
+          !isEnded && (
+            <>
+              <s.TextID>
+                {isStarted
+                  ? "End in"
+                  : "Start in"}
+              </s.TextID>
+              <Countdown
+                date={
+                  isStarted
+                    ? parseInt(idoInfo.end) * 1000
+                    : parseInt(idoInfo.start) * 1000
+                }
+              />
+            </>
+          )
+        }
         <s.TextID>Progress</s.TextID>
         <ProgressBar now={idoInfo.progress} />
       </NavLink>

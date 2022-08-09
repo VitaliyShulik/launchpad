@@ -135,6 +135,9 @@ const BuyTokenCard = (props) => {
     }
   };
 
+  const isStarted = parseInt(idoInfo.start) < (parseInt(Date.now() / 1000));
+  const isEnded = parseInt(idoInfo.end) < (parseInt(Date.now() / 1000));
+
   return (
     <s.Card
       style={{
@@ -144,9 +147,9 @@ const BuyTokenCard = (props) => {
       }}
     >
       <s.TextTitle>BUY TOKEN</s.TextTitle>
-      {parseInt(idoInfo.end) < parseInt(Date.now() / 1000) ? (
+      {isEnded ? (
         <Badge bg="secondary">Ended</Badge>
-      ) : parseInt(idoInfo.start) < parseInt(Date.now() / 1000) ? (
+      ) : isStarted ? (
         <Badge bg="success">Started</Badge>
       ) : (
         <Badge bg="secondary">Not started</Badge>
@@ -205,7 +208,7 @@ const BuyTokenCard = (props) => {
         <s.Container flex={1}>
           <s.button
             disabled={
-              BigNumber(Date.now() / 1000).lt(BigNumber(idoInfo.end)) ||
+              !isEnded ||
               BigNumber(idoInfo.totalInvestedETH).gt(
                 BigNumber(idoInfo.softCap)
               ) ||
@@ -259,8 +262,8 @@ const BuyTokenCard = (props) => {
                 .plus(BigNumber(idoInfo.toDistributed))
                 .gt(BigNumber(idoInfo.maxDistributed)) ||
               price == "0" ||
-              parseInt(idoInfo.end) < parseInt(Date.now() / 1000) ||
-              parseInt(idoInfo.start) > parseInt(Date.now() / 1000)
+              isEnded ||
+              !isStarted
             }
             onClick={(e) => {
               e.preventDefault();

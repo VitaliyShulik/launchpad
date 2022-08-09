@@ -1,14 +1,22 @@
 import Countdown from "react-countdown";
 import * as s from "../../styles/global";
 const PoolCountdown = ({ start, end }) => {
+  const dateNow = (parseInt(Date.now() / 1000));
+  const isStarted = parseInt(start) < dateNow;
+  const isEnded = parseInt(end) < dateNow;
+
+  if (isEnded) {
+    return null;
+  }
+
   return (
     <s.Container fd="row" jc="space-between">
       <s.TextID>
-        {parseInt(start) < new Date(Date.now() / 1000) ? "End in" : "Start in"}
+        {isStarted ? "End in" : "Start in"}
       </s.TextID>
       <Countdown
         date={
-          parseInt(start) < new Date(Date.now() / 1000)
+          isStarted
             ? parseInt(end) * 1000
             : parseInt(start) * 1000
         }

@@ -10,9 +10,7 @@ import ProgressBar from "../Modal/ProgressBar";
 const PoolRenderer = (props) => {
   const contract = useSelector((state) => state.contract);
   const [image, setImage] = useState("");
-  const { idoAddress } = props;
-
-  const idoInfo = props.pool;
+  const { pool: idoInfo } = props;
 
   let imageSolid = require("../../assets/images/image-solid.png");
 

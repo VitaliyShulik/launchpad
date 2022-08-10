@@ -103,9 +103,7 @@ export const loadPoolData = async (idoAddress, web3, account) => {
     let metadata = await getTokenURI(uri);
     let owner = await idoPool.methods.owner().call();
 
-    const userData = account && account !== ""
-      ? await idoPool.methods.userInfo(account).call()
-      : null;
+    const userData = await loadUserData(idoAddress, web3, account)
 
     let tokenName = await token.methods.name().call();
     let tokenSymbol = await token.methods.symbol().call();

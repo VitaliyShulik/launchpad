@@ -32,7 +32,7 @@ const WithdrawETH = (props) => {
 
   const web3 = blockchain.web3;
 
-  const withdrawToken = async () => {
+  const withdrawETH = async () => {
     setLoading(true);
     const web3 = blockchain.web3;
     try {
@@ -60,7 +60,65 @@ const WithdrawETH = (props) => {
     }
   };
 
-  const isEnded = parseInt(idoInfo.end) < parseInt(Date.now() / 1000);
+  const withdrawToken = async () => {
+    setLoading(true);
+    const web3 = blockchain.web3;
+    try {
+      const IDOPoolContract = await new web3.eth.Contract(
+        IDOPool.abi,
+        idoAddress
+      );
+      console.log('withdrawToken IDOPoolContract', IDOPoolContract)
+
+      // IDOPoolContract.methods
+      //   .withdrawETH()
+      //   .send({
+      //     from: blockchain.account,
+      //   })
+      //   .once("error", (err) => {
+      //     setLoading(false);
+      //     console.log(err);
+      //   })
+      //   .then((receipt) => {
+      //     setLoading(false);
+      //     console.log(receipt);
+      //     dispatch(fetchData(blockchain.account));
+      //   });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const withdrawUnsoldToken = async () => {
+    setLoading(true);
+    const web3 = blockchain.web3;
+    try {
+      const IDOPoolContract = await new web3.eth.Contract(
+        IDOPool.abi,
+        idoAddress
+      );
+      console.log('withdrawUnsoldToken IDOPoolContract', IDOPoolContract)
+
+      // IDOPoolContract.methods
+      //   .withdrawETH()
+      //   .send({
+      //     from: blockchain.account,
+      //   })
+      //   .once("error", (err) => {
+      //     setLoading(false);
+      //     console.log(err);
+      //   })
+      //   .then((receipt) => {
+      //     setLoading(false);
+      //     console.log(receipt);
+      //     dispatch(fetchData(blockchain.account));
+      //   });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const hasEnded = parseInt(idoInfo.end) < parseInt(Date.now() / 1000);
 
   return (
     <s.Card
@@ -74,7 +132,7 @@ const WithdrawETH = (props) => {
       <s.TextID>(Pool owner only)</s.TextID>
       <s.SpacerSmall />
       {
-        !isEnded && (
+        !hasEnded && (
           <s.Container fd="row" ai="center" jc="space-between">
             <s.Container flex={3}>
               <s.TextID>Can withdraw in</s.TextID>
@@ -96,12 +154,12 @@ const WithdrawETH = (props) => {
         </s.Container>
         <s.button
           disabled={
-            isEnded ||
+            !hasEnded ||
             BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap))
           }
           onClick={(e) => {
             e.preventDefault();
-            withdrawToken();
+            withdrawETH();
           }}
         >
           WITHDRAW
@@ -121,8 +179,8 @@ const WithdrawETH = (props) => {
         {BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap)) ? (
           <s.button
             disabled={
-              isEnded ||
-              BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap))
+              !hasEnded ||
+              !BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap))
             }
             onClick={(e) => {
               e.preventDefault();
@@ -134,14 +192,14 @@ const WithdrawETH = (props) => {
         ) : (
           <s.button
             disabled={
-              isEnded ||
+              !hasEnded ||
               BigNumber(idoInfo.totalInvestedETH).gte(
                 BigNumber(idoInfo.softCap)
               )
             }
             onClick={(e) => {
               e.preventDefault();
-              withdrawToken();
+              withdrawUnsoldToken();
             }}
           >
             WITHDRAW UNSOLD TOKEN

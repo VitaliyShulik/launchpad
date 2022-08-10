@@ -17,8 +17,13 @@ export const PoolContextProvider = ({ children }) => {
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       allPoolAddress.map(async (address, index) => {
-        await utils.loadPoolData(address, contract.web3, account).then((e) => {
-          setAllPools((p) => ({ ...p, ...{ [address]: e } }));
+        await utils.loadPoolData(address, contract.web3, account).then((IDOPoolData) => {
+          setAllPools((p) => ({ ...p, ...{ [address]: IDOPoolData } }));
+          const { owner, userData, idoAddress } = IDOPoolData;
+          if (
+            owner?.toLowerCase() === account?.toLowerCase()
+            || (userData?.totalInvestedETH && userData?.totalInvestedETH !== "0")
+          ) setUserPoolAddresses((prevUserPoolAddresses) => [ ...prevUserPoolAddresses, idoAddress ])
         });
       });
     }, 3000);

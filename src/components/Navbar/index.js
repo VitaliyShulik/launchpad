@@ -10,7 +10,11 @@ import * as s from "../../styles/global";
 const Navigation = () => {
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
-  const data = useSelector((state) => state.data);
+  const {
+    ETHamount,
+    EBTCamount,
+    EBTCSymbol,
+  } = useSelector((state) => state.data);
 
   return (
     <Navbar collapseOnSelect expand="lg" variant="dark" style={{ margin: 15 }}>
@@ -57,11 +61,11 @@ const Navigation = () => {
           </Nav>
           <Nav>
             <Nav.Link>{process.env.REACT_APP_networkID}</Nav.Link>
-            {data.ETHamount >= 0 ? (
+            {ETHamount >= 0 ? (
               <NavDropdown
                 title={
-                  "$ETH " +
-                  BigNumber(data.ETHamount)
+                  `$${process.env.REACT_APP_CURRENCY || 'ETH'} ` +
+                  BigNumber(ETHamount)
                     .dividedBy(10 ** 18)
                     .toFormat(2)
                 }
@@ -71,8 +75,8 @@ const Navigation = () => {
                   href="https://jarupak-sri.gitbook.io/cfont-documents/"
                   target="_blank"
                 >
-                  {"$EBTC " +
-                    BigNumber(data.EBTCamount)
+                  {`$${EBTCSymbol} ` +
+                    BigNumber(EBTCamount)
                       .dividedBy(10 ** 18)
                       .toFormat(0)}
                 </Nav.Link>

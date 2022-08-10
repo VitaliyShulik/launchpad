@@ -17,7 +17,7 @@ const PoolRenderer = (props) => {
   const card = useRef(null);
 
   const isStarted = parseInt(idoInfo.start) < (parseInt(Date.now() / 1000));
-  const isEnded = parseInt(idoInfo.end) < (parseInt(Date.now() / 1000));
+  const hasEnded = parseInt(idoInfo.end) < (parseInt(Date.now() / 1000));
 
   useEffect(async () => {
     setImage(idoInfo.metadata.image);
@@ -68,7 +68,7 @@ const PoolRenderer = (props) => {
         </s.UpperCard>
         <s.SpacerSmall />
         <s.Container fd="row" jc="flex-start">
-          {isEnded ? (
+          {hasEnded ? (
             <Badge bg="secondary">Ended</Badge>
           ) : isStarted ? (
             <Badge bg="success">Started</Badge>
@@ -103,7 +103,7 @@ const PoolRenderer = (props) => {
         </s.Container>
         <s.SpacerSmall />
         {
-          !isEnded && (
+          !hasEnded && (
             <>
               <s.TextID>
                 {isStarted

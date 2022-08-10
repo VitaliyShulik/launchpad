@@ -3,9 +3,9 @@ import * as s from "../../styles/global";
 const PoolCountdown = ({ start, end }) => {
   const dateNow = (parseInt(Date.now() / 1000));
   const isStarted = parseInt(start) < dateNow;
-  const isEnded = parseInt(end) < dateNow;
+  const hasEnded = parseInt(end) < dateNow;
 
-  if (isEnded) {
+  if (hasEnded) {
     return null;
   }
 

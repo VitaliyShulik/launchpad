@@ -2,6 +2,7 @@ const initialState = {
   loading: false,
   ETHamount: -1,
   EBTCamount: -1,
+  EBTCSymbol: '',
   EBTCApproveToFactory: -1,
   allPools: -1,
   error: false,
@@ -21,6 +22,7 @@ const dataReducer = (state = initialState, action) => {
         loading: false,
         ETHamount: action.payload.ETHamount,
         EBTCamount: action.payload.EBTCamount,
+        EBTCSymbol: action.payload.EBTCSymbol,
         EBTCApproveToFactory: action.payload.EBTCApproveToFactory,
         allPools: action.payload.allPools,
       };

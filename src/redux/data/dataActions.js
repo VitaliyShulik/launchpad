@@ -31,6 +31,10 @@ export const fetchData = (account) => {
         .getState()
         .blockchain.EBTC.methods.balanceOf(account)
         .call();
+      let EBTCSymbol = await store
+        .getState()
+        .blockchain.EBTC.methods.symbol()
+        .call();
       let EBTCApproveToFactory = await store
         .getState()
         .blockchain.EBTC.methods.allowance(account, idoFactoryAddress)
@@ -41,8 +45,9 @@ export const fetchData = (account) => {
       dispatch(
         fetchDataSuccess({
           ETHamount: ethAmount,
-          EBTCamount: EBTCamount,
-          EBTCApproveToFactory: EBTCApproveToFactory,
+          EBTCamount,
+          EBTCSymbol,
+          EBTCApproveToFactory,
         })
       );
     } catch (err) {

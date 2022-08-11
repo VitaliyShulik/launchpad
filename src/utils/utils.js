@@ -110,7 +110,12 @@ export const loadPoolData = async (idoAddress, web3, account) => {
     let tokenDecimals = await token.methods.decimals().call();
     let totalSupply = await token.methods.totalSupply().call();
     let capacity = await idoPool.methods.capacity().call();
-    let unsold = await idoPool.methods.getNotSoldToken().call();
+
+    // TODO: make a check for withdraw tokens from the contract if the Soft Cap is not collected
+    let unsold = 0;
+    try { unsold = await idoPool.methods.getNotSoldToken().call(); }
+    catch (e) { console.log(e); }
+
     let time = await idoPool.methods.time().call();
     let uniswap = await idoPool.methods.uniswap().call();
     let lockInfo = await idoPool.methods.lockInfo().call();
@@ -165,6 +170,7 @@ export const loadPoolData = async (idoAddress, web3, account) => {
     return result;
   } catch (e) {
     console.log(e);
+    throw e;
   }
 };
 

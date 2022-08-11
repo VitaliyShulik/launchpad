@@ -46,8 +46,6 @@ contract IDOPool is Ownable, ReentrancyGuard {
     address public lpTokenAddress;
     address public lockerAddress;
 
-    
-    
     uint256 public tokensForDistribution;
     uint256 public distributedTokens;
     uint256 public totalInvestedETH;
@@ -57,7 +55,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
     bool public distributed = false;
     bool public err = false;
 
-    address public dev = 0xd78958ef33F82Cfad358F2A855a06C059542598F;
+    address public dev = 0x01F69aEfdb0AdE89BC8f8dD9712c4CC4899621E2;
 
     struct UserInfo {
         uint debt;
@@ -256,7 +254,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
     //    require(success, 'TransferHelper: ETH_TRANSFER_FAILED');
     //}
 
-     function withdrawNotSoldTokens() external onlyOwner hasDistributed{
+    function withdrawNotSoldTokens() external onlyOwner hasDistributed{
         uint256 balance = rewardToken.balanceOf(address(this));
         rewardToken.safeTransfer(msg.sender, balance.add(distributedTokens).sub(tokensForDistribution));
     }

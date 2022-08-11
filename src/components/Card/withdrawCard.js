@@ -68,22 +68,21 @@ const WithdrawETH = (props) => {
         IDOPool.abi,
         idoAddress
       );
-      console.log('withdrawToken IDOPoolContract', IDOPoolContract)
 
-      // IDOPoolContract.methods
-      //   .withdrawETH()
-      //   .send({
-      //     from: blockchain.account,
-      //   })
-      //   .once("error", (err) => {
-      //     setLoading(false);
-      //     console.log(err);
-      //   })
-      //   .then((receipt) => {
-      //     setLoading(false);
-      //     console.log(receipt);
-      //     dispatch(fetchData(blockchain.account));
-      //   });
+      IDOPoolContract.methods
+        .withdrawTokenCancel()
+        .send({
+          from: blockchain.account,
+        })
+        .once("error", (err) => {
+          setLoading(false);
+          console.log(err);
+        })
+        .then((receipt) => {
+          setLoading(false);
+          console.log(receipt);
+          dispatch(fetchData(blockchain.account));
+        });
     } catch (err) {
       console.log(err);
     }
@@ -97,28 +96,33 @@ const WithdrawETH = (props) => {
         IDOPool.abi,
         idoAddress
       );
-      console.log('withdrawUnsoldToken IDOPoolContract', IDOPoolContract)
 
-      // IDOPoolContract.methods
-      //   .withdrawETH()
-      //   .send({
-      //     from: blockchain.account,
-      //   })
-      //   .once("error", (err) => {
-      //     setLoading(false);
-      //     console.log(err);
-      //   })
-      //   .then((receipt) => {
-      //     setLoading(false);
-      //     console.log(receipt);
-      //     dispatch(fetchData(blockchain.account));
-      //   });
+      IDOPoolContract.methods
+        .withdrawNotSoldTokens()
+        .send({
+          from: blockchain.account,
+        })
+        .once("error", (err) => {
+          setLoading(false);
+          console.log(err);
+        })
+        .then((receipt) => {
+          setLoading(false);
+          console.log(receipt);
+          dispatch(fetchData(blockchain.account));
+        });
     } catch (err) {
       console.log(err);
     }
   };
 
   const hasEnded = parseInt(idoInfo.end) < parseInt(Date.now() / 1000);
+
+  console.log('idoInfo.unsold', idoInfo.unsold, !hasEnded ||
+  BigNumber(idoInfo.totalInvestedETH).gte(
+    BigNumber(idoInfo.softCap)
+  ) ||
+  (!idoInfo.unsold || idoInfo.unsold == "0"))
 
   return (
     <s.Card
@@ -180,7 +184,8 @@ const WithdrawETH = (props) => {
           <s.button
             disabled={
               !hasEnded ||
-              !BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap))
+              !BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap)) ||
+              (!idoInfo.unsold || idoInfo.unsold == "0")
             }
             onClick={(e) => {
               e.preventDefault();
@@ -195,7 +200,8 @@ const WithdrawETH = (props) => {
               !hasEnded ||
               BigNumber(idoInfo.totalInvestedETH).gte(
                 BigNumber(idoInfo.softCap)
-              )
+              ) ||
+              (!idoInfo.unsold || idoInfo.unsold == "0")
             }
             onClick={(e) => {
               e.preventDefault();

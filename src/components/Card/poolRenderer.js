@@ -4,6 +4,7 @@ import { Badge } from "react-bootstrap";
 import Countdown from "react-countdown";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
+import { getValidImageUrl } from "../../utils/utils";
 import * as s from "../../styles/global";
 import ProgressBar from "../Modal/ProgressBar";
 
@@ -20,7 +21,7 @@ const PoolRenderer = (props) => {
   const hasEnded = parseInt(idoInfo.end) < (parseInt(Date.now() / 1000));
 
   useEffect(async () => {
-    setImage(idoInfo.metadata.image);
+    setImage(getValidImageUrl(idoInfo.metadata.image));
   }, [idoInfo]);
 
   // if (!utils.isValidPool(idoInfo) || !idoInfo) {

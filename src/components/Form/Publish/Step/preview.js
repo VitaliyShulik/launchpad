@@ -10,15 +10,24 @@ import * as s from "../../../../styles/global";
 import { chainRouter } from "../../../../utils/chainInfo";
 import SocialMediaModal from "../../../Modal/socialmediaModal";
 import ReadMore from "../../readMore";
-
-const key = process.env.REACT_APP_PINATA_KEY;
-const secret = process.env.REACT_APP_PINATA_SECRET;
 const axios = require("axios");
+
+const projectId = process.env.REACT_APP_INFURA_IPFS_KEY;
+const projectSecret = process.env.REACT_APP_INFURA_IPFS_SECRET;
+const auth = "Basic " + Buffer.from(projectId + ":" + projectSecret).toString('base64');
+console.log('auth', auth)
+
 const ipfs = create({
   host: "ipfs.infura.io",
   port: 5001,
   protocol: "https",
+  headers: {
+      authorization: auth,
+  },
 });
+
+const key = process.env.REACT_APP_PINATA_KEY;
+const secret = process.env.REACT_APP_PINATA_SECRET;
 
 export default function Preview() {
   const context = useStoreContext();

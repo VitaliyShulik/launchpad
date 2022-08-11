@@ -2,6 +2,7 @@ import BigNumber from "bignumber.js";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { usePoolContext } from "../../context/poolContext";
+import { getValidImageUrl } from "../../utils/utils";
 import * as s from "../../styles/global";
 import ReadMore from "../Form/readMore";
 import SocialMediaModal from "../Modal/socialmediaModal";
@@ -15,7 +16,7 @@ const TokenInfo = (props) => {
   const idoInfo = usePoolContext().allPools[idoAddress];
 
   useEffect(() => {
-    setImage(idoInfo.metadata.image);
+    setImage(getValidImageUrl(idoInfo.metadata.image));
   }, [idoInfo]);
 
   if (!idoInfo) {

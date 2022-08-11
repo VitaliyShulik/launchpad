@@ -237,3 +237,8 @@ export function getTokenURI(uri) {
       console.error(error);
     });
 }
+
+export function getValidImageUrl(imageUrl) {
+  const infuraDedicatedGateway = process.env.REACT_APP_INFURA_DEDICATED_GATEWAY;
+  return infuraDedicatedGateway ? imageUrl.replace('https://ipfs.infura.io', infuraDedicatedGateway) : imageUrl;
+}

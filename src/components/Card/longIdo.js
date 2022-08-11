@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { usePoolContext } from "../../context/poolContext";
+import { getValidImageUrl } from "../../utils/utils";
 import * as s from "../../styles/global";
 import ProgressBar from "../Modal/ProgressBar";
 import PoolCountdown from "../Utils/poolCountdown";
@@ -18,7 +19,7 @@ const LongIdo = (props) => {
 
   useEffect(async () => {
     if (idoInfo) {
-      setImage(idoInfo.metadata.image);
+      setImage(getValidImageUrl(idoInfo.metadata.image));
     }
   }, [idoInfo.metadata.image]);
 

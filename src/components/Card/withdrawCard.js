@@ -159,7 +159,8 @@ const WithdrawETH = (props) => {
         <s.button
           disabled={
             !hasEnded ||
-            BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap))
+            BigNumber(idoInfo.totalInvestedETH).lt(BigNumber(idoInfo.softCap)) ||
+            idoInfo.balance == 0
           }
           onClick={(e) => {
             e.preventDefault();
@@ -198,9 +199,7 @@ const WithdrawETH = (props) => {
           <s.button
             disabled={
               !hasEnded ||
-              BigNumber(idoInfo.totalInvestedETH).gte(
-                BigNumber(idoInfo.softCap)
-              ) ||
+              idoInfo.balance > 0 ||
               (!idoInfo.unsold || idoInfo.unsold == "0")
             }
             onClick={(e) => {

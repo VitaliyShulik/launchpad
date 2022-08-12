@@ -30,7 +30,7 @@ const Navigation = () => {
               color: "var(--primary)",
             }}
           >
-            FONTPAD
+            NEXTCUBATOR
           </s.Card>
         </s.TextTitle>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />

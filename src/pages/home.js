@@ -7,7 +7,7 @@ const Home = (props) => {
       <s.Container ai="center">
         <s.SpacerLarge />
         <s.SpacerLarge />
-        <s.TextDescription fs={"89px"}>FONTPAD</s.TextDescription>
+        <s.TextDescription fs={"89px"}>NEXTCUBATOR</s.TextDescription>
         <s.TextDescription style={{ textAlign: "center" }}>
           Decentralize IDO launchpad platform
         </s.TextDescription>

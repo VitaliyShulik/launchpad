@@ -39,7 +39,7 @@ const Account = (props) => {
           <LongIdoList />
         </s.Container>
 
-        <s.Container flex={1}>
+        {/* <s.Container flex={1}>
           <s.Container fd="row" ai="center" jc="space-between">
             <s.TextTitle style={{ flex: 1, whiteSpace: "nowrap", margin: 20 }}>
               My Locker
@@ -54,7 +54,7 @@ const Account = (props) => {
             </s.Container>
           </s.Container>
           <LockerList showZero={showZero} />
-        </s.Container>
+        </s.Container> */}
       </s.Container>
     </s.Container>
   );

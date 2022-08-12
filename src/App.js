@@ -68,8 +68,8 @@ function App() {
             <Route path="/publish" element={<Publish />} />
             <Route path="/lock" element={<LockToken />} />
             <Route path="/account" element={<Account />} />
-            <Route path="/locker" element={<Locker />} />
-            <Route path="/locker/:lockerAddress" element={<LockerInfo />} />
+            {/* <Route path="/locker" element={<Locker />} />
+            <Route path="/locker/:lockerAddress" element={<LockerInfo />} /> */}
           </Routes>
           <s.SpacerLarge />
           <s.SpacerLarge />

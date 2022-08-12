@@ -37,7 +37,7 @@ const Footer = () => {
             >
               {IDOFactory.networks[process.env.REACT_APP_networkID].address}
             </FooterLink>
-            <p>Locker Factory: </p>
+            {/* <p>Locker Factory: </p>
             <FooterLink
               target="_blank"
               href={
@@ -47,7 +47,7 @@ const Footer = () => {
               }
             >
               {LockerFactory.networks[process.env.REACT_APP_networkID].address}
-            </FooterLink>
+            </FooterLink> */}
           </Column>
           <Column fd="row" jc="space-evenly">
             <SocialIcon

@@ -3,12 +3,13 @@ import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import LongIdo from "../Card/longIdo";
+import PoolRenderer from "../Card/poolRenderer";
 
 const LongIdoList = (props) => {
   const [limit, setLimit] = useState(5);
   const [loading, setLoading] = useState(false);
 
-  const { userPoolAddresses } = usePoolContext();
+  const { userPoolAddresses, allPools } = usePoolContext();
 
   const loadmore = (amount) => {
     setLimit((p) => (p < userPoolAddresses.length ? p + amount : p));
@@ -17,7 +18,8 @@ const LongIdoList = (props) => {
   return (
     <s.Container ai="center">
       <s.Container ai="center">
-        <s.Container
+      <s.Container
+          fd="row"
           jc="space-around"
           style={{ flexWrap: "wrap", marginTop: 20 }}
         >
@@ -26,9 +28,10 @@ const LongIdoList = (props) => {
               return null;
             }
             return (
-              <s.Container key={index} style={{ padding: 10 }}>
-                <LongIdo idoAddress={poolAddress} />
-              </s.Container>
+              <PoolRenderer key={index} pool={allPools[poolAddress]}/>
+              // <s.Container key={index} style={{ padding: 10 }}>
+              //   <LongIdo idoAddress={poolAddress} />
+              // </s.Container>
             );
           })}
         </s.Container>

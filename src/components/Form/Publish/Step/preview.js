@@ -15,7 +15,6 @@ const axios = require("axios");
 const projectId = process.env.REACT_APP_INFURA_IPFS_KEY;
 const projectSecret = process.env.REACT_APP_INFURA_IPFS_SECRET;
 const auth = "Basic " + Buffer.from(projectId + ":" + projectSecret).toString('base64');
-console.log('auth', auth)
 
 const ipfs = create({
   host: "ipfs.infura.io",

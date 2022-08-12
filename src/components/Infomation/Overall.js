@@ -3,7 +3,6 @@ import * as s from "../../styles/global";
 import Decimal from "../Decimal";
 
 const Overall = (props) => {
-  console.log(props.market.remainingEthers);
   return (
     <s.Container className="Fontcard" style={{ padding: 30 }}>
       <s.TextTitle>Dashboard</s.TextTitle>

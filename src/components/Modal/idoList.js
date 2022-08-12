@@ -39,7 +39,6 @@ const IDOList = (props) => {
           style={{ flexWrap: "wrap", marginTop: 20 }}
         >
           {poolKeys.map((item, index) => {
-            console.log(allPools[item]);
             if (index >= limit) {
               return null;
             }

@@ -118,12 +118,6 @@ const WithdrawETH = (props) => {
 
   const hasEnded = parseInt(idoInfo.end) < parseInt(Date.now() / 1000);
 
-  console.log('idoInfo.unsold', idoInfo.unsold, !hasEnded ||
-  BigNumber(idoInfo.totalInvestedETH).gte(
-    BigNumber(idoInfo.softCap)
-  ) ||
-  (!idoInfo.unsold || idoInfo.unsold == "0"))
-
   return (
     <s.Card
       style={{

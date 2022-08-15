@@ -37,17 +37,25 @@ const Footer = () => {
             >
               {IDOFactory.networks[process.env.REACT_APP_networkID].address}
             </FooterLink>
-            {/* <p>Locker Factory: </p>
-            <FooterLink
-              target="_blank"
-              href={
-                process.env.REACT_APP_Explorer +
-                "address/" +
-                LockerFactory.networks[process.env.REACT_APP_networkID].address
-              }
-            >
-              {LockerFactory.networks[process.env.REACT_APP_networkID].address}
-            </FooterLink> */}
+            {
+              process.env.REACT_APP_ENABLE_LOCKER === 'true' && (
+                <>
+                  <p>Locker Factory: </p>
+                  <FooterLink
+                    target="_blank"
+                    href={
+                      process.env.REACT_APP_Explorer +
+                      "address/" +
+                      LockerFactory.networks[process.env.REACT_APP_networkID].address
+                    }
+                  >
+                    {LockerFactory.networks[process.env.REACT_APP_networkID].address}
+                  </FooterLink>
+                </>
+              )
+
+            }
+            {/*  */}
           </Column>
           <Column fd="row" jc="space-evenly">
             <SocialIcon

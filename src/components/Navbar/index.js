@@ -42,9 +42,12 @@ const Navigation = () => {
             <LinkContainer to="/launchpad">
               <Nav.Link>Launchpad</Nav.Link>
             </LinkContainer>
-            {/* <LinkContainer to="/locker">
-              <Nav.Link>Locker</Nav.Link>
-            </LinkContainer> */}
+            {
+              process.env.REACT_APP_ENABLE_LOCKER === 'true' &&
+              <LinkContainer to="/locker">
+                <Nav.Link>Locker</Nav.Link>
+              </LinkContainer> 
+            }
             <LinkContainer to="/account">
               <Nav.Link>Account</Nav.Link>
             </LinkContainer>

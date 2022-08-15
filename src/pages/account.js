@@ -39,22 +39,25 @@ const Account = (props) => {
           <LongIdoList />
         </s.Container>
 
-        {/* <s.Container flex={1}>
-          <s.Container fd="row" ai="center" jc="space-between">
-            <s.TextTitle style={{ flex: 1, whiteSpace: "nowrap", margin: 20 }}>
-              My Locker
-            </s.TextTitle>
-            <CreateLocker />
-          </s.Container>
-          <s.Container fd="row" flex={1}>
-            <s.Container flex={4}></s.Container>
-            <s.Container flex={2} ai="center" fd="row" jc="center">
-              <s.TextDescription>show zero?</s.TextDescription>
-              <Checkbox value={showZero} onChange={handleShowZero} />
+        {
+          process.env.REACT_APP_ENABLE_LOCKER === 'true' &&
+          <s.Container flex={1}>
+            <s.Container fd="row" ai="center" jc="space-between">
+              <s.TextTitle style={{ flex: 1, whiteSpace: "nowrap", margin: 20 }}>
+                My Locker
+              </s.TextTitle>
+              <CreateLocker />
             </s.Container>
+            <s.Container fd="row" flex={1}>
+              <s.Container flex={4}></s.Container>
+              <s.Container flex={2} ai="center" fd="row" jc="center">
+                <s.TextDescription>show zero?</s.TextDescription>
+                <Checkbox value={showZero} onChange={handleShowZero} />
+              </s.Container>
+            </s.Container>
+            <LockerList showZero={showZero} />
           </s.Container>
-          <LockerList showZero={showZero} />
-        </s.Container> */}
+        }
       </s.Container>
     </s.Container>
   );

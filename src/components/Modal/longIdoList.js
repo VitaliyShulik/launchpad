@@ -18,23 +18,37 @@ const LongIdoList = (props) => {
   return (
     <s.Container ai="center">
       <s.Container ai="center">
-      <s.Container
+
+      {
+        process.env.REACT_APP_ENABLE_LOCKER === 'true' ?
+        <s.Container
+          jc="space-around"
+          style={{ flexWrap: "wrap", marginTop: 20 }}
+        >
+          {userPoolAddresses.map((poolAddress, index) => {
+              if (index >= limit) {
+                return null;
+              }
+              return (
+                <s.Container key={index} style={{ padding: 10 }}>
+                  <LongIdo idoAddress={poolAddress} />
+                </s.Container>
+              );
+            })}
+        </s.Container> :
+        <s.Container
           fd="row"
           jc="space-around"
           style={{ flexWrap: "wrap", marginTop: 20 }}
         >
           {userPoolAddresses.map((poolAddress, index) => {
-            if (index >= limit) {
-              return null;
-            }
-            return (
-              <PoolRenderer key={index} pool={allPools[poolAddress]}/>
-              // <s.Container key={index} style={{ padding: 10 }}>
-              //   <LongIdo idoAddress={poolAddress} />
-              // </s.Container>
-            );
-          })}
+              if (index >= limit) {
+                return null;
+              }
+              return <PoolRenderer key={index} pool={allPools[poolAddress]}/>;
+            })}
         </s.Container>
+      }
       </s.Container>
       <s.SpacerSmall />
       {limit >= userPoolAddresses.length ? null : (

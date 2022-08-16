@@ -54,7 +54,7 @@ const LongLocker = (props) => {
             <s.TextID style={{ color: "var(--primary)" }}>UNLOCKED</s.TextID>
           ) : (
             <s.TextID>
-              <Countdown date={BigNumber(lockerInfo.time)}></Countdown>
+              <Countdown date={parseInt(lockerInfo.time) * 1000}></Countdown>
             </s.TextID>
           )}
         </s.Container>

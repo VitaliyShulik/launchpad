@@ -12,15 +12,14 @@ const LockerList = (props) => {
 
   const { tokenAddress, owner, showZero } = props;
 
-  const allPools = usePoolContext().allLocker;
-  const lockerKeys = Object.keys(allPools);
+  const { allLocker, userLockersAddresses } = usePoolContext();
 
-  if (!lockerKeys.length) {
+  if (!userLockersAddresses.length) {
     return null;
   }
 
   const loadmore = (amount) => {
-    setLimit((p) => (p < allPools.length ? p + amount : p));
+    setLimit((p) => (p < allLocker.length ? p + amount : p));
   };
 
   return (
@@ -30,23 +29,23 @@ const LockerList = (props) => {
           jc="space-around"
           style={{ flexWrap: "wrap", marginTop: 20 }}
         >
-          {lockerKeys.map((item, index) => {
+          {userLockersAddresses.map((lockerAddress, index) => {
             if (index >= limit || !ListItemAvatar) {
               return null;
             }
             if (!showZero) {
-              if (BigNumber(allPools[item].balance).lte(0)) {
+              if (BigNumber(allLocker[lockerAddress].balance).lte(0)) {
                 return null;
               }
             }
             if (owner && owner !== "") {
-              if (allPools[item].owner.toLowerCase() !== owner.toLowerCase()) {
+              if (allLocker[lockerAddress].owner.toLowerCase() !== owner.toLowerCase()) {
                 return null;
               }
             }
             if (tokenAddress && tokenAddress !== "") {
               if (
-                allPools[item].token.tokenAddress.toLowerCase() !==
+                allLocker[lockerAddress].token.tokenAddress.toLowerCase() !==
                 tokenAddress.toLowerCase()
               ) {
                 return null;
@@ -54,14 +53,14 @@ const LockerList = (props) => {
             }
             return (
               <s.Container key={index} style={{ padding: 10 }}>
-                <LongLocker lockerAddress={item} />
+                <LongLocker lockerAddress={lockerAddress} />
               </s.Container>
             );
           })}
         </s.Container>
       </s.Container>
       <s.SpacerSmall />
-      {limit >= lockerKeys.length ? null : (
+      {limit >= userLockersAddresses.length ? null : (
         <s.button
           onClick={async (e) => {
             e.preventDefault();

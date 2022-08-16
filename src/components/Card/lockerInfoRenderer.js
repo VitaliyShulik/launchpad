@@ -111,7 +111,8 @@ const LockerInfoRenderer = (props) => {
             <s.button
               disabled={
                 BigNumber(lockerInfo.balance).lte(0) ||
-                !BigNumber(lockerInfo.time).lt(Date.now() / 1000)
+                !BigNumber(lockerInfo.time).lt(Date.now() / 1000) ||
+                blockchain.account.toLowerCase() !== lockerInfo.withdrawer.toLowerCase()
               }
               onClick={(e) => {
                 e.preventDefault();

@@ -10,6 +10,7 @@ export const PoolContextProvider = ({ children }) => {
   const [allPools, setAllPools] = useState(new Object());
   const [allLocker, setAllLocker] = useState(new Object());
   const [userPoolAddresses, setUserPoolAddresses] = useState([]);
+  const [userLockersAddresses, setUserLockersAddresses] = useState([]);
   const dispatch = useDispatch();
   const contract = useSelector((state) => state.contract);
   const { account } = useSelector((state) => state.blockchain);
@@ -65,8 +66,6 @@ export const PoolContextProvider = ({ children }) => {
   }, [allLockerAddress]);
 
   useEffect(async () => {
-    let poolKeys = new Array();
-
     if (!contract.IDOFactory) {
       return null;
     }
@@ -76,8 +75,6 @@ export const PoolContextProvider = ({ children }) => {
         fromBlock: 0,
       },
       async function (error, event) {
-        console.log('error', error)
-        console.log('event', event)
         if (event) {
           setAllPoolAddress((p) => [...p, event.returnValues.idoPool]);
         }
@@ -86,8 +83,6 @@ export const PoolContextProvider = ({ children }) => {
   }, [dispatch, contract]);
 
   useEffect(async () => {
-    let lockerKeys = new Array();
-
     if (!contract.LockerFactory) {
       return null;
     }
@@ -104,12 +99,29 @@ export const PoolContextProvider = ({ children }) => {
     );
   }, [dispatch, contract]);
 
+  useEffect(() => {
+    setUserLockersAddresses([])
+    const delayDebounceFn = setTimeout(() => {
+      Object.values(allLocker).map(async (lockerData, index) => {
+        const { withdrawer, owner, lockerAddress } = lockerData;
+        if (
+          owner?.toLowerCase() === account?.toLowerCase()
+          || withdrawer?.toLowerCase() === account?.toLowerCase()
+        ) setUserLockersAddresses((prevUserLockersAddresses) => [ ...prevUserLockersAddresses, lockerAddress ])
+
+      });
+    }, 3000);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [account, allLocker])
+
   const value = {
     allPools,
     allPoolAddress,
     userPoolAddresses,
     allLocker,
     allLockerAddress,
+    userLockersAddresses,
   };
   return <PoolContext.Provider value={value}>{children}</PoolContext.Provider>;
 };

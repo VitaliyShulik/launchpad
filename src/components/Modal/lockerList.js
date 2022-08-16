@@ -1,6 +1,6 @@
 import { ListItemAvatar } from "@mui/material";
 import BigNumber from "bignumber.js";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
@@ -9,17 +9,23 @@ import LongLocker from "../Card/longLocker";
 const LockerList = (props) => {
   const [limit, setLimit] = useState(5);
   const [loading, setLoading] = useState(false);
+  const [lockersAddresses, setLockersAddresses] = useState([])
 
-  const { tokenAddress, owner, showZero } = props;
+  const { tokenAddress, owner, showZero, showUserLockers } = props;
 
-  const { allLocker, userLockersAddresses } = usePoolContext();
+  const { allLocker, allLockerAddress, userLockersAddresses } = usePoolContext();
 
-  if (!userLockersAddresses.length) {
+
+  useEffect(() => {
+    setLockersAddresses(showUserLockers ? userLockersAddresses : allLockerAddress);
+  }, [showUserLockers, userLockersAddresses, allLockerAddress]);
+
+  if (!lockersAddresses.length) {
     return null;
   }
 
   const loadmore = (amount) => {
-    setLimit((p) => (p < allLocker.length ? p + amount : p));
+    setLimit((p) => (p < lockersAddresses.length ? p + amount : p));
   };
 
   return (
@@ -29,23 +35,23 @@ const LockerList = (props) => {
           jc="space-around"
           style={{ flexWrap: "wrap", marginTop: 20 }}
         >
-          {userLockersAddresses.map((lockerAddress, index) => {
+          {lockersAddresses.map((lockerAddress, index) => {
             if (index >= limit || !ListItemAvatar) {
               return null;
             }
             if (!showZero) {
-              if (BigNumber(allLocker[lockerAddress].balance).lte(0)) {
+              if (BigNumber(allLocker[lockerAddress]?.balance).lte(0)) {
                 return null;
               }
             }
             if (owner && owner !== "") {
-              if (allLocker[lockerAddress].owner.toLowerCase() !== owner.toLowerCase()) {
+              if (allLocker[lockerAddress]?.owner.toLowerCase() !== owner.toLowerCase()) {
                 return null;
               }
             }
             if (tokenAddress && tokenAddress !== "") {
               if (
-                allLocker[lockerAddress].token.tokenAddress.toLowerCase() !==
+                allLocker[lockerAddress]?.token.tokenAddress.toLowerCase() !==
                 tokenAddress.toLowerCase()
               ) {
                 return null;
@@ -60,7 +66,7 @@ const LockerList = (props) => {
         </s.Container>
       </s.Container>
       <s.SpacerSmall />
-      {limit >= userLockersAddresses.length ? null : (
+      {limit >= lockersAddresses.length ? null : (
         <s.button
           onClick={async (e) => {
             e.preventDefault();

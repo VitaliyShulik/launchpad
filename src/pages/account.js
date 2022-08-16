@@ -55,7 +55,7 @@ const Account = (props) => {
                 <Checkbox value={showZero} onChange={handleShowZero} />
               </s.Container>
             </s.Container>
-            <LockerList showZero={showZero} />
+            <LockerList showZero={showZero} showUserLockers />
           </s.Container>
         }
       </s.Container>

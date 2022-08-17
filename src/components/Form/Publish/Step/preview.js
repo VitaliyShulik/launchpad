@@ -112,28 +112,39 @@ export default function Preview() {
     }
     const tokenURI = pinataResponse.pinataUrl;
 
+    const rewardToken = context.address[0];
+    const tokenRate = blockchain.web3.utils.toWei(context.tokenRate[0]);
+    const listingRate = blockchain.web3.utils.toWei("0");
+    const capacity = [
+      blockchain.web3.utils.toWei(context.softCap[0]),
+      blockchain.web3.utils.toWei(context.hardCap[0]),
+      blockchain.web3.utils.toWei(context.minETH[0]),
+      blockchain.web3.utils.toWei(context.maxETH[0]),
+    ];
+    const time = [
+      BigNumber(context.start[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
+      BigNumber(context.end[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
+      BigNumber(context.unlock[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
+    ];
+    const uniswap = [
+      chainRouter[process.env.REACT_APP_networkID][0].ROUTER,
+      chainRouter[process.env.REACT_APP_networkID][0].FACTORY,
+      chainRouter[process.env.REACT_APP_networkID][0].WETH,
+    ];
+    const lockInfo = [
+      parseInt("60"),
+      blockchain.LockerFactory._address
+    ];
+
     blockchain.IDOFactory.methods
       .createIDO(
-        context.address[0],
-        blockchain.web3.utils.toWei(context.tokenRate[0]),
-        blockchain.web3.utils.toWei("0"),
-        [
-          blockchain.web3.utils.toWei(context.softCap[0]),
-          blockchain.web3.utils.toWei(context.hardCap[0]),
-          blockchain.web3.utils.toWei(context.minETH[0]),
-          blockchain.web3.utils.toWei(context.maxETH[0]),
-        ],
-        [
-          BigNumber(context.start[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
-          BigNumber(context.end[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
-          BigNumber(context.unlock[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
-        ],
-        [
-          chainRouter[process.env.REACT_APP_networkID][0].ROUTER,
-          chainRouter[process.env.REACT_APP_networkID][0].FACTORY,
-          chainRouter[process.env.REACT_APP_networkID][0].WETH,
-        ],
-        [parseInt("60"), blockchain.LockerFactory._address],
+        rewardToken,
+        tokenRate,
+        listingRate,
+        capacity,
+        time,
+        uniswap,
+        lockInfo,
         tokenURI
       )
       .send({

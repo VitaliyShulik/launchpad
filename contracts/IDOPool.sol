@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.12;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -70,7 +70,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         uint256 ethAmount,
         uint256 tokenAmount
     );
-    
+
     event TokensWithdrawn(address indexed holder, uint256 amount);
 
     constructor(
@@ -129,7 +129,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         require(msg.value <= capacity.maxEthPayment, "More then max amount");
         require(block.timestamp >= time.startTimestamp, "Not started");
         require(block.timestamp < time.finishTimestamp, "Ended");
-        
+
         uint256 tokenAmount = getTokenAmount(msg.value);
         require(totalInvestedETH.add(msg.value) <= capacity.hardCap, "Overfilled");
 
@@ -141,7 +141,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         user.totalInvestedETH = user.totalInvestedETH.add(msg.value);
         user.total = user.total.add(tokenAmount);
         user.debt = user.debt.add(tokenAmount);
-        
+
         emit TokensDebt(msg.sender, msg.value, tokenAmount);
     }
 
@@ -181,7 +181,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         UserInfo storage user = userInfo[_receiver];
         uint256 _amount = user.debt;
         if (_amount > 0) {
-            user.debt = 0;            
+            user.debt = 0;
             distributedTokens = distributedTokens.add(_amount);
             rewardToken.safeTransfer(_receiver, _amount);
             emit TokensWithdrawn(_receiver,_amount);
@@ -192,9 +192,9 @@ contract IDOPool is Ownable, ReentrancyGuard {
         UserInfo storage user = userInfo[msg.sender];
         uint256 _amount = user.totalInvestedETH;
         if (_amount > 0) {
-            user.debt = 0; 
-            user.totalInvestedETH = 0; 
-            user.total = 0; 
+            user.debt = 0;
+            user.totalInvestedETH = 0;
+            user.total = 0;
 
             (bool success, ) = msg.sender.call{value: _amount}("");
             require(success, "Transfer failed.");
@@ -211,28 +211,23 @@ contract IDOPool is Ownable, ReentrancyGuard {
     function withdrawETH() external payable onlyOwner hasReachSoftCap hasEnded hasNotDistributed{
         // This forwards all available gas. Be sure to check the return value!
         uint256 balance = address(this).balance;
-        // uint256 ethForLP = (balance * lockInfo.lpPercentage)/100;
-        // uint256 ethWithdraw = balance - ethForLP;
 
-        // uint256 tokenAmount = getListingAmount(ethForLP);
+        if ( lockInfo.lpPercentage > 0 && listingRate > 0 && block.timestamp > time.unlockTimestamp ) {
+            uint256 ethForLP = (balance * lockInfo.lpPercentage)/100;
+            uint256 ethWithdraw = balance - ethForLP;
 
-        // IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(uniswap.router);
-        // // add the liquidity
-        // rewardToken.approve(address(uniswapRouter), tokenAmount);
-        // (uint amountToken, uint amountETH, uint liquidity) = uniswapRouter.addLiquidityETH{value: ethForLP}(
-        //     address(rewardToken),
-        //     tokenAmount,
-        //     0, // slippage is unavoidable
-        //     0, // slippage is unavoidable
-        //     address(this),
-        //     block.timestamp + 360
-        // );
+            uint256 tokenAmount = getListingAmount(ethForLP);
 
-        // lpTokenAddress = IUniswapV2Factory(uniswap.factory).getPair(address(rewardToken), uniswap.weth);
-        // ERC20(lpTokenAddress).approve(lockInfo.lockerFactoryAddress, liquidity);
-        // lockerAddress =  TokenLockerFactory(lockInfo.lockerFactoryAddress).createLocker(ERC20(lpTokenAddress), "LP token lock", liquidity, msg.sender, time.unlockTimestamp);
-        (bool success, ) = msg.sender.call{value: balance}("");
-        require(success, "Transfer failed.");
+            addLiquidityETHAndLockLPTokens(tokenAmount, ethForLP);
+
+            // Withdraw rest ETH
+            (bool success, ) = msg.sender.call{value: ethWithdraw}("");
+            require(success, "Transfer failed.");
+        } else {
+            (bool success, ) = msg.sender.call{value: balance}("");
+            require(success, "Transfer failed.");
+        }
+
         distributed = true;
     }
 
@@ -306,13 +301,13 @@ contract IDOPool is Ownable, ReentrancyGuard {
         _;
     }
 
-    function addLiquidityETH(
+    function addLiquidityETHAndLockLPTokens(
         uint256 tokenAmount,
         uint256 ethAmount
     ) internal {
 
+        // Add Liquidity ETH
         IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(uniswap.router);
-        // add the liquidity
         rewardToken.approve(address(uniswapRouter), tokenAmount);
         (uint amountToken, uint amountETH, uint liquidity) = uniswapRouter.addLiquidityETH{value: ethAmount}(
             address(rewardToken),
@@ -323,10 +318,17 @@ contract IDOPool is Ownable, ReentrancyGuard {
             block.timestamp + 360
         );
 
+        // Lock LP Tokens
         lpTokenAddress = IUniswapV2Factory(uniswap.factory).getPair(address(rewardToken), uniswap.weth);
 
-        lockerAddress =  TokenLockerFactory(lockInfo.lockerFactoryAddress).createLocker(ERC20(lpTokenAddress), "LP token lock", liquidity, msg.sender, time.unlockTimestamp);
-      
+        ERC20 lpToken = ERC20(lpTokenAddress);
+        lpToken.approve(lockInfo.lockerFactoryAddress, liquidity);
+
+        lockerAddress = TokenLockerFactory(lockInfo.lockerFactoryAddress).createLocker(
+            lpToken,
+            string.concat(lpToken.symbol(), " tokens locker"),
+            liquidity, msg.sender, time.unlockTimestamp
+        );
     }
 
 }

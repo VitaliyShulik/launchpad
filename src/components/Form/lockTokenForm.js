@@ -313,7 +313,7 @@ const LockTokenForm = (props) => {
               e.preventDefault();
               approveToken(
                 address,
-                BigNumber(tokenDistributed).times(10 ** decimals)
+                BigNumber(tokenDistributed)
               );
             }}
           >

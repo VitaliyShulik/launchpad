@@ -12,7 +12,7 @@ contract TokenLockerFactory is Ownable {
     using SafeERC20 for ERC20;
     
     uint256 public lockerCount = 0;
-    uint256 public fee = 1 ether;
+    uint256 public fee = 0;
     
     struct lockerInfo {
         uint256 lockerId;
@@ -39,7 +39,7 @@ contract TokenLockerFactory is Ownable {
         uint256 _withdrawTime
         ) payable public returns(address){
             
-        require(msg.value == fee);
+        require(msg.value == fee, 'Fee amount is required');
 
         TokenLocker tokenLocker = new TokenLocker(_tokenAddress,_name, _withdrawer, _withdrawTime);
         tokenLocker.transferOwnership(msg.sender);

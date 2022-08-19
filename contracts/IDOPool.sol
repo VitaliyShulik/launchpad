@@ -212,7 +212,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         // This forwards all available gas. Be sure to check the return value!
         uint256 balance = address(this).balance;
 
-        if ( lockInfo.lpPercentage > 0 && listingRate > 0 && block.timestamp > time.unlockTimestamp ) {
+        if ( lockInfo.lpPercentage > 0 && listingRate > 0 && time.unlockTimestamp > block.timestamp ) {
             uint256 ethForLP = (balance * lockInfo.lpPercentage)/100;
             uint256 ethWithdraw = balance - ethForLP;
 

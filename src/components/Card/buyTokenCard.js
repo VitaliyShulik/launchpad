@@ -168,7 +168,7 @@ const BuyTokenCard = (props) => {
         <s.Container flex={1}>
           <s.button
             disabled={
-              Date.now() / 1000 < BigNumber(idoInfo.claim) ||
+              Date.now() / 1000 < BigNumber(idoInfo.end) ||
               BigNumber(idoInfo.userData.debt).lte(0)
             }
             onClick={(e) => {

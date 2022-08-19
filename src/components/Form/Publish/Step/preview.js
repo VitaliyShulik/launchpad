@@ -44,7 +44,7 @@ export default function Preview() {
   const lp = BigNumber(context.liquidityPercentage[0]);
   const requiredToken = tokenRate
     .times(hardCap)
-    // .plus(hardCap.times(lp).dividedBy(100).times(listingRate))
+    .plus(hardCap.times(lp).dividedBy(100).times(listingRate))
     .times(
       BigNumber(10).pow(
         BigNumber(parseInt(context.tokenInformation[0].tokenDecimals))
@@ -114,7 +114,7 @@ export default function Preview() {
 
     const rewardToken = context.address[0];
     const tokenRate = blockchain.web3.utils.toWei(context.tokenRate[0]);
-    const listingRate = blockchain.web3.utils.toWei("0");
+    const listingRate = blockchain.web3.utils.toWei(context.listingRate[0]);
     const capacity = [
       blockchain.web3.utils.toWei(context.softCap[0]),
       blockchain.web3.utils.toWei(context.hardCap[0]),
@@ -132,7 +132,7 @@ export default function Preview() {
       chainRouter[process.env.REACT_APP_networkID][0].WETH,
     ];
     const lockInfo = [
-      parseInt("60"),
+      parseInt(context.liquidityPercentage[0]),
       blockchain.LockerFactory._address
     ];
 
@@ -290,13 +290,13 @@ export default function Preview() {
               process.env.REACT_APP_CURRENCY}
           </s.TextDescription>
           <s.SpacerSmall />
-          {/* <s.TextID>Liquidity %</s.TextID>
+          <s.TextID>Liquidity %</s.TextID>
           <s.TextDescription>
             {BigNumber(context.liquidityPercentage[0]).toFixed(0) + " %"}
-          </s.TextDescription> */}
+          </s.TextDescription>
         </s.Container>
       </s.Container>
-      {/* <s.TextID>Listing rate</s.TextID>
+      <s.TextID>Listing rate</s.TextID>
       <s.TextDescription>
         {"1 $" +
           process.env.REACT_APP_CURRENCY +
@@ -304,8 +304,8 @@ export default function Preview() {
           BigNumber(context.listingRate[0]).toFormat(2) +
           " $" +
           token.tokenSymbol}
-      </s.TextDescription> */}
-      {/* (TokenRate * HardCap) + ((HardCap * LP%) * ListingRate) */}
+      </s.TextDescription>
+      (TokenRate * HardCap) + ((HardCap * LP%) * ListingRate)
       <s.TextDescription fullWidth style={{ color: "var(--primary)" }}>
         {"Required " +
           requiredToken

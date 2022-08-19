@@ -113,7 +113,7 @@ export default function IDOInfo() {
           />
           <s.TextIDWarning>{context.idoError["maxETH"]}</s.TextIDWarning>
           <s.SpacerSmall />
-          {/* <NumberField
+          <NumberField
             value={BigNumber(context.liquidityPercentage[0]).toFixed()}
             label={"Liquidity % (51% - 100%)"}
             onChange={(e) => {
@@ -128,11 +128,11 @@ export default function IDOInfo() {
           />
           <s.TextIDWarning>
             {context.idoError["liquidityPercentage"]}
-          </s.TextIDWarning> */}
+          </s.TextIDWarning>
         </s.Container>
       </s.Container>
       <s.SpacerSmall />
-      {/* <s.TextID>
+      <s.TextID>
         If I pay 1 {process.env.REACT_APP_CURRENCY} how much token I will get
         after presale?
       </s.TextID>
@@ -150,7 +150,7 @@ export default function IDOInfo() {
         }}
       />
       <s.TextIDWarning>{context.idoError["listingRate"]}</s.TextIDWarning>
-      <s.SpacerMedium /> */}
+      <s.SpacerMedium />
       <s.Container fd={"row"} jc="space-between">
         <s.Container flex={1} style={{ marginLeft: 10, marginRight: 10 }}>
           <LocalizationProvider dateAdapter={AdapterDateFns}>

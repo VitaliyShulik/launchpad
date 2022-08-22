@@ -212,7 +212,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         // This forwards all available gas. Be sure to check the return value!
         uint256 balance = address(this).balance;
 
-        if ( lockInfo.lpPercentage > 0 && listingRate > 0 && time.unlockTimestamp > block.timestamp ) {
+        if ( lockInfo.lpPercentage > 0 && listingRate > 0 ) {
             uint256 ethForLP = (balance * lockInfo.lpPercentage)/100;
             uint256 ethWithdraw = balance - ethForLP;
 
@@ -322,13 +322,19 @@ contract IDOPool is Ownable, ReentrancyGuard {
         lpTokenAddress = IUniswapV2Factory(uniswap.factory).getPair(address(rewardToken), uniswap.weth);
 
         ERC20 lpToken = ERC20(lpTokenAddress);
-        lpToken.approve(lockInfo.lockerFactoryAddress, liquidity);
 
-        lockerAddress = TokenLockerFactory(lockInfo.lockerFactoryAddress).createLocker(
-            lpToken,
-            string.concat(lpToken.symbol(), " tokens locker"),
-            liquidity, msg.sender, time.unlockTimestamp
-        );
+        if (time.unlockTimestamp > block.timestamp) {
+            lpToken.approve(lockInfo.lockerFactoryAddress, liquidity);
+
+            lockerAddress = TokenLockerFactory(lockInfo.lockerFactoryAddress).createLocker(
+                lpToken,
+                string.concat(lpToken.symbol(), " tokens locker"),
+                liquidity, msg.sender, time.unlockTimestamp
+            );
+        } else {
+            lpToken.transfer(msg.sender, liquidity);
+        }
+
     }
 
 }

@@ -218,7 +218,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
 
             uint256 tokenAmount = getListingAmount(ethForLP);
 
-            addLiquidityETHAndLockLPTokens(tokenAmount, ethForLP);
+            addLiquidityNEXTAndLockLPTokens(tokenAmount, ethForLP);
 
             // Withdraw rest ETH
             (bool success, ) = msg.sender.call{value: ethWithdraw}("");
@@ -301,15 +301,15 @@ contract IDOPool is Ownable, ReentrancyGuard {
         _;
     }
 
-    function addLiquidityETHAndLockLPTokens(
+    function addLiquidityNEXTAndLockLPTokens(
         uint256 tokenAmount,
         uint256 ethAmount
     ) internal {
 
-        // Add Liquidity ETH
+        // Add Liquidity NEXT
         IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(uniswap.router);
         rewardToken.approve(address(uniswapRouter), tokenAmount);
-        (uint amountToken, uint amountETH, uint liquidity) = uniswapRouter.addLiquidityETH{value: ethAmount}(
+        (uint amountToken, uint amountETH, uint liquidity) = uniswapRouter.addLiquidityNEXT{value: ethAmount}(
             address(rewardToken),
             tokenAmount,
             0, // slippage is unavoidable

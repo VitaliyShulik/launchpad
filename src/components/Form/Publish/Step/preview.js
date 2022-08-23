@@ -39,9 +39,12 @@ export default function Preview() {
   const [tokenApprove, setTokenApprove] = useState("");
   const [loading, setLoading] = useState(false);
   const tokenRate = BigNumber(context.tokenRate[0]);
-  const listingRate = BigNumber(context.listingRate[0]);
   const hardCap = BigNumber(context.hardCap[0]);
-  const lp = BigNumber(context.liquidityPercentage[0]);
+  const {
+    isAddLiquidityEnabled: [isAddLiquidityEnabled],
+  } = context;
+  const listingRate = BigNumber(isAddLiquidityEnabled ? context.listingRate[0] : 0);
+  const lp = BigNumber(isAddLiquidityEnabled ? context.liquidityPercentage[0] : 0);
   const requiredToken = tokenRate
     .times(hardCap)
     .plus(hardCap.times(lp).dividedBy(100).times(listingRate))
@@ -114,7 +117,7 @@ export default function Preview() {
 
     const rewardToken = context.address[0];
     const tokenRate = blockchain.web3.utils.toWei(context.tokenRate[0]);
-    const listingRate = blockchain.web3.utils.toWei(context.listingRate[0]);
+    const listingRate = blockchain.web3.utils.toWei(isAddLiquidityEnabled ? context.listingRate[0] : 0);
     const capacity = [
       blockchain.web3.utils.toWei(context.softCap[0]),
       blockchain.web3.utils.toWei(context.hardCap[0]),
@@ -132,7 +135,7 @@ export default function Preview() {
       chainRouter[process.env.REACT_APP_networkID][0].WETH,
     ];
     const lockInfo = [
-      parseInt(context.liquidityPercentage[0]),
+      parseInt(isAddLiquidityEnabled ? context.liquidityPercentage[0] : 0),
       blockchain.LockerFactory._address
     ];
 
@@ -289,23 +292,31 @@ export default function Preview() {
               " $" +
               process.env.REACT_APP_CURRENCY}
           </s.TextDescription>
-          <s.SpacerSmall />
-          <s.TextID>Liquidity %</s.TextID>
-          <s.TextDescription>
-            {BigNumber(context.liquidityPercentage[0]).toFixed(0) + " %"}
-          </s.TextDescription>
+          {
+            isAddLiquidityEnabled && <>
+              <s.SpacerSmall />
+              <s.TextID>Liquidity %</s.TextID>
+              <s.TextDescription>
+                {BigNumber(context.liquidityPercentage[0]).toFixed(0) + " %"}
+              </s.TextDescription>
+            </>
+          }
         </s.Container>
       </s.Container>
-      <s.TextID>Listing rate</s.TextID>
-      <s.TextDescription>
-        {"1 $" +
-          process.env.REACT_APP_CURRENCY +
-          " -> " +
-          BigNumber(context.listingRate[0]).toFormat(2) +
-          " $" +
-          token.tokenSymbol}
-      </s.TextDescription>
-      (TokenRate * HardCap) + ((HardCap * LP%) * ListingRate)
+      {
+        isAddLiquidityEnabled && <>
+          <s.TextID>Listing rate</s.TextID>
+          <s.TextDescription>
+            {"1 $" +
+              process.env.REACT_APP_CURRENCY +
+              " -> " +
+              BigNumber(context.listingRate[0]).toFormat(2) +
+              " $" +
+              token.tokenSymbol}
+          </s.TextDescription>
+          (TokenRate * HardCap) + ((HardCap * LP%) * ListingRate)
+        </>
+      }
       <s.TextDescription fullWidth style={{ color: "var(--primary)" }}>
         {"Required " +
           requiredToken

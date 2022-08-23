@@ -28,6 +28,8 @@ const PoolInfoRenderer = (props) => {
 
   const web3 = contract.web3;
 
+  const isAddLiquidityEnabled = idoInfo.listingRate > 0 && idoInfo.lockInfo.lpPercentage > 0;
+
   return (
     <s.Container flex={2} ai="center" style={{ margin: 10, minWidth: 400 }}>
       <s.Card
@@ -54,10 +56,12 @@ const PoolInfoRenderer = (props) => {
           {web3.utils.fromWei(idoInfo.tokenRate) + " $" + idoInfo.tokenSymbol}
         </s.Container>
         <s.SpacerSmall />
-        <s.Container fd="row" jc="space-between">
-          <s.TextID fw="700">Listing rate</s.TextID>
-          {web3.utils.fromWei(idoInfo.listingRate) + " $" + idoInfo.tokenSymbol}
-        </s.Container>
+        {
+          isAddLiquidityEnabled && <s.Container fd="row" jc="space-between">
+            <s.TextID fw="700">Listing rate</s.TextID>
+            {web3.utils.fromWei(idoInfo.listingRate) + " $" + idoInfo.tokenSymbol}
+          </s.Container>
+        }
         <s.SpacerSmall />
         <s.Container fd="row" jc="space-between" style={{ marginTop: 10 }}>
           <s.Card ai="center" style={{ padding: 0 }}>
@@ -90,16 +94,20 @@ const PoolInfoRenderer = (props) => {
           </s.Card>
         </s.Container>
         <s.SpacerSmall />
-        <s.Container fd="row" jc="space-between">
-          <s.TextID fw="700">Liquidity %</s.TextID>
-          {idoInfo.lockInfo.lpPercentage + " %"}
-        </s.Container>
-        <s.SpacerSmall />
-        <s.Container fd="row" jc="space-between">
-          <s.TextID fw="700">Router</s.TextID>
-          {getRouterName()}
-        </s.Container>
-        <s.SpacerSmall />
+        {
+          isAddLiquidityEnabled && <>
+            <s.Container fd="row" jc="space-between">
+              <s.TextID fw="700">Liquidity %</s.TextID>
+              {idoInfo.lockInfo.lpPercentage + " %"}
+            </s.Container>
+            <s.SpacerSmall />
+            <s.Container fd="row" jc="space-between">
+              <s.TextID fw="700">Router</s.TextID>
+              {getRouterName()}
+            </s.Container>
+            <s.SpacerSmall />
+          </>
+        }
         <s.Container fd="row" jc="space-between">
           <s.TextID fw="700">Start time</s.TextID>
           {startDate.toString()}

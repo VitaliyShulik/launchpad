@@ -7,6 +7,7 @@ import BigNumber from "bignumber.js";
 import React, { useEffect, useState } from "react";
 import { Badge } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import ERC20 from "../../contracts/ERC20.json";
 import { fetchData } from "../../redux/data/dataActions";
 import * as s from "../../styles/global";
@@ -39,6 +40,7 @@ const LockTokenForm = (props) => {
   const [loading, setLoading] = useState(false);
   const blockchain = useSelector((state) => state.blockchain);
   const dispatch = useDispatch();
+  let navigate = useNavigate();
 
   useEffect(() => {
     if (decimals > 0) {
@@ -67,7 +69,7 @@ const LockTokenForm = (props) => {
 
   useEffect(async () => {
     const lockerFactory = blockchain.LockerFactory;
-    let lockerFee = await lockerFactory.methods.fee().call();
+    let lockerFee = await lockerFactory?.methods?.fee().call();
     setFee(lockerFee);
   }, []);
 
@@ -172,8 +174,10 @@ const LockTokenForm = (props) => {
       })
       .then((receipt) => {
         setLoading(false);
-        console.log(receipt);
         dispatch(fetchData(blockchain.account));
+        if (receipt?.events?.LockerCreated?.returnValues?.lockerAddress){
+          navigate(`../locker/${receipt.events.LockerCreated.returnValues.lockerAddress}`)
+        }
       });
   };
 
@@ -283,7 +287,7 @@ const LockTokenForm = (props) => {
       </LocalizationProvider>
 
       <s.Container ai="center">
-        {BigNumber(tokenApprove) >= BigNumber(tokenDistributed) &&
+        {BigNumber(tokenApprove) >= BigNumber(tokenDistributed).times(10 ** decimals) &&
         tokenDistributed !== "0" ? (
           <s.button
             disabled={

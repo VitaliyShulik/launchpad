@@ -14,7 +14,8 @@ const IDOList = (props) => {
   const contract = useSelector((state) => state.contract);
 
   const { allPools } = usePoolContext();
-  const poolKeys = Object.keys(allPools);
+  // sort IDOs by start time
+  const poolKeys = Object.keys(allPools).sort((a, b) => allPools[b]?.start - allPools[a]?.start);
 
   const { owner, tokenAddress } = props;
 

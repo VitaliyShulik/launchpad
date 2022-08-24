@@ -24,6 +24,9 @@ const LockerList = (props) => {
     return null;
   }
 
+  // sort lockers by unlock time
+  lockersAddresses.sort((a, b) => allLocker[b]?.time - allLocker[a]?.time);
+
   const loadmore = (amount) => {
     setLimit((p) => (p < lockersAddresses.length ? p + amount : p));
   };

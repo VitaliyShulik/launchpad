@@ -6,11 +6,11 @@ export const PoolContext = createContext({});
 
 export const PoolContextProvider = ({ children }) => {
   const [allPoolAddress, setAllPoolAddress] = useState([]);
-  const [allLockerAddress, setAllLockerAddress] = useState([]);
-  const [allPools, setAllPools] = useState(new Object());
-  const [allLocker, setAllLocker] = useState(new Object());
   const [userPoolAddresses, setUserPoolAddresses] = useState([]);
+  const [allPools, setAllPools] = useState({});
+  const [allLockerAddress, setAllLockerAddress] = useState([]);
   const [userLockersAddresses, setUserLockersAddresses] = useState([]);
+  const [allLocker, setAllLocker] = useState({});
   const dispatch = useDispatch();
   const contract = useSelector((state) => state.contract);
   const { account } = useSelector((state) => state.blockchain);

@@ -11,6 +11,9 @@ const LongIdoList = (props) => {
 
   const { userPoolAddresses, allPools } = usePoolContext();
 
+  // sort IDOs by start time
+  userPoolAddresses.sort((a, b) => allPools[b]?.start - allPools[a]?.start);
+
   const loadmore = (amount) => {
     setLimit((p) => (p < userPoolAddresses.length ? p + amount : p));
   };

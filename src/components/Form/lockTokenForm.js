@@ -40,7 +40,7 @@ const LockTokenForm = (props) => {
   const [loading, setLoading] = useState(false);
   const blockchain = useSelector((state) => state.blockchain);
   const dispatch = useDispatch();
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (decimals > 0) {
@@ -287,7 +287,7 @@ const LockTokenForm = (props) => {
       </LocalizationProvider>
 
       <s.Container ai="center">
-        {BigNumber(tokenApprove) >= BigNumber(tokenDistributed).times(10 ** decimals) &&
+        {BigNumber(tokenApprove) >= BigNumber(tokenDistributed) &&
         tokenDistributed !== "0" ? (
           <s.button
             disabled={

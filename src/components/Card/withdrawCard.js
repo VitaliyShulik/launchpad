@@ -40,11 +40,14 @@ const WithdrawETH = (props) => {
         IDOPool.abi,
         idoAddress
       );
-
+      // TODO: add logic if LockerFactory have fee
+      // const lockerFactory = blockchain.LockerFactory;
+      // let lockerFee = await lockerFactory?.methods?.fee().call();
       IDOPoolContract.methods
         .withdrawETH()
         .send({
           from: blockchain.account,
+          // value: lockerFee,
         })
         .once("error", (err) => {
           setLoading(false);

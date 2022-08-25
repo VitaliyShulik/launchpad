@@ -3,6 +3,7 @@ import { create } from "ipfs-http-client";
 import React, { useEffect, useState } from "react";
 import { FaImage } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { useStoreContext } from "../../../../context/store";
 import ERC20 from "../../../../contracts/ERC20.json";
 import { fetchData } from "../../../../redux/data/dataActions";
@@ -33,6 +34,8 @@ export default function Preview() {
   const token = context.tokenInformation[0];
   const blockchain = useSelector((state) => state.blockchain);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
 
   const address = context.address[0];
   const icon = context.icon[0];
@@ -161,6 +164,9 @@ export default function Preview() {
         setLoading(false);
         console.log(receipt);
         dispatch(fetchData(blockchain.account));
+        if (receipt?.events?.IDOCreated?.returnValues?.idoPool){
+          navigate(`../locker/${receipt.events.IDOCreated.returnValues.idoPool}`)
+        }
       });
   };
 

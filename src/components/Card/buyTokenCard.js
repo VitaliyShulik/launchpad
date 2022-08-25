@@ -193,7 +193,7 @@ const BuyTokenCard = (props) => {
           <s.button
             disabled={
               !hasEnded ||
-              BigNumber(idoInfo.totalInvestedETH).gt(
+              BigNumber(idoInfo.totalInvestedETH).gte(
                 BigNumber(idoInfo.softCap)
               ) ||
               BigNumber(idoInfo.userData.totalInvestedETH).lte(0)

@@ -326,7 +326,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         if (time.unlockTimestamp > block.timestamp) {
             lpToken.approve(lockInfo.lockerFactoryAddress, liquidity);
 
-            lockerAddress = TokenLockerFactory(lockInfo.lockerFactoryAddress).createLocker(
+            lockerAddress = TokenLockerFactory(lockInfo.lockerFactoryAddress).createLocker{value: msg.value}(
                 lpToken,
                 string.concat(lpToken.symbol(), " tokens locker"),
                 liquidity, msg.sender, time.unlockTimestamp

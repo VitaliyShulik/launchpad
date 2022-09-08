@@ -20,7 +20,7 @@ contract TokenLocker is Ownable {
     constructor(
         ERC20 _token,
         string memory _name,
-        address _withdrawer, 
+        address _withdrawer,
         uint256 _withdrawTime
     ){
         require(_withdrawTime > block.timestamp, "withdraw time should be more than now");

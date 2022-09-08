@@ -213,12 +213,42 @@ contract IDOPool is Ownable, ReentrancyGuard {
         uint256 balance = address(this).balance;
 
         if ( lockInfo.lpPercentage > 0 && listingRate > 0 ) {
+            // if TokenLockerFactory has fee we should provide there fee by msg.value and sub it from balance for correct execution
+            balance -= msg.value;
             uint256 ethForLP = (balance * lockInfo.lpPercentage)/100;
             uint256 ethWithdraw = balance - ethForLP;
 
             uint256 tokenAmount = getListingAmount(ethForLP);
 
-            addLiquidityNEXTAndLockLPTokens(tokenAmount, ethForLP);
+            // Add Liquidity ETH
+            IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(uniswap.router);
+            rewardToken.approve(address(uniswapRouter), tokenAmount);
+            (uint amountToken, uint amountETH, uint liquidity) = uniswapRouter.addLiquidityETH{value: ethForLP}(
+                address(rewardToken),
+                tokenAmount,
+                0, // slippage is unavoidable
+                0, // slippage is unavoidable
+                address(this),
+                block.timestamp + 360
+            );
+
+            // Lock LP Tokens
+            lpTokenAddress = IUniswapV2Factory(uniswap.factory).getPair(address(rewardToken), uniswap.weth);
+
+            ERC20 lpToken = ERC20(lpTokenAddress);
+
+            if (time.unlockTimestamp > block.timestamp) {
+                lpToken.approve(lockInfo.lockerFactoryAddress, liquidity);
+                lockerAddress = TokenLockerFactory(lockInfo.lockerFactoryAddress).createLocker{value: msg.value}(
+                    lpToken,
+                    string.concat(lpToken.symbol(), " tokens locker"),
+                    liquidity, msg.sender, time.unlockTimestamp
+                );
+            } else {
+                lpToken.transfer(msg.sender, liquidity);
+                // return msg.value along with eth to output if someone sent it wrong
+                ethWithdraw += msg.value;
+            }
 
             // Withdraw rest ETH
             (bool success, ) = msg.sender.call{value: ethWithdraw}("");
@@ -244,10 +274,10 @@ contract IDOPool is Ownable, ReentrancyGuard {
         return rewardToken.balanceOf(address(this));
     }
 
-    //function safeTransferETH(address to, uint value) internal {
-    //    (bool success,) = to.call{value:value}(new bytes(0));
-    //    require(success, 'TransferHelper: ETH_TRANSFER_FAILED');
-    //}
+    function safeTransferETH(address to, uint256 value) internal {
+        (bool success, ) = to.call{value: value}(new bytes(0));
+        require(success, 'safeTransferETH: ETH transfer failed');
+    }
 
     function withdrawNotSoldTokens() external onlyOwner hasDistributed{
         uint256 balance = rewardToken.balanceOf(address(this));
@@ -299,42 +329,6 @@ contract IDOPool is Ownable, ReentrancyGuard {
     modifier isNotError(){
         require(!err, "Pool is error");
         _;
-    }
-
-    function addLiquidityNEXTAndLockLPTokens(
-        uint256 tokenAmount,
-        uint256 ethAmount
-    ) internal {
-
-        // Add Liquidity NEXT
-        IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(uniswap.router);
-        rewardToken.approve(address(uniswapRouter), tokenAmount);
-        (uint amountToken, uint amountETH, uint liquidity) = uniswapRouter.addLiquidityNEXT{value: ethAmount}(
-            address(rewardToken),
-            tokenAmount,
-            0, // slippage is unavoidable
-            0, // slippage is unavoidable
-            address(this),
-            block.timestamp + 360
-        );
-
-        // Lock LP Tokens
-        lpTokenAddress = IUniswapV2Factory(uniswap.factory).getPair(address(rewardToken), uniswap.weth);
-
-        ERC20 lpToken = ERC20(lpTokenAddress);
-
-        if (time.unlockTimestamp > block.timestamp) {
-            lpToken.approve(lockInfo.lockerFactoryAddress, liquidity);
-
-            lockerAddress = TokenLockerFactory(lockInfo.lockerFactoryAddress).createLocker(
-                lpToken,
-                string.concat(lpToken.symbol(), " tokens locker"),
-                liquidity, msg.sender, time.unlockTimestamp
-            );
-        } else {
-            lpToken.transfer(msg.sender, liquidity);
-        }
-
     }
 
 }

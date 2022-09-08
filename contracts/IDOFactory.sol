@@ -16,9 +16,6 @@ contract IDOFactory is Ownable {
     uint256 public feeAmount;
     uint256 public burnPercent;
     uint256 public divider;
-    uint256 public withdrawfeePercentage4 = 50;
-
-    uint256 public transferAmount;
 
     struct  PoolInfoStruct{
         uint256 startTimestamp;
@@ -55,10 +52,6 @@ contract IDOFactory is Ownable {
         feeAmount = _feeAmount;
         burnPercent = _burnPercent;
         divider = 100;
-    }
-
-    function setWithdrawFee(uint256 _fee4) external onlyOwner {
-        withdrawfeePercentage4 = _fee4;
     }
 
     function setFeeToken(address _newFeeToken) external onlyOwner {
@@ -124,8 +117,9 @@ contract IDOFactory is Ownable {
                 _lockInfo,
                 _tokenURI
             );
-            
-        transferAmount = getTokenAmount(_capacity.hardCap, _tokenRate) + getTokenAmount(_capacity.hardCap * _lockInfo.lpPercentage / 100, _listingRate);
+
+        uint256 transferAmount = getTokenAmount(_capacity.hardCap, _tokenRate) + getTokenAmount(_capacity.hardCap * _lockInfo.lpPercentage / 100, _listingRate);
+
         idoPool.transferOwnership(msg.sender);
 
         _rewardToken.safeTransferFrom(
@@ -134,8 +128,7 @@ contract IDOFactory is Ownable {
             transferAmount
         );
 
-
-        emit IDOCreated(msg.sender, 
+        emit IDOCreated(msg.sender,
                         address(idoPool),
                         address(_rewardToken),
                         _tokenURI);
@@ -151,6 +144,14 @@ contract IDOFactory is Ownable {
         return _ethAmount.mul(_rate).div(10 ** 18);
     }
 
+    function getTokenAmount(uint256 ethAmount, uint8 decimals, uint256 price)
+        internal
+        view
+        returns (uint256)
+    {
+        return ethAmount.mul(10**decimals).div(price);
+    }
+
     function isContract(address _addr) private view returns (bool) {
         uint32 size;
         assembly {
@@ -159,11 +160,4 @@ contract IDOFactory is Ownable {
         return (size > 0);
     }
 
-    function getTokenAmount(uint256 ethAmount, uint8 decimals, uint256 price)
-        internal
-        view
-        returns (uint256)
-    {
-        return ethAmount.mul(10**decimals).div(price);
-    }
 }

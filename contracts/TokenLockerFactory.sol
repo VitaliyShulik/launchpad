@@ -10,10 +10,10 @@ import "./TokenLocker.sol";
 contract TokenLockerFactory is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for ERC20;
-    
+
     uint256 public lockerCount = 0;
     uint256 public fee = 0;
-    
+
     struct lockerInfo {
         uint256 lockerId;
         address tokenAddress;
@@ -26,7 +26,7 @@ contract TokenLockerFactory is Ownable {
 
     event LockerCreated(uint256 lockerId, address indexed lockerAddress, address tokenAddress);
 
-    constructor( 
+    constructor(
     ){
 
     }
@@ -34,14 +34,13 @@ contract TokenLockerFactory is Ownable {
     function createLocker(
         ERC20 _tokenAddress,
         string memory _name,
-        uint256 _lockAmount, 
-        address _withdrawer, 
+        uint256 _lockAmount,
+        address _withdrawer,
         uint256 _withdrawTime
         ) payable public returns(address){
-            
         require(msg.value == fee, 'Fee amount is required');
 
-        TokenLocker tokenLocker = new TokenLocker(_tokenAddress,_name, _withdrawer, _withdrawTime);
+        TokenLocker tokenLocker = new TokenLocker(_tokenAddress, _name, _withdrawer, _withdrawTime);
         tokenLocker.transferOwnership(msg.sender);
 
         _tokenAddress.safeTransferFrom(

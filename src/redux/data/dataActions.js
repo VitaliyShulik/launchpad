@@ -29,15 +29,15 @@ export const fetchData = (account) => {
         ._address;
       let EBTCamount = await store
         .getState()
-        .blockchain.EBTC.methods.balanceOf(account)
+        .blockchain.FeeToken.methods.balanceOf(account)
         .call();
       let EBTCSymbol = await store
         .getState()
-        .blockchain.EBTC.methods.symbol()
+        .blockchain.FeeToken.methods.symbol()
         .call();
       let EBTCApproveToFactory = await store
         .getState()
-        .blockchain.EBTC.methods.allowance(account, idoFactoryAddress)
+        .blockchain.FeeToken.methods.allowance(account, idoFactoryAddress)
         .call();
       let ethAmount = await store
         .getState()

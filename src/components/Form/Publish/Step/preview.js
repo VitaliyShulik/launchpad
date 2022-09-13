@@ -120,7 +120,7 @@ export default function Preview() {
 
     const rewardToken = context.address[0];
     const tokenRate = blockchain.web3.utils.toWei(context.tokenRate[0]);
-    const listingRate = blockchain.web3.utils.toWei(isAddLiquidityEnabled ? context.listingRate[0] : 0);
+    const listingRate = blockchain.web3.utils.toWei(isAddLiquidityEnabled ? context.listingRate[0] : "0");
     const capacity = [
       blockchain.web3.utils.toWei(context.softCap[0]),
       blockchain.web3.utils.toWei(context.hardCap[0]),

@@ -2,7 +2,7 @@
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
-import eBTC from "../../contracts/eBTC.json";
+import FeeToken from "../../contracts/FeeToken.json";
 import IDOFactory from "../../contracts/IDOFactory.json";
 import LockerFactory from "../../contracts/TokenLockerFactory.json";
 // log
@@ -59,7 +59,7 @@ export const connect = () => {
     const accounts = await web3.eth.getAccounts();
     const chainId = await web3.eth.getChainId();
 
-    const eBitcoinNetworkData = await eBTC.networks[networkId];
+    const eBitcoinNetworkData = await FeeToken.networks[networkId];
     const IDOFactoryNetworkData = await IDOFactory.networks[networkId];
     const LockerFactoryNetworkData = await LockerFactory.networks[networkId];
 
@@ -73,8 +73,8 @@ export const connect = () => {
         IDOFactory.abi,
         IDOFactoryNetworkData.address
       );
-      const EBTCContract = new web3.eth.Contract(
-        eBTC.abi,
+      const FeeTokenContract = new web3.eth.Contract(
+        FeeToken.abi,
         eBitcoinNetworkData.address
       );
 
@@ -86,7 +86,7 @@ export const connect = () => {
         connectSuccess({
           account: accounts[0],
           IDOFactory: IDOFactoryContract,
-          EBTC: EBTCContract,
+          FeeToken: FeeTokenContract,
           LockerFactory: LockerFactoryContract,
           web3: web3,
         })

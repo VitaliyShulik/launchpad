@@ -1,7 +1,7 @@
 const initialState = {
   loading: false,
   account: null,
-  EBTC: null,
+  FeeToken: null,
   IDOFactory: null,
   LockerFactory: null,
   web3: null,
@@ -20,7 +20,7 @@ const blockchainReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         account: action.payload.account,
-        EBTC: action.payload.EBTC,
+        FeeToken: action.payload.FeeToken,
         IDOFactory: action.payload.IDOFactory,
         LockerFactory: action.payload.LockerFactory,
         web3: action.payload.web3,

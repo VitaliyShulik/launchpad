@@ -4,6 +4,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+
 import "./IDOPool.sol";
 
 contract IDOFactory is Ownable {
@@ -33,10 +34,12 @@ contract IDOFactory is Ownable {
         address WETH;
     }
 
-    event IDOCreated(address indexed owner, address idoPool,
+    event IDOCreated(
+        address indexed owner,
+        address idoPool,
         address indexed rewardToken,
         string tokenURI
-        );
+    );
 
     event TokenFeeUpdated(address newFeeToken);
     event FeeAmountUpdated(uint256 newFeeAmount);
@@ -93,19 +96,7 @@ contract IDOFactory is Ownable {
         IDOPool.Uniswap memory _uniswap,
         IDOPool.LockInfo memory _lockInfo,
         string memory _tokenURI
-    ) external payable returns(address){
-        if(feeAmount > 0){
-            uint256 burnAmount = feeAmount.mul(burnPercent).div(divider);
-
-            feeToken.safeTransferFrom(
-                msg.sender,
-                feeWallet,
-                feeAmount.sub(burnAmount)
-            );
-            feeToken.safeTransferFrom(msg.sender, address(this), burnAmount);
-            feeToken.burn(burnAmount);
-        }
-
+    ) external {
         IDOPool idoPool =
             new IDOPool(
                 _rewardToken,
@@ -128,12 +119,26 @@ contract IDOFactory is Ownable {
             transferAmount
         );
 
-        emit IDOCreated(msg.sender,
-                        address(idoPool),
-                        address(_rewardToken),
-                        _tokenURI);
+        emit IDOCreated(
+            msg.sender,
+            address(idoPool),
+            address(_rewardToken),
+            _tokenURI
+        );
 
-        return address(idoPool);
+
+        if(feeAmount > 0){
+            uint256 burnAmount = feeAmount.mul(burnPercent).div(divider);
+
+            feeToken.safeTransferFrom(
+                msg.sender,
+                feeWallet,
+                feeAmount.sub(burnAmount)
+            );
+
+            feeToken.burnFrom(msg.sender, burnAmount);
+
+        }
     }
 
     function getTokenAmount(uint256 _ethAmount, uint256 _rate)

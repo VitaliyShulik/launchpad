@@ -1,10 +1,10 @@
-const idoFactory = artifacts.require("IDOFactory");
-const tokenLockerFactory = artifacts.require("TokenLockerFactory");
+const IdoFactory = artifacts.require("IDOFactory");
+const TokenLockerFactory = artifacts.require("TokenLockerFactory");
 
 module.exports = function (deployer) {
   deployer.then(async () => {
-    let burnableTokenAddressForFee = "0xaFF4481D10270F50f203E0763e2597776068CBc5";
-    await deployer.deploy(idoFactory, burnableTokenAddressForFee, "0", "0");
-    await deployer.deploy(tokenLockerFactory);
+    let feeToken = "0xc5007E592e9ACE06Cfec11CB7e1C1A18906A43Ec";
+    await deployer.deploy(IdoFactory, feeToken, "0", "0");
+    await deployer.deploy(TokenLockerFactory);
   });
 };

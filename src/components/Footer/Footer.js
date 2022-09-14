@@ -59,13 +59,28 @@ const Footer = () => {
           </Column>
           <Column fd="row" jc="space-evenly">
             <SocialIcon
-              url="https://twitter.com/nextsmartchain"
+              network="email"
+              url="mailto:support@onout.org?subject=IDOFactory&body=Hello, write you from IDOFactory demo..."
               target="_blank"
               bgColor="#fff"
               fgColor="#000000"
             />
             <SocialIcon
-              url="https://discord.gg/sbcbVKsdMd"
+              network="telegram"
+              url="https://t.me/swaponline"
+              target="_blank"
+              bgColor="#fff"
+              fgColor="#000000"
+            />
+            <SocialIcon
+              network="discord"
+              url="https://discord.gg/ukkgCUsU5c"
+              target="_blank"
+              bgColor="#fff"
+              fgColor="#000000"
+            />
+            <SocialIcon
+              url="https://tools.onout.org/"
               target="_blank"
               bgColor="#fff"
               fgColor="#000000"

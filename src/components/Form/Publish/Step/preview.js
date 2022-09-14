@@ -33,12 +33,17 @@ export default function Preview() {
   const context = useStoreContext();
   const token = context.tokenInformation[0];
   const blockchain = useSelector((state) => state.blockchain);
+  const {
+    EBTCApproveToFactory,
+    EBTCSymbol,
+  } = useSelector((state) => state.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
 
   const address = context.address[0];
   const icon = context.icon[0];
+  const [IDOFactoryFee, sesIDOFactoryFee] = useState("0");
   const [tokenApprove, setTokenApprove] = useState("");
   const [loading, setLoading] = useState(false);
   const tokenRate = BigNumber(context.tokenRate[0]);
@@ -56,6 +61,7 @@ export default function Preview() {
         BigNumber(parseInt(context.tokenInformation[0].tokenDecimals))
       )
     );
+
   useEffect(async () => {
     if (blockchain.web3) {
       if (blockchain.web3.utils.isAddress(address)) {
@@ -70,6 +76,16 @@ export default function Preview() {
       setTokenApprove("");
     }
   }, [blockchain.web3]);
+
+  useEffect(() => {
+    const fetchIDOFactoryFee = async () => {
+      const { IDOFactory } = blockchain;
+      const IDOFactoryFee = await IDOFactory?.methods?.feeAmount().call() || "0";
+      sesIDOFactoryFee(IDOFactoryFee);
+    }
+
+    fetchIDOFactoryFee();
+  }, []);
 
   const pinJSONToIPFS = async (JSONBody) => {
     const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
@@ -170,10 +186,10 @@ export default function Preview() {
       });
   };
 
-  const approveToken = async (_address, amount) => {
+  const approveToken = async (_address, amount, tokenContract = null) => {
     setLoading(true);
     const web3 = blockchain.web3;
-    const token = await new web3.eth.Contract(ERC20.abi, _address);
+    const token = tokenContract || await new web3.eth.Contract(ERC20.abi, _address);
     token.methods
       .approve(blockchain.IDOFactory._address, amount)
       .send({
@@ -336,9 +352,32 @@ export default function Preview() {
           token.tokenSymbol}
       </s.TextDescription>
       <s.Container ai="center">
-        {BigNumber(tokenApprove).gte(BigNumber(requiredToken)) ? (
+        {BigNumber(EBTCApproveToFactory).lt(BigNumber(IDOFactoryFee)) ? (
           <s.button
             style={{ marginTop: 20 }}
+            disabled={loading}
+            onClick={(e) => {
+              e.preventDefault();
+              approveToken('', IDOFactoryFee, blockchain.FeeToken);
+            }}
+          >
+            {loading ? ". . ." : `APPROVE ${EBTCSymbol}`}
+          </s.button>
+        ) : BigNumber(tokenApprove).lt(BigNumber(requiredToken)) ? (
+          <s.button
+            style={{ marginTop: 20 }}
+            disabled={loading}
+            onClick={(e) => {
+              e.preventDefault();
+              approveToken(address, BigNumber(requiredToken).toFixed(0));
+            }}
+          >
+            {loading ? ". . ." : `APPROVE ${token.tokenSymbol}`}
+          </s.button>
+        ) : (
+          <s.button
+            style={{ marginTop: 20 }}
+            disabled={loading}
             onClick={(e) => {
               e.preventDefault();
               createIDO();
@@ -346,18 +385,10 @@ export default function Preview() {
           >
             {loading ? ". . ." : "CREATE LAUNCHPAD"}
           </s.button>
-        ) : (
-          <s.button
-            style={{ marginTop: 20 }}
-            onClick={(e) => {
-              e.preventDefault();
-              approveToken(address, BigNumber(requiredToken).toFixed(0));
-            }}
-          >
-            {loading ? ". . ." : "APPROVE TOKEN"}
-          </s.button>
         )}
       </s.Container>
+
+      {IDOFactoryFee && `Create IDO fee : ${blockchain.web3.utils.fromWei(IDOFactoryFee)} ${EBTCSymbol}`}
     </s.Container>
   );
 }

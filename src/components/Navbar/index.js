@@ -16,23 +16,28 @@ const Navigation = () => {
     EBTCSymbol,
   } = useSelector((state) => state.data);
 
+  const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
+
   return (
     <Navbar collapseOnSelect expand="lg" variant="dark" style={{ margin: 15 }}>
       <Container style={{ maxWidth: "100%" }}>
-        <s.TextTitle style={{ fontSize: "24px" }}>
-          <s.Card
-            style={{
-              padding: 10,
-              margin: 0,
-              paddingLeft: 20,
-              paddingRight: 20,
-              fontWeight: 700,
-              color: "var(--primary)",
-            }}
-          >
-            NEXTCUBATOR
-          </s.Card>
-        </s.TextTitle>
+        {!mockCompanyLogo ? (
+          <s.TextTitle style={{ fontSize: "24px" }}>
+            <s.Card
+              style={{
+                padding: 10,
+                margin: 0,
+                paddingLeft: 20,
+                paddingRight: 20,
+                fontWeight: 700,
+                color: "var(--primary)",
+              }}
+            >
+              YourTextLogo
+            </s.Card>
+          </s.TextTitle>
+        ) : <s.LogoTitle src={mockCompanyLogo} />
+        }
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">

@@ -110,6 +110,12 @@ export const Slideshow = styled.div`
   transition: ease 1000ms;
 `;
 
+export const LogoTitle = styled.img`
+  width: auto;
+  height: 50px;
+  margin-right: 1rem;
+`;
+
 export const TextTitle = styled.p`
   color: var(--text);
   width: ${({ fullWidth }) => (fullWidth ? "100%" : "none")};

@@ -1,11 +1,11 @@
-# IDO FACTORY
+# IDOFactory
 
 ## Getting Started
 
 ### Preparation
 
 - Copy `.env.example`, rename it to `.env.production` and fill all constants
-- In `migrations/1_deployed.js` file replace **EBTCAddress** token address to yours
+- In `migrations/1_deployed.js` file replace **feeToken** token address to yours
 - In `contracts/IDOPool.sol` file replace **dev** address (required for **emergencyWithdraw** extra method)  to yours
 - Create `.secret` file with your mnemonic phrase (ussualy it is a 12 word, required for deploy smart contracts)
 
@@ -26,15 +26,15 @@
 3. Compile and deploy necessary contacts
 
     ```bash
-    truffle migrate --network nsc
+    truffle migrate --network goerli
     # or
-    npx truffle migrate --network nsc
+    npx truffle migrate --network goerli
     ```
 
 4. Start app
 
     ```bash
-    yarn start:production
+    yarn start:prod
     ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

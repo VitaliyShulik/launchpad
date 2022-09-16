@@ -25,7 +25,7 @@ const styles = {
 const LockTokenForm = (props) => {
   const [address, setAddress] = useState("");
   const [name, setName] = useState("");
-  const [tokenApprove, setTokenApprove] = useState("");
+  const [tokenApprove, setTokenApprove] = useState("0");
   const [tokenName, setTokenName] = useState("");
   const [fee, setFee] = useState("0");
   const [totalSupply, setTotalSupply] = useState("");
@@ -37,8 +37,9 @@ const LockTokenForm = (props) => {
   );
   const [tokenDistributed, setTokenDistributed] = useState("0");
   const [tokenDistributedInput, setTokenDistributedInput] = useState(0);
+  const [tokenLoading, setTokenLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const blockchain = useSelector((state) => state.blockchain);
+  const { web3, account, LockerFactory, } = useSelector((state) => state.blockchain);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -50,34 +51,21 @@ const LockTokenForm = (props) => {
     }
   }, [tokenDistributedInput, decimals]);
 
-  useEffect(async () => {
-    if (blockchain.web3 && tokenName) {
-      if (blockchain.web3.utils.isAddress(address)) {
-        const web3 = blockchain.web3;
-
-        const token = new web3.eth.Contract(ERC20.abi, address);
-        let tokenApproval = await token.methods
-          .allowance(blockchain.account, blockchain.LockerFactory._address)
-          .call();
-
-        setTokenApprove(tokenApproval);
+  useEffect(() => {
+    const fethcLockerFee = async () => {
+      if (LockerFactory) {
+        const lockerFee = await LockerFactory.methods.fee().call();
+        setFee(lockerFee);
+      } else {
+        setFee("0");
       }
-    } else {
-      setTokenApprove("");
     }
-  }, [tokenName, tokenApprove]);
+    fethcLockerFee();
+  }, [LockerFactory]);
 
-  useEffect(async () => {
-    const lockerFactory = blockchain.LockerFactory;
-    let lockerFee = await lockerFactory?.methods?.fee().call();
-    setFee(lockerFee);
-  }, []);
-
-  if (blockchain.account == null) {
+  if (account == null) {
     return null;
   }
-
-  const web3 = blockchain.web3;
 
   const setDistributed = () => {
     if (decimals > 0) {
@@ -89,47 +77,57 @@ const LockTokenForm = (props) => {
     }
   };
 
-  const getDecimals = async (tokenAddress) => {
+  const checkAndSetTokensDetails = async (tokenAddress) => {
     if (web3.utils.isAddress(tokenAddress)) {
-      const token = await new web3.eth.Contract(ERC20.abi, tokenAddress);
-      if (token.methods.decimals()) {
-        await token.methods
-          .decimals()
-          .call()
-          .then(async (e) => {
-            setDecimals(parseInt(e));
-          });
-        await token.methods
-          .name()
-          .call()
-          .then(async (e) => {
-            setTokenName(e);
-          });
-        await token.methods
-          .totalSupply()
-          .call()
-          .then(async (e) => {
-            setTotalSupply(e);
-          });
-        await token.methods
-          .symbol()
-          .call()
-          .then(async (e) => {
-            setTokenSymbol(e);
-            return true;
-          });
-        await token.methods
-          .allowance(blockchain.account, blockchain.IDOFactory._address)
-          .call()
-          .then(async (e) => {
-            setTokenApprove(e);
-            return true;
-          });
-      } else {
+      setTokenLoading(true);
+      try {
+        const token = await new web3.eth.Contract(ERC20.abi, tokenAddress);
+        if (token.methods.decimals()) {
+          await token.methods
+            .decimals()
+            .call()
+            .then(async (e) => {
+              setDecimals(parseInt(e));
+            });
+          await token.methods
+            .name()
+            .call()
+            .then(async (e) => {
+              setTokenName(e);
+            });
+          await token.methods
+            .totalSupply()
+            .call()
+            .then(async (e) => {
+              setTotalSupply(e);
+            });
+          await token.methods
+            .symbol()
+            .call()
+            .then(async (e) => {
+              setTokenSymbol(e);
+              return true;
+            });
+          await token.methods
+            .allowance(account, LockerFactory._address)
+            .call()
+            .then(async (e) => {
+              setTokenApprove(e);
+              return true;
+            });
+        } else {
+          setDecimals(-1);
+          await utils.timeout(100);
+          return false;
+      }
+      } catch (error) {
         setDecimals(-1);
         await utils.timeout(100);
         return false;
+      } finally {
+        setTokenLoading(false)
       }
+
     } else {
       setDecimals(-1);
       await utils.timeout(100);
@@ -141,12 +139,11 @@ const LockTokenForm = (props) => {
     if (!_address || _address == "") {
       return false;
     }
-    const web3 = blockchain.web3;
     const token = await new web3.eth.Contract(ERC20.abi, _address);
     token.methods
-      .approve(blockchain.LockerFactory._address, amount)
+      .approve(LockerFactory._address, amount)
       .send({
-        from: blockchain.account,
+        from: account,
       })
       .once("error", (err) => {
         setLoading(false);
@@ -156,16 +153,16 @@ const LockTokenForm = (props) => {
         setLoading(false);
         console.log(receipt);
         setTokenApprove(amount);
-        dispatch(fetchData(blockchain.account));
+        dispatch(fetchData(account));
       });
   };
 
   const createLocker = async () => {
     setLoading(true);
-    blockchain.LockerFactory.methods
+    LockerFactory.methods
       .createLocker(address, name, tokenDistributed, withdrawer, withdrawTime)
       .send({
-        from: blockchain.account,
+        from: account,
         value: fee,
       })
       .once("error", (err) => {
@@ -174,7 +171,7 @@ const LockTokenForm = (props) => {
       })
       .then((receipt) => {
         setLoading(false);
-        dispatch(fetchData(blockchain.account));
+        dispatch(fetchData(account));
         if (receipt?.events?.LockerCreated?.returnValues?.lockerAddress){
           navigate(`../locker/${receipt.events.LockerCreated.returnValues.lockerAddress}`)
         }
@@ -192,10 +189,12 @@ const LockTokenForm = (props) => {
       <s.TextTitle>Lock token</s.TextTitle>
       <s.SpacerSmall />
       <s.TextDescription style={{ marginBottom: 20 }}>
-        {decimals > 0 &&
+        {tokenLoading ? (
+          <Badge bg="secondary">Token Address Checking...</Badge>
+        ) : (decimals > 0 &&
         tokenName !== "" &&
         tokenSymbol !== "" &&
-        totalSupply !== "" ? (
+        totalSupply !== "") ? (
           <s.Container fd="row" style={{ flexWrap: "wrap" }}>
             <Badge bg="success">{"Name: " + tokenName}</Badge>
             <s.SpacerXSmall />
@@ -210,7 +209,7 @@ const LockTokenForm = (props) => {
             <s.SpacerXSmall />
             <Badge bg="success">{"Symbol: " + tokenSymbol}</Badge>
           </s.Container>
-        ) : address !== "" ? (
+        ) :  address !== "" ? (
           <Badge bg="danger">{"Contract not valid"}</Badge>
         ) : (
           ""
@@ -222,9 +221,7 @@ const LockTokenForm = (props) => {
         label={"Locker name"}
         onChange={(e) => {
           e.preventDefault();
-          if (getDecimals(e.target.value)) {
-            setName(e.target.value);
-          }
+          setName(e.target.value);
         }}
       ></TextField>
       <s.SpacerSmall />
@@ -234,7 +231,7 @@ const LockTokenForm = (props) => {
         label={"Token address"}
         onChange={(e) => {
           e.preventDefault();
-          if (getDecimals(e.target.value)) {
+          if (checkAndSetTokensDetails(e.target.value)) {
             setAddress(e.target.value);
             setDistributed();
           }
@@ -251,7 +248,7 @@ const LockTokenForm = (props) => {
         type={"number"}
         onChange={async (e) => {
           e.preventDefault();
-          let val = BigNumber(e.target.value).absoluteValue();
+          const val = BigNumber(e.target.value).absoluteValue();
           if (!isNaN(val)) {
             setTokenDistributedInput(val);
           } else {
@@ -291,9 +288,10 @@ const LockTokenForm = (props) => {
         tokenDistributed !== "0" ? (
           <s.button
             disabled={
+              loading ||
               !web3.utils.isAddress(withdrawer) ||
               !web3.utils.isAddress(address) ||
-              !BigNumber(tokenDistributed) > 0 ||
+              !(BigNumber(tokenDistributed) > 0) ||
               withdrawTime <= Date.now() / 1000
             }
             style={{ marginTop: 20 }}
@@ -307,8 +305,8 @@ const LockTokenForm = (props) => {
         ) : (
           <s.button
             disabled={
+              loading ||
               !address ||
-              address == "" ||
               tokenDistributed <= 0 ||
               decimals <= 0
             }

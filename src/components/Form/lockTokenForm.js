@@ -315,7 +315,7 @@ const LockTokenForm = (props) => {
               e.preventDefault();
               approveToken(
                 address,
-                BigNumber(tokenDistributed)
+                tokenDistributed
               );
             }}
           >

@@ -1,19 +1,38 @@
 import { TextField } from "@mui/material";
 import BigNumber from "bignumber.js";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Badge } from "react-bootstrap";
 import { useStoreContext } from "../../../../context/store";
 import * as s from "../../../../styles/global";
 import { utils } from "../../../../utils";
+
 export default function TokenVerify({ formProps, blockchain }) {
+
+  const { web3 } = blockchain
   const context = useStoreContext();
   const data = context.tokenInformation;
   const address = context.address;
-  useEffect(async () => {
-    if (address !== "") {
-      let token = await utils.getTokenData(address[0], blockchain.web3);
-      data[1](token);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+
+    const fetchTokenInfo = async() => {
+      if (address?.[0] !== "" && web3) {
+        setLoading(true)
+        try {
+          const token = await utils.getTokenData(address[0], web3);
+          data[1](token);
+        } catch (error) {
+          console.log(error)
+        } finally {
+          setLoading(false)
+        }
+      }
     }
-  }, [address[0]]);
+
+    fetchTokenInfo();
+
+  }, [address[0], web3]);
 
   return (
     <s.Container flex={1} ai="center">
@@ -31,7 +50,10 @@ export default function TokenVerify({ formProps, blockchain }) {
         label={"Token address"}
         fullWidth
       />
-      <s.TextIDWarning fullWidth>{context.tokenError["token"]}</s.TextIDWarning>
+      {loading ? (
+          <Badge bg="secondary">Token Address Checking...</Badge>
+        ) : <s.TextIDWarning fullWidth>{context.tokenError["token"]}</s.TextIDWarning>
+      }
       {data[0] ? (
         <s.Container style={{}}>
           <s.SpacerSmall />

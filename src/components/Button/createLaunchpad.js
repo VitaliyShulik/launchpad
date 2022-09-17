@@ -29,7 +29,7 @@ const CreateLaunchpad = (props) => {
             color: "var(--card)",
           }}
         >
-          Create launchpad
+          Create IDO Poll
         </NavLink>
       ) : null}
     </div>

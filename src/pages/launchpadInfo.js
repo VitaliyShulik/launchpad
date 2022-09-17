@@ -9,7 +9,7 @@ const LaunchpadInFo = (props) => {
 
   return (
     <s.Container ai="center">
-      <s.TextTitle>Launchpad Information</s.TextTitle>
+      <s.TextTitle>Launchpad</s.TextTitle>
       <s.SpacerMedium />
       <s.Container jc="space-around" fd="row">
         <PoolInfoRenderer idoAddress={idoAddress} />

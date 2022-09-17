@@ -310,7 +310,7 @@ const PublishForm = (props) => {
         maxWidth: 1000,
       }}
     >
-      <s.TextTitle>Create launchpad</s.TextTitle>
+      <s.TextTitle>Create IDO Poll</s.TextTitle>
       <s.Container ai="center">
         <div
           style={{
@@ -623,7 +623,7 @@ const PublishForm = (props) => {
               createIDO();
             }}
           >
-            {loading ? ". . ." : "CREATE LAUNCHPAD"}
+            {loading ? ". . ." : "Create IDO Poll"}
           </s.button>
         ) : (
           <s.button

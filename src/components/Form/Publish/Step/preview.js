@@ -383,7 +383,7 @@ export default function Preview() {
               createIDO();
             }}
           >
-            {loading ? ". . ." : "CREATE LAUNCHPAD"}
+            {loading ? ". . ." : "Create IDO Poll"}
           </s.button>
         )}
       </s.Container>

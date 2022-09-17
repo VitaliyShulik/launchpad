@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 
 export const StoreContext = createContext({});
 
@@ -44,6 +44,10 @@ export const StoreContextProvider = ({ children }) => {
     setTokenError(errors);
     return formIsValid;
   };
+
+  useEffect(() => {
+    setTokenError({})
+  }, [address])
 
   const idoFormValidate = () => {
     let errors = {};

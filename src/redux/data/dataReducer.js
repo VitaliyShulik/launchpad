@@ -1,9 +1,9 @@
 const initialState = {
   loading: false,
   ETHamount: -1,
-  EBTCamount: -1,
-  EBTCSymbol: '',
-  EBTCApproveToFactory: -1,
+  FeeTokenamount: -1,
+  FeeTokenSymbol: '',
+  FeeTokenApproveToFactory: -1,
   allPools: -1,
   error: false,
   errorMsg: "",
@@ -21,9 +21,9 @@ const dataReducer = (state = initialState, action) => {
         ...initialState,
         loading: false,
         ETHamount: action.payload.ETHamount,
-        EBTCamount: action.payload.EBTCamount,
-        EBTCSymbol: action.payload.EBTCSymbol,
-        EBTCApproveToFactory: action.payload.EBTCApproveToFactory,
+        FeeTokenamount: action.payload.FeeTokenamount,
+        FeeTokenSymbol: action.payload.FeeTokenSymbol,
+        FeeTokenApproveToFactory: action.payload.FeeTokenApproveToFactory,
         allPools: action.payload.allPools,
       };
     case "CHECK_DATA_FAILED":

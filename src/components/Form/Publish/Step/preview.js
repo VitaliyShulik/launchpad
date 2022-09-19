@@ -34,8 +34,8 @@ export default function Preview() {
   const token = context.tokenInformation[0];
   const blockchain = useSelector((state) => state.blockchain);
   const {
-    EBTCApproveToFactory,
-    EBTCSymbol,
+    FeeTokenApproveToFactory,
+    FeeTokenSymbol,
   } = useSelector((state) => state.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -352,7 +352,7 @@ export default function Preview() {
           token.tokenSymbol}
       </s.TextDescription>
       <s.Container ai="center">
-        {BigNumber(EBTCApproveToFactory).lt(BigNumber(IDOFactoryFee)) ? (
+        {BigNumber(FeeTokenApproveToFactory).lt(BigNumber(IDOFactoryFee)) ? (
           <s.button
             style={{ marginTop: 20 }}
             disabled={loading}
@@ -361,7 +361,7 @@ export default function Preview() {
               approveToken('', IDOFactoryFee, blockchain.FeeToken);
             }}
           >
-            {loading ? ". . ." : `APPROVE ${EBTCSymbol}`}
+            {loading ? ". . ." : `APPROVE ${FeeTokenSymbol}`}
           </s.button>
         ) : BigNumber(tokenApprove).lt(BigNumber(requiredToken)) ? (
           <s.button
@@ -388,7 +388,7 @@ export default function Preview() {
         )}
       </s.Container>
 
-      {IDOFactoryFee && `Create IDO fee : ${blockchain.web3.utils.fromWei(IDOFactoryFee)} ${EBTCSymbol}`}
+      {IDOFactoryFee && `Create IDO fee : ${blockchain.web3.utils.fromWei(IDOFactoryFee)} ${FeeTokenSymbol}`}
     </s.Container>
   );
 }

@@ -16,11 +16,11 @@ const Overall = (props) => {
         >
           <s.TextDescription>
             Fee Pool:{" "}
-            <Decimal number={props.market.feePool} currency={"eBTC"} />
+            <Decimal number={props.market.feePool} currency={"FeeToken"} />
           </s.TextDescription>
           <s.TextDescription>
             Mining Pool:{" "}
-            <Decimal number={props.market.remainingeBTC} currency={"eBTC"} />
+            <Decimal number={props.market.remainingFeeToken} currency={"FeeToken"} />
           </s.TextDescription>
           <s.TextDescription>
             {process.env.REACT_APP_Native} Pool:{" "}

@@ -59,13 +59,13 @@ export const connect = () => {
     const accounts = await web3.eth.getAccounts();
     const chainId = await web3.eth.getChainId();
 
-    const eBitcoinNetworkData = await FeeToken.networks[networkId];
+    const FeeTokenNetworkData = await FeeToken.networks[networkId];
     const IDOFactoryNetworkData = await IDOFactory.networks[networkId];
     const LockerFactoryNetworkData = await LockerFactory.networks[networkId];
 
     if (
       IDOFactoryNetworkData &&
-      eBitcoinNetworkData &&
+      FeeTokenNetworkData &&
       LockerFactoryNetworkData &&
       networkId == chainId
     ) {
@@ -75,7 +75,7 @@ export const connect = () => {
       );
       const FeeTokenContract = new web3.eth.Contract(
         FeeToken.abi,
-        eBitcoinNetworkData.address
+        FeeTokenNetworkData.address
       );
 
       const LockerFactoryContract = new web3.eth.Contract(
@@ -88,7 +88,7 @@ export const connect = () => {
           IDOFactory: IDOFactoryContract,
           FeeToken: FeeTokenContract,
           LockerFactory: LockerFactoryContract,
-          web3: web3,
+          web3,
         })
       );
       // Add listeners start

@@ -9,11 +9,11 @@ import * as s from "../../styles/global";
 
 const Navigation = () => {
   const dispatch = useDispatch();
-  const blockchain = useSelector((state) => state.blockchain);
+  const { account, FeeToken } = useSelector((state) => state.blockchain);
   const {
     ETHamount,
-    EBTCamount,
-    EBTCSymbol,
+    FeeTokenamount,
+    FeeTokenSymbol,
   } = useSelector((state) => state.data);
 
   const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
@@ -56,16 +56,6 @@ const Navigation = () => {
             <LinkContainer to="/account">
               <Nav.Link>Account</Nav.Link>
             </LinkContainer>
-            {/* <NavDropdown title="Resources" id="collasible-nav-dropdown">
-              <Nav.Link
-                href="https://jarupak-sri.gitbook.io/cfont-documents/"
-                target="_blank"
-              >
-                Whitepaper
-              </Nav.Link>
-              <NavDropdown.Item href="#action/3.3"></NavDropdown.Item>
-              <NavDropdown.Divider />
-            </NavDropdown>*/}
           </Nav>
           <Nav>
             <Nav.Link>{process.env.REACT_APP_networkID}</Nav.Link>
@@ -80,11 +70,11 @@ const Navigation = () => {
                 id="collasible-nav-dropdown"
               >
                 <Nav.Link
-                  href="https://jarupak-sri.gitbook.io/cfont-documents/"
+                  href={`${process.env.REACT_APP_Explorer}address/${FeeToken._address}`}
                   target="_blank"
                 >
-                  {`$${EBTCSymbol} ` +
-                    BigNumber(EBTCamount)
+                  {`$${FeeTokenSymbol} ` +
+                    BigNumber(FeeTokenamount)
                       .dividedBy(10 ** 18)
                       .toFormat(0)}
                 </Nav.Link>
@@ -94,7 +84,7 @@ const Navigation = () => {
             ) : null}
           </Nav>
           <s.Container ai="center">
-            {blockchain.account == null ? (
+            {account == null ? (
               <s.button
                 onClick={(e) => {
                   e.preventDefault();
@@ -111,7 +101,7 @@ const Navigation = () => {
                   dispatch(clearCache());
                 }}
               >
-                {blockchain.account}
+                {account}
               </s.button>
             )}
           </s.Container>

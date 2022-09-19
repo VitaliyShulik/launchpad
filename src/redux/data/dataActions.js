@@ -25,29 +25,29 @@ export const fetchData = (account) => {
   return async (dispatch) => {
     dispatch(fetchDataRequest());
     try {
-      let idoFactoryAddress = await store.getState().blockchain.IDOFactory
+      const idoFactoryAddress = await store.getState().blockchain.IDOFactory
         ._address;
-      let EBTCamount = await store
+      const FeeTokenamount = await store
         .getState()
         .blockchain.FeeToken.methods.balanceOf(account)
         .call();
-      let EBTCSymbol = await store
+      const FeeTokenSymbol = await store
         .getState()
         .blockchain.FeeToken.methods.symbol()
         .call();
-      let EBTCApproveToFactory = await store
+      const FeeTokenApproveToFactory = await store
         .getState()
         .blockchain.FeeToken.methods.allowance(account, idoFactoryAddress)
         .call();
-      let ethAmount = await store
+      const ethAmount = await store
         .getState()
         .blockchain.web3.eth.getBalance(account);
       dispatch(
         fetchDataSuccess({
           ETHamount: ethAmount,
-          EBTCamount,
-          EBTCSymbol,
-          EBTCApproveToFactory,
+          FeeTokenamount,
+          FeeTokenSymbol,
+          FeeTokenApproveToFactory,
         })
       );
     } catch (err) {

@@ -1,9 +1,10 @@
-pragma solidity 0.6.12;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract IDOPool is Ownable, ReentrancyGuard {
@@ -47,7 +48,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         uint256 _minEthPayment,
         uint256 _maxEthPayment,
         uint256 _maxDistributedTokenAmount
-    ) public {
+    ) {
         tokenPrice = _tokenPrice;
         rewardToken = _rewardToken;
         decimals = rewardToken.decimals();
@@ -57,7 +58,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
             "Start timestamp must be less than finish timestamp"
         );
         require(
-            _finishTimestamp > now,
+            _finishTimestamp > block.timestamp,
             "Finish timestamp must be more than current block"
         );
         startTimestamp = _startTimestamp;
@@ -71,8 +72,8 @@ contract IDOPool is Ownable, ReentrancyGuard {
     function pay() payable external {
         require(msg.value >= minEthPayment, "Less then min amount");
         require(msg.value <= maxEthPayment, "More then max amount");
-        require(now >= startTimestamp, "Not started");
-        require(now < finishTimestamp, "Ended");
+        require(block.timestamp >= startTimestamp, "Not started");
+        require(block.timestamp < finishTimestamp, "Ended");
 
         uint256 tokenAmount = getTokenAmount(msg.value);
         require(tokensForDistribution.add(tokenAmount) <= maxDistributedTokenAmount, "Overfilled");
@@ -113,7 +114,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
     function proccessClaim(
         address _receiver
     ) internal nonReentrant{
-        require(now > startClaimTimestamp, "Distribution not started");
+        require(block.timestamp > startClaimTimestamp, "Distribution not started");
         UserInfo storage user = userInfo[_receiver];
         uint256 _amount = user.debt;
         if (_amount > 0) {
@@ -126,17 +127,12 @@ contract IDOPool is Ownable, ReentrancyGuard {
 
     function withdrawETH(uint256 amount) external onlyOwner {
         // This forwards all available gas. Be sure to check the return value!
-        (bool success, ) = msg.sender.call.value(amount)("");
+        (bool success, ) = msg.sender.call{ value: amount }("");
         require(success, "Transfer failed.");
     }
 
-    //function safeTransferETH(address to, uint value) internal {
-    //    (bool success,) = to.call{value:value}(new bytes(0));
-    //    require(success, 'TransferHelper: ETH_TRANSFER_FAILED');
-    //}
-
      function withdrawNotSoldTokens() external onlyOwner {
-        require(now > finishTimestamp, "Withdraw allowed after stop accept ETH");
+        require(block.timestamp > finishTimestamp, "Withdraw allowed after stop accept ETH");
         uint256 balance = rewardToken.balanceOf(address(this));
         rewardToken.safeTransfer(msg.sender, balance.add(distributedTokens).sub(tokensForDistribution));
     }

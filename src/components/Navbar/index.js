@@ -86,8 +86,7 @@ const Navigation = () => {
           <s.Container ai="center">
             {account == null ? (
               <s.button
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   dispatch(connect());
                 }}
               >

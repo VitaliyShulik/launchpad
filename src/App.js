@@ -5,7 +5,6 @@ import { Outlet, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Footer from "./components/Footer/Footer";
 import Navigation from "./components/Navbar";
-import { usePoolContext } from "./context/poolContext";
 import Account from "./pages/account";
 import Home from "./pages/home.js";
 import Launchpad from "./pages/launchpad.js";
@@ -22,8 +21,6 @@ function App() {
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
-  const contract = useSelector((state) => state.contract);
-  const allPools = usePoolContext().allPools;
 
   const isLockerEnabled = process.env.REACT_APP_ENABLE_LOCKER === 'true';
 
@@ -61,11 +58,12 @@ function App() {
 
           <Outlet />
           <Routes>
+            <Route path="/" element={<Launchpad />} />
+            <Route path="/launchpad" element={<Launchpad />} />
             <Route
-              path="/"
+              path="/home"
               element={<Home blockchain={blockchain} data={data} />}
             />
-            <Route path="/launchpad" element={<Launchpad />} />
             <Route path="/launchpad/:idoAddress" element={<LaunchpadInfo />} />
             <Route path="/publish" element={<Publish />} />
             <Route path="/lock" element={<LockToken />} />

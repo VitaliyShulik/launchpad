@@ -41,7 +41,7 @@ const Navigation = () => {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <LinkContainer to="/">
+            <LinkContainer to="/home">
               <Nav.Link>Home</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/launchpad">
@@ -51,7 +51,7 @@ const Navigation = () => {
               process.env.REACT_APP_ENABLE_LOCKER === 'true' &&
               <LinkContainer to="/locker">
                 <Nav.Link>Locker</Nav.Link>
-              </LinkContainer> 
+              </LinkContainer>
             }
             <LinkContainer to="/account">
               <Nav.Link>Account</Nav.Link>

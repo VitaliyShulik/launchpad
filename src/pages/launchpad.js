@@ -1,15 +1,21 @@
 import { TextField } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import IDOList from "../components/Modal/idoList";
-import { usePoolContext } from "../context/poolContext";
 import * as s from "../styles/global";
 import { utils } from "../utils";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Launchpad = (props) => {
   const [address, setAddress] = useState("");
   const contract = useSelector((state) => state.contract);
-  const poolContext = usePoolContext();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.pathname === '/') navigate('/launchpad');
+  }, []);
 
   if (!contract.web3) {
     return null;

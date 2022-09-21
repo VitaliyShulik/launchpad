@@ -236,7 +236,7 @@ export const getLockerData = async (lockerAddress, web3) => {
 };
 
 export function getTokenURI(uri) {
-  return fetch(uri)
+  return fetch(getValidIPFSUrl(uri))
     .then((response) => response.json())
     .then((responseJson) => {
       return responseJson;
@@ -248,5 +248,10 @@ export function getTokenURI(uri) {
 
 export function getValidImageUrl(imageUrl) {
   const infuraDedicatedGateway = process.env.REACT_APP_INFURA_DEDICATED_GATEWAY;
-  return infuraDedicatedGateway ? imageUrl.replace('https://ipfs.infura.io', infuraDedicatedGateway) : imageUrl;
+  return infuraDedicatedGateway && imageUrl.match('ipfs.infura.io') ? imageUrl.replace('https://ipfs.infura.io', infuraDedicatedGateway) : imageUrl;
+}
+
+export function getValidIPFSUrl(url) {
+  const infuraDedicatedGateway = process.env.REACT_APP_INFURA_DEDICATED_GATEWAY;
+  return infuraDedicatedGateway && url.match('gateway.pinata.cloud') ? url.replace('https://gateway.pinata.cloud', infuraDedicatedGateway) : url;
 }

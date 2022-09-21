@@ -11,15 +11,27 @@ contract IDOPool is Ownable, ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for ERC20;
 
-    uint256 public tokenPrice;
+    struct FinInfo {
+        uint256 tokenPrice;
+        uint256 softCap;
+        uint256 hardCap;
+        uint256 minEthPayment;
+        uint256 maxEthPayment;
+    }
+
+    struct Timestaps {
+        uint256 startTimestamp;
+        uint256 finishTimestamp;
+        uint256 startClaimTimestamp;
+    }
+
     ERC20 public rewardToken;
     uint256 public decimals;
-    uint256 public startTimestamp;
-    uint256 public finishTimestamp;
-    uint256 public startClaimTimestamp;
-    uint256 public minEthPayment;
-    uint256 public maxEthPayment;
-    uint256 public maxDistributedTokenAmount;
+
+    FinInfo public finInfo;
+    Timestaps public timestaps;
+
+    uint256 public totalInvestedETH;
     uint256 public tokensForDistribution;
     uint256 public distributedTokens;
 
@@ -40,46 +52,47 @@ contract IDOPool is Ownable, ReentrancyGuard {
     event TokensWithdrawn(address indexed holder, uint256 amount);
 
     constructor(
-        uint256 _tokenPrice,
         ERC20 _rewardToken,
-        uint256 _startTimestamp,
-        uint256 _finishTimestamp,
-        uint256 _startClaimTimestamp,
-        uint256 _minEthPayment,
-        uint256 _maxEthPayment,
-        uint256 _maxDistributedTokenAmount
+        FinInfo memory _finInfo,
+        Timestaps memory _timestamps
     ) {
-        tokenPrice = _tokenPrice;
-        rewardToken = _rewardToken;
-        decimals = rewardToken.decimals();
+        setUtils(_rewardToken, rewardToken.decimals());
 
+        finInfo = _finInfo;
+
+        setTimestamps(_timestamps);
+    }
+
+    function setUtils(ERC20 _rewardToken, uint256 _decimals) internal{
+        rewardToken = _rewardToken;
+        decimals = _decimals;
+    }
+
+    function setTimestamps(Timestaps memory _timestamps) internal {
         require(
-            _startTimestamp < _finishTimestamp,
+            _timestamps.startTimestamp < _timestamps.finishTimestamp,
             "Start timestamp must be less than finish timestamp"
         );
         require(
-            _finishTimestamp > block.timestamp,
+            _timestamps.finishTimestamp > block.timestamp,
             "Finish timestamp must be more than current block"
         );
-        startTimestamp = _startTimestamp;
-        finishTimestamp = _finishTimestamp;
-        startClaimTimestamp = _startClaimTimestamp;
-        minEthPayment = _minEthPayment;
-        maxEthPayment = _maxEthPayment;
-        maxDistributedTokenAmount = _maxDistributedTokenAmount;
+
+        timestaps = _timestamps;
     }
 
     function pay() payable external {
-        require(msg.value >= minEthPayment, "Less then min amount");
-        require(msg.value <= maxEthPayment, "More then max amount");
-        require(block.timestamp >= startTimestamp, "Not started");
-        require(block.timestamp < finishTimestamp, "Ended");
+        require(block.timestamp >= timestaps.startTimestamp, "Not started");
+        require(block.timestamp < timestaps.finishTimestamp, "Ended");
 
-        uint256 tokenAmount = getTokenAmount(msg.value);
-        require(tokensForDistribution.add(tokenAmount) <= maxDistributedTokenAmount, "Overfilled");
+        require(msg.value >= finInfo.minEthPayment, "Less then min amount");
+        require(msg.value <= finInfo.maxEthPayment, "More then max amount");
+        require(totalInvestedETH.add(msg.value) <= finInfo.hardCap, "Overfilled");
 
         UserInfo storage user = userInfo[msg.sender];
-        require(user.totalInvestedETH.add(msg.value) <= maxEthPayment, "More then max amount");
+        require(user.totalInvestedETH.add(msg.value) <= finInfo.maxEthPayment, "More then max amount");
+
+        uint256 tokenAmount = getTokenAmount(msg.value);
 
         tokensForDistribution = tokensForDistribution.add(tokenAmount);
         user.totalInvestedETH = user.totalInvestedETH.add(msg.value);
@@ -94,7 +107,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         view
         returns (uint256)
     {
-        return ethAmount.mul(10**decimals).div(tokenPrice);
+        return ethAmount.mul(10**decimals).div(finInfo.tokenPrice);
     }
 
 
@@ -114,7 +127,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
     function proccessClaim(
         address _receiver
     ) internal nonReentrant{
-        require(block.timestamp > startClaimTimestamp, "Distribution not started");
+        require(block.timestamp > timestaps.startClaimTimestamp, "Distribution not started");
         UserInfo storage user = userInfo[_receiver];
         uint256 _amount = user.debt;
         if (_amount > 0) {
@@ -132,7 +145,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
     }
 
      function withdrawNotSoldTokens() external onlyOwner {
-        require(block.timestamp > finishTimestamp, "Withdraw allowed after stop accept ETH");
+        require(block.timestamp > timestaps.finishTimestamp, "Withdraw allowed after stop accept ETH");
         uint256 balance = rewardToken.balanceOf(address(this));
         rewardToken.safeTransfer(msg.sender, balance.add(distributedTokens).sub(tokensForDistribution));
     }

@@ -137,36 +137,33 @@ export default function Preview() {
     const rewardToken = context.address[0];
     const tokenRate = blockchain.web3.utils.toWei(context.tokenRate[0]);
     const listingRate = blockchain.web3.utils.toWei(isAddLiquidityEnabled ? context.listingRate[0] : "0");
-    const capacity = [
+    const finInfo = [
+      tokenRate,
       blockchain.web3.utils.toWei(context.softCap[0]),
       blockchain.web3.utils.toWei(context.hardCap[0]),
       blockchain.web3.utils.toWei(context.minETH[0]),
       blockchain.web3.utils.toWei(context.maxETH[0]),
+      listingRate,
+      parseInt(isAddLiquidityEnabled ? context.liquidityPercentage[0] : 0),
     ];
-    const time = [
+    const timestamps = [
       BigNumber(context.start[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
       BigNumber(context.end[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
       BigNumber(context.unlock[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
     ];
-    const uniswap = [
+    const dexInfo = [
       chainRouter[process.env.REACT_APP_networkID][0].ROUTER,
       chainRouter[process.env.REACT_APP_networkID][0].FACTORY,
       chainRouter[process.env.REACT_APP_networkID][0].WETH,
-    ];
-    const lockInfo = [
-      parseInt(isAddLiquidityEnabled ? context.liquidityPercentage[0] : 0),
-      blockchain.LockerFactory._address
     ];
 
     blockchain.IDOFactory.methods
       .createIDO(
         rewardToken,
-        tokenRate,
-        listingRate,
-        capacity,
-        time,
-        uniswap,
-        lockInfo,
+        finInfo,
+        timestamps,
+        dexInfo,
+        blockchain.LockerFactory._address,
         tokenURI
       )
       .send({
@@ -388,7 +385,7 @@ export default function Preview() {
         )}
       </s.Container>
 
-      {IDOFactoryFee && `Create IDO fee : ${blockchain.web3.utils.fromWei(IDOFactoryFee)} ${FeeTokenSymbol}`}
+      {IDOFactoryFee && IDOFactoryFee !== "0" && `Create IDO fee : ${blockchain.web3.utils.fromWei(IDOFactoryFee)} ${FeeTokenSymbol}`}
     </s.Container>
   );
 }

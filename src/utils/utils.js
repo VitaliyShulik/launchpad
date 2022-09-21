@@ -96,11 +96,11 @@ export const isValidToken = (_tokenInfo) => {
 export const loadPoolData = async (idoAddress, web3, account) => {
   try {
     const idoPool = await new web3.eth.Contract(IDOPool.abi, idoAddress);
-    let uri = await idoPool.methods.tokenURI().call();
+    let metadataURL = await idoPool.methods.metadataURL().call();
     let balance = await web3.eth.getBalance(idoAddress);
     let tokenAddress = await idoPool.methods.rewardToken().call();
     const token = new web3.eth.Contract(ERC20.abi, tokenAddress);
-    let metadata = await getTokenURI(uri);
+    let metadata = await getTokenURI(metadataURL);
     let owner = await idoPool.methods.owner().call();
 
     const userData = await loadUserData(idoAddress, web3, account)
@@ -109,35 +109,37 @@ export const loadPoolData = async (idoAddress, web3, account) => {
     let tokenSymbol = await token.methods.symbol().call();
     let tokenDecimals = await token.methods.decimals().call();
     let totalSupply = await token.methods.totalSupply().call();
-    let capacity = await idoPool.methods.capacity().call();
+    let finInfo = await idoPool.methods.finInfo().call();
 
     // TODO: make a check for withdraw tokens from the contract if the Soft Cap is not collected
     let unsold = 0;
     try { unsold = await idoPool.methods.getNotSoldToken().call(); }
     catch (e) { console.log(e); }
 
-    let time = await idoPool.methods.time().call();
-    let uniswap = await idoPool.methods.uniswap().call();
-    let lockInfo = await idoPool.methods.lockInfo().call();
-    let tokenRate = await idoPool.methods.tokenRate().call();
-    let listingRate = await idoPool.methods.listingRate().call();
-    let totalInvestedETH = await idoPool.methods.totalInvestedETH().call();
-    let start = time.startTimestamp;
-    let end = time.finishTimestamp;
-    let claim = time.unlockTimestamp;
-    let min = capacity.minEthPayment;
-    let max = capacity.maxEthPayment;
-    let hardCap = capacity.hardCap;
-    let softCap = capacity.softCap;
+    const timestamps = await idoPool.methods.timestamps().call();
+    const dexInfo = await idoPool.methods.dexInfo().call();
+    const totalInvestedETH = await idoPool.methods.totalInvestedETH().call();
 
-    let currentDistributed = await idoPool.methods
-      .tokensForDistribution()
-      .call();
+    const {
+      startTimestamp,
+      endTimestamp,
+      unlockTimestamp,
+    } = timestamps;
 
-    let progress = parseFloat(
+    const {
+      tokenPrice,
+      hardCap,
+      softCap,
+      minEthPayment,
+      maxEthPayment,
+      listingPrice,
+      lpInterestRate,
+    } = finInfo;
+
+    const progress = parseFloat(
       BigNumber(totalInvestedETH)
         .times(100)
-        .dividedBy(BigNumber(capacity.hardCap))
+        .dividedBy(BigNumber(finInfo.hardCap))
     );
 
     let result = {
@@ -151,20 +153,20 @@ export const loadPoolData = async (idoAddress, web3, account) => {
       owner: owner,
       balance: balance,
       unsold: unsold,
-      tokenRate: tokenRate,
-      listingRate: listingRate,
-      uniswap: uniswap,
-      lockInfo: lockInfo,
-      start: start,
-      end: end,
-      claim: claim,
-      min: min,
-      max: max,
+      tokenRate: tokenPrice,
+      listingRate: listingPrice,
+      dexInfo,
+      lpPercentage: lpInterestRate,
+      start: startTimestamp,
+      end: endTimestamp,
+      claim: unlockTimestamp,
+      min: minEthPayment,
+      max: maxEthPayment,
       softCap: softCap,
       hardCap: hardCap,
       totalInvestedETH: totalInvestedETH,
       progress: progress,
-      uri: uri,
+      metadataURL,
       userData: userData,
     };
     return result;

@@ -73,7 +73,7 @@ const WithdrawETH = (props) => {
       );
 
       IDOPoolContract.methods
-        .withdrawTokenCancel()
+        .refundTokens()
         .send({
           from: blockchain.account,
         })

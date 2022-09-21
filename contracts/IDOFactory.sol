@@ -18,22 +18,6 @@ contract IDOFactory is Ownable {
     uint256 public burnPercent;
     uint256 public divider;
 
-    struct  PoolInfoStruct{
-        uint256 startTimestamp;
-        uint256 finishTimestamp;
-        uint256 startClaimTimestamp;
-        uint256 lpWithdrawTimestamp;
-        uint256 minEthPayment;
-        uint256 maxEthPayment;
-        uint256 maxDistributedTokenAmount;
-    }
-
-    struct  Uniswap{
-        address FACTORY;
-        address ROUTER;
-        address WETH;
-    }
-
     event IDOCreated(
         address indexed owner,
         address idoPool,
@@ -89,27 +73,23 @@ contract IDOFactory is Ownable {
 
     function createIDO(
         ERC20 _rewardToken,
-        uint256 _tokenRate,
-        uint256 _listingRate,
-        IDOPool.Capacity memory _capacity,
-        IDOPool.Time memory _time,
-        IDOPool.Uniswap memory _uniswap,
-        IDOPool.LockInfo memory _lockInfo,
-        string memory _tokenURI
+        IDOPool.FinInfo memory _finInfo,
+        IDOPool.Timestamps memory _timestamps,
+        IDOPool.DEXInfo memory _dexInfo,
+        address _lockerFactoryAddress,
+        string memory _metadataURL
     ) external {
         IDOPool idoPool =
             new IDOPool(
                 _rewardToken,
-                _tokenRate,
-                _listingRate,
-                _capacity,
-                _time,
-                _uniswap,
-                _lockInfo,
-                _tokenURI
+                _finInfo,
+                _timestamps,
+                _dexInfo,
+                _lockerFactoryAddress,
+                _metadataURL
             );
 
-        uint256 transferAmount = getTokenAmount(_capacity.hardCap, _tokenRate) + getTokenAmount(_capacity.hardCap * _lockInfo.lpPercentage / 100, _listingRate);
+        uint256 transferAmount = getTokenAmount(_finInfo.hardCap, _finInfo.tokenPrice) + getTokenAmount(_finInfo.hardCap * _finInfo.lpInterestRate / 100, _finInfo.listingPrice);
 
         idoPool.transferOwnership(msg.sender);
 
@@ -123,7 +103,7 @@ contract IDOFactory is Ownable {
             msg.sender,
             address(idoPool),
             address(_rewardToken),
-            _tokenURI
+            _metadataURL
         );
 
 

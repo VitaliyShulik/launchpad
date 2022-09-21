@@ -28,7 +28,7 @@ const PoolInfoRenderer = (props) => {
 
   const web3 = contract.web3;
 
-  const isAddLiquidityEnabled = idoInfo.listingRate > 0 && idoInfo.lockInfo.lpPercentage > 0;
+  const isAddLiquidityEnabled = idoInfo.listingRate > 0 && idoInfo.lpPercentage > 0;
 
   return (
     <s.Container flex={2} ai="center" style={{ margin: 10, minWidth: 400 }}>
@@ -98,7 +98,7 @@ const PoolInfoRenderer = (props) => {
           isAddLiquidityEnabled && <>
             <s.Container fd="row" jc="space-between">
               <s.TextID fw="700">Liquidity %</s.TextID>
-              {idoInfo.lockInfo.lpPercentage + " %"}
+              {idoInfo.lpPercentage + " %"}
             </s.Container>
             <s.SpacerSmall />
             <s.Container fd="row" jc="space-between">

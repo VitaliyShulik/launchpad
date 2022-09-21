@@ -101,7 +101,7 @@ const BuyTokenCard = (props) => {
       );
 
       IDOPoolContract.methods
-        .claimETH()
+        .refund()
         .send({
           from: blockchain.account,
         })

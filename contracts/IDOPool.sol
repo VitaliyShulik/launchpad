@@ -27,8 +27,8 @@ contract IDOPool is Ownable, ReentrancyGuard {
 
     struct Timestamps {
         uint256 startTimestamp;
-        uint256 finishTimestamp;
-        uint256 startClaimTimestamp;
+        uint256 endTimestamp;
+        uint256 unlockTimestamp;
     }
 
     struct DEXInfo {
@@ -37,8 +37,15 @@ contract IDOPool is Ownable, ReentrancyGuard {
         address weth;
     }
 
+    struct UserInfo {
+        uint debt;
+        uint total;
+        uint totalInvestedETH;
+    }
+
     ERC20 public rewardToken;
     uint256 public decimals;
+    string public metadataURL;
 
     FinInfo public finInfo;
     Timestamps public timestamps;
@@ -50,11 +57,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
     uint256 public tokensForDistribution;
     uint256 public distributedTokens;
 
-    struct UserInfo {
-        uint debt;
-        uint total;
-        uint totalInvestedETH;
-    }
+    bool public distributed = false;
 
     mapping(address => UserInfo) public userInfo;
 
@@ -70,35 +73,44 @@ contract IDOPool is Ownable, ReentrancyGuard {
         ERC20 _rewardToken,
         FinInfo memory _finInfo,
         Timestamps memory _timestamps,
-        DEXInfo memory _dexInfo
+        DEXInfo memory _dexInfo,
+        address _lockerFactoryAddress,
+        string memory _metadataURL
     ) {
 
         rewardToken = _rewardToken;
         decimals = rewardToken.decimals();
+        lockerFactory = TokenLockerFactory(_lockerFactoryAddress);
 
         finInfo = _finInfo;
 
         setTimestamps(_timestamps);
 
         dexInfo = _dexInfo;
+
+        setMetadataURL(_metadataURL);
     }
 
     function setTimestamps(Timestamps memory _timestamps) internal {
         require(
-            _timestamps.startTimestamp < _timestamps.finishTimestamp,
+            _timestamps.startTimestamp < _timestamps.endTimestamp,
             "Start timestamp must be less than finish timestamp"
         );
         require(
-            _timestamps.finishTimestamp > block.timestamp,
+            _timestamps.endTimestamp > block.timestamp,
             "Finish timestamp must be more than current block"
         );
 
         timestamps = _timestamps;
     }
 
+    function setMetadataURL(string memory _metadataURL) public{
+        metadataURL = _metadataURL;
+    }
+
     function pay() payable external {
         require(block.timestamp >= timestamps.startTimestamp, "Not started");
-        require(block.timestamp < timestamps.finishTimestamp, "Ended");
+        require(block.timestamp < timestamps.endTimestamp, "Ended");
 
         require(msg.value >= finInfo.minEthPayment, "Less then min amount");
         require(msg.value <= finInfo.maxEthPayment, "More then max amount");
@@ -109,6 +121,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
 
         uint256 tokenAmount = getTokenAmount(msg.value);
 
+        totalInvestedETH = totalInvestedETH.add(msg.value);
         tokensForDistribution = tokensForDistribution.add(tokenAmount);
         user.totalInvestedETH = user.totalInvestedETH.add(msg.value);
         user.total = user.total.add(tokenAmount);
@@ -117,22 +130,23 @@ contract IDOPool is Ownable, ReentrancyGuard {
         emit TokensDebt(msg.sender, msg.value, tokenAmount);
     }
 
-    function getTokenAmount(uint256 ethAmount)
-        internal
-        view
-        returns (uint256)
-    {
-        return ethAmount.mul(10**decimals).div(finInfo.tokenPrice);
-    }
+    function refund() external {
+        require(block.timestamp > timestamps.endTimestamp, "The IDO pool has not ended.");
+        require(totalInvestedETH < finInfo.softCap, "The IDO pool has reach soft cap.");
 
-    function getListingAmount(uint256 ethAmount)
-        internal
-        view
-        returns (uint256)
-    {
-        return ethAmount.mul(10**decimals).div(finInfo.listingPrice);
-    }
+        UserInfo storage user = userInfo[msg.sender];
 
+        uint256 _amount = user.totalInvestedETH;
+        require(_amount > 0 , "You have no investment.");
+
+        user.debt = 0;
+        user.totalInvestedETH = 0;
+        user.total = 0;
+
+        (bool success, ) = msg.sender.call{value: _amount}("");
+        require(success, "Transfer failed.");
+
+    }
 
     /// @dev Allows to claim tokens for the specific user.
     /// @param _user Token receiver.
@@ -150,18 +164,25 @@ contract IDOPool is Ownable, ReentrancyGuard {
     function proccessClaim(
         address _receiver
     ) internal nonReentrant{
-        require(block.timestamp > timestamps.startClaimTimestamp, "Distribution not started");
+        require(block.timestamp > timestamps.endTimestamp, "The IDO pool has not ended.");
+        require(totalInvestedETH >= finInfo.softCap, "The IDO pool did not reach soft cap.");
+
         UserInfo storage user = userInfo[_receiver];
+
         uint256 _amount = user.debt;
-        if (_amount > 0) {
-            user.debt = 0;
-            distributedTokens = distributedTokens.add(_amount);
-            rewardToken.safeTransfer(_receiver, _amount);
-            emit TokensWithdrawn(_receiver,_amount);
-        }
+        require(_amount > 0 , "You do not have debt tokens.");
+
+        user.debt = 0;
+        distributedTokens = distributedTokens.add(_amount);
+        rewardToken.safeTransfer(_receiver, _amount);
+        emit TokensWithdrawn(_receiver,_amount);
     }
 
     function withdrawETH() external payable onlyOwner {
+        require(block.timestamp > timestamps.endTimestamp, "The IDO pool has not ended.");
+        require(totalInvestedETH >= finInfo.softCap, "The IDO pool did not reach soft cap.");
+        require(!distributed, "Already distributed.");
+
         // This forwards all available gas. Be sure to check the return value!
         uint256 balance = address(this).balance;
 
@@ -190,12 +211,12 @@ contract IDOPool is Ownable, ReentrancyGuard {
 
             ERC20 lpToken = ERC20(lpTokenAddress);
 
-            if (timestamps.startClaimTimestamp > block.timestamp) {
+            if (timestamps.unlockTimestamp > block.timestamp) {
                 lpToken.approve(address(lockerFactory), liquidity);
                 lockerFactory.createLocker{value: msg.value}(
                     lpToken,
                     string.concat(lpToken.symbol(), " tokens locker"),
-                    liquidity, msg.sender, timestamps.startClaimTimestamp
+                    liquidity, msg.sender, timestamps.unlockTimestamp
                 );
             } else {
                 lpToken.transfer(msg.sender, liquidity);
@@ -210,11 +231,51 @@ contract IDOPool is Ownable, ReentrancyGuard {
             (bool success, ) = msg.sender.call{value: balance}("");
             require(success, "Transfer failed.");
         }
+
+        distributed = true;
     }
 
      function withdrawNotSoldTokens() external onlyOwner {
-        require(block.timestamp > timestamps.finishTimestamp, "Withdraw allowed after stop accept ETH");
+        require(distributed, "Withdraw allowed after distributed.");
+
         uint256 balance = rewardToken.balanceOf(address(this));
+        require(balance > 0, "The IDO pool has not unsold tokens.");
         rewardToken.safeTransfer(msg.sender, balance.add(distributedTokens).sub(tokensForDistribution));
+    }
+
+    function refundTokens() external onlyOwner {
+        require(block.timestamp > timestamps.endTimestamp, "The IDO pool has not ended.");
+        require(totalInvestedETH < finInfo.softCap, "The IDO pool has reach soft cap.");
+
+        uint256 balance = rewardToken.balanceOf(address(this));
+        require(balance > 0, "The IDO pool has not refund tokens.");
+        rewardToken.safeTransfer(msg.sender, balance);
+    }
+
+    function getTokenAmount(uint256 ethAmount)
+        internal
+        view
+        returns (uint256)
+    {
+        return ethAmount.mul(10**decimals).div(finInfo.tokenPrice);
+    }
+
+    function getListingAmount(uint256 ethAmount)
+        internal
+        view
+        returns (uint256)
+    {
+        return ethAmount.mul(10**decimals).div(finInfo.listingPrice);
+    }
+
+    /**
+     * @notice It allows the owner to recover wrong tokens sent to the contract
+     * @param _tokenAddress: the address of the token to withdraw with the exception of rewardToken
+     * @param _tokenAmount: the number of token amount to withdraw
+     * @dev Only callable by owner.
+     */
+    function recoverWrongTokens(address _tokenAddress, uint256 _tokenAmount) external onlyOwner {
+        require(_tokenAddress != address(rewardToken));
+        ERC20(_tokenAddress).safeTransfer(address(msg.sender), _tokenAmount);
     }
 }

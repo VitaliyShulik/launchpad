@@ -15,7 +15,7 @@ contract IDOFactory is Ownable {
     ERC20Burnable public feeToken;
     address public feeWallet;
     uint256 public feeAmount;
-    uint256 public burnPercent;
+    uint256 public burnPercent; // use this state only if your token is ERC20Burnable and has burnFrom method
     uint256 public divider;
 
     event IDOCreated(
@@ -108,16 +108,23 @@ contract IDOFactory is Ownable {
 
 
         if(feeAmount > 0){
-            uint256 burnAmount = feeAmount.mul(burnPercent).div(divider);
+            if (burnPercent > 0){
+                uint256 burnAmount = feeAmount.mul(burnPercent).div(divider);
 
-            feeToken.safeTransferFrom(
-                msg.sender,
-                feeWallet,
-                feeAmount.sub(burnAmount)
-            );
+                feeToken.safeTransferFrom(
+                    msg.sender,
+                    feeWallet,
+                    feeAmount.sub(burnAmount)
+                );
 
-            feeToken.burnFrom(msg.sender, burnAmount);
-
+                feeToken.burnFrom(msg.sender, burnAmount);
+            } else {
+                feeToken.safeTransferFrom(
+                    msg.sender,
+                    feeWallet,
+                    feeAmount
+                );
+            }
         }
     }
 

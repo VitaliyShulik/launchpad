@@ -7,10 +7,11 @@ import * as s from "../../styles/global";
 import ReadMore from "../Form/readMore";
 import SocialMediaModal from "../Modal/socialmediaModal";
 
+import imageSolid from "../../assets/images/image-solid.png"
+
 const TokenInfo = (props) => {
   const contract = useSelector((state) => state.contract);
   const [image, setImage] = useState(null);
-  let imageSolid = require("../../assets/images/image-solid.png");
   const { idoAddress } = props;
 
   const idoInfo = usePoolContext().allPools[idoAddress];

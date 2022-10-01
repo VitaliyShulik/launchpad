@@ -8,14 +8,14 @@ import * as s from "../../styles/global";
 import ProgressBar from "../Modal/ProgressBar";
 import PoolCountdown from "../Utils/poolCountdown";
 
+import imageSolid from "../../assets/images/image-solid.png"
+
 const LongIdo = (props) => {
   const contract = useSelector((state) => state.contract);
   const [image, setImage] = useState("");
   const { idoAddress } = props;
 
   const idoInfo = usePoolContext().allPools[idoAddress];
-
-  let imageSolid = require("../../assets/images/image-solid.png");
 
   useEffect(async () => {
     if (idoInfo) {

@@ -1,6 +1,6 @@
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import DateTimePicker from "@mui/lab/DateTimePicker";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+
 import { MenuItem, TextField, Checkbox } from "@mui/material";
 import BigNumber from "bignumber.js";
 import React from "react";

@@ -8,12 +8,12 @@ import { getValidImageUrl } from "../../utils/utils";
 import * as s from "../../styles/global";
 import ProgressBar from "../Modal/ProgressBar";
 
+import imageSolid from "../../assets/images/image-solid.png"
+
 const PoolRenderer = (props) => {
   const contract = useSelector((state) => state.contract);
   const [image, setImage] = useState("");
   const { pool: idoInfo } = props;
-
-  let imageSolid = require("../../assets/images/image-solid.png");
 
   const card = useRef(null);
 
@@ -52,7 +52,7 @@ const PoolRenderer = (props) => {
               style={{ width: 100, height: 100, borderRadius: 20 }}
               src={image}
               onError={(e) => {
-                setImage(imageSolid.default);
+                setImage(imageSolid);
               }}
             ></img>
           </s.Container>

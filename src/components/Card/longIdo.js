@@ -59,7 +59,7 @@ const LongIdo = (props) => {
               style={{ width: 60, height: 60, borderRadius: 10 }}
               src={image}
               onError={(e) => {
-                setImage(imageSolid.default);
+                setImage(imageSolid);
               }}
             ></img>
             <s.Container flex={1} ai="flex-start" style={{ paddingLeft: 20 }}>

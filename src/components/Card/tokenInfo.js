@@ -53,7 +53,7 @@ const TokenInfo = (props) => {
             style={{ width: 100, height: 100, borderRadius: 20 }}
             src={image}
             onError={(e) => {
-              setImage(imageSolid.default);
+              setImage(imageSolid);
             }}
           ></img>
         </div>

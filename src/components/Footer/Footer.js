@@ -34,7 +34,7 @@ const Footer = () => {
               target="_blank"
               href={
                 explorer +
-                "address/" +
+                "/address/" +
                 IDOFactory.networks[networkId].address
               }
             >
@@ -45,7 +45,7 @@ const Footer = () => {
                 target="_blank"
                 href={
                   explorer +
-                  "address/" +
+                  "/address/" +
                   LockerFactory.networks[networkId].address
                 }
               >

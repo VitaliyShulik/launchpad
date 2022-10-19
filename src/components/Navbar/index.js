@@ -71,7 +71,7 @@ const Navigation = () => {
                 id="collasible-nav-dropdown"
               >
                 <Nav.Link
-                  href={`${explorer}address/${FeeToken._address}`}
+                  href={`${explorer}/address/${FeeToken._address}`}
                   target="_blank"
                 >
                   {`$${FeeTokenSymbol} ` +

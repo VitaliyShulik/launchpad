@@ -2,6 +2,7 @@
 import Web3 from "web3";
 import IDOFactory from "../../contracts/IDOFactory.json";
 import LockerFactory from "../../contracts/TokenLockerFactory.json";
+import { networks } from '../../utils/chainInfo';
 
 const fetchContractRequest = () => {
   return {
@@ -27,8 +28,9 @@ export const fetchContract = () => {
   return async (dispatch) => {
     dispatch(fetchContractRequest());
 
-    let web3 = new Web3(process.env.REACT_APP_WS);
-    const networkId = process.env.REACT_APP_networkID;
+    const networkId = process.env.REACT_APP_networkID || 5;
+
+    let web3 = new Web3(networks[networkId].wsrpc);
     try {
       const IDOFactoryNetworkData = await IDOFactory.networks[networkId];
       const IDOFactoryContract = new web3.eth.Contract(

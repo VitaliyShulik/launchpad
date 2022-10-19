@@ -7,6 +7,7 @@ import IDOPool from "../../contracts/IDOPool.json";
 import { fetchData } from "../../redux/data/dataActions";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
+import { networks } from "../../utils/chainInfo";
 
 const WithdrawETH = (props) => {
   const blockchain = useSelector((state) => state.blockchain);
@@ -121,6 +122,8 @@ const WithdrawETH = (props) => {
 
   const hasEnded = parseInt(idoInfo.end) < parseInt(Date.now() / 1000);
 
+  const { baseCurrency } = networks[process.env.REACT_APP_networkID || 5]
+
   return (
     <s.Card
       style={{
@@ -150,7 +153,7 @@ const WithdrawETH = (props) => {
           <s.TextDescription>
             {BigNumber(web3.utils.fromWei(idoInfo.balance)).toFixed(2) +
               " " +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrency.symbol}
           </s.TextDescription>
         </s.Container>
         <s.button

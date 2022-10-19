@@ -8,6 +8,7 @@ import IDOPool from "../../contracts/IDOPool.json";
 import { fetchData } from "../../redux/data/dataActions";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
+import { networks } from "../../utils/chainInfo";
 import ProgressBar from "../Modal/ProgressBar";
 import PoolCountdown from "../Utils/poolCountdown";
 
@@ -17,7 +18,8 @@ const BuyTokenCard = (props) => {
   const [loading, setLoading] = useState(false);
   const { idoAddress } = props;
   const dispatch = useDispatch();
-  const currency = " " + process.env.REACT_APP_CURRENCY;
+  const { baseCurrency } = networks[process.env.REACT_APP_networkID || 5]
+  const currency = " " + baseCurrency.symbol;
   const idoInfo = usePoolContext().allPools[idoAddress];
 
   if (!blockchain.account) {
@@ -182,7 +184,7 @@ const BuyTokenCard = (props) => {
       </s.Container>
       <s.Container fd="row" jc="space-between" ai="center">
         <s.Container flex={4}>
-          <s.TextID>My invested {process.env.REACT_APP_CURRENCY}</s.TextID>
+          <s.TextID>My invested {baseCurrency.symbol}</s.TextID>
           <s.TextDescription>
             {BigNumber(web3.utils.fromWei(idoInfo.userData.totalInvestedETH)).toFormat(
               2

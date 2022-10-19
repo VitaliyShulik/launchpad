@@ -6,7 +6,7 @@ import BigNumber from "bignumber.js";
 import React from "react";
 import { useStoreContext } from "../../../../context/store";
 import * as s from "../../../../styles/global";
-import { chainRouter } from "../../../../utils/chainInfo";
+import { chainRouter, networks } from "../../../../utils/chainInfo";
 import { timeout } from "../../../../utils/utils";
 import { NumberField } from "../../../FormField";
 export default function IDOInfo() {
@@ -16,12 +16,14 @@ export default function IDOInfo() {
     isAddLiquidityEnabled: [isAddLiquidityEnabled, setIsAddLiquidityEnabled],
   } = context;
 
+  const { baseCurrency } = networks[process.env.REACT_APP_networkID || 5]
+
   return (
     <s.Container flex={1}>
       <s.TextTitle fullWidth>IDO Information</s.TextTitle>
       <s.SpacerSmall />
       <s.TextID>
-        If I pay 1 {process.env.REACT_APP_CURRENCY} how much token I will get?
+        If I pay 1 {baseCurrency.symbol} how much token I will get?
       </s.TextID>
       <NumberField
         value={BigNumber(context.tokenRate[0]).toFixed()}
@@ -151,7 +153,7 @@ export default function IDOInfo() {
       {
         isAddLiquidityEnabled && <>
           <s.TextID>
-            If I pay 1 {process.env.REACT_APP_CURRENCY} how much token I will get
+            If I pay 1 {baseCurrency.symbol} how much token I will get
             after presale?
           </s.TextID>
           <NumberField

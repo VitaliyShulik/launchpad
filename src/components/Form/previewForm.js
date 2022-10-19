@@ -1,7 +1,9 @@
 import React from "react";
 import * as s from "../../styles/global";
+import { networks } from "../../utils/chainInfo";
 
 const PreviewForm = (props) => {
+  const { baseCurrency } = networks[process.env.REACT_APP_networkID || 5]
   return (
     <s.Container>
       <s.TextTitle style={{ width: 640 }}>Preview</s.TextTitle>
@@ -21,11 +23,11 @@ const PreviewForm = (props) => {
         style={{ marginTop: 20, flexWrap: "wrap" }}
       >
         <s.TextDescription>
-          Min {process.env.REACT_APP_CURRENCY} Purchase
+          Min {baseCurrency.symbol} Purchase
         </s.TextDescription>
         <s.Input readOnly />
         <s.TextDescription>
-          Max {process.env.REACT_APP_CURRENCY} Purchase
+          Max {baseCurrency.symbol} Purchase
         </s.TextDescription>
         <s.Input readOnly />
       </s.Container>

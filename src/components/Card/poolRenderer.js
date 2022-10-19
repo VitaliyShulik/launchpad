@@ -9,6 +9,7 @@ import * as s from "../../styles/global";
 import ProgressBar from "../Modal/ProgressBar";
 
 import imageSolid from "../../assets/images/image-solid.png"
+import { networks } from "../../utils/chainInfo";
 
 const PoolRenderer = (props) => {
   const contract = useSelector((state) => state.contract);
@@ -19,6 +20,7 @@ const PoolRenderer = (props) => {
 
   const isStarted = parseInt(idoInfo.start) < (parseInt(Date.now() / 1000));
   const hasEnded = parseInt(idoInfo.end) < (parseInt(Date.now() / 1000));
+  const { baseCurrency } = networks[process.env.REACT_APP_networkID || 5]
 
   useEffect(async () => {
     setImage(getValidImageUrl(idoInfo.metadata.image));
@@ -91,7 +93,7 @@ const PoolRenderer = (props) => {
               2
             ) +
               " " +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrency.symbol}
           </s.Container>
           <s.Container ai="center" flex={1}>
             <s.TextID fullWidth>Hard cap</s.TextID>
@@ -99,7 +101,7 @@ const PoolRenderer = (props) => {
               2
             ) +
               " " +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrency.symbol}
           </s.Container>
         </s.Container>
         <s.SpacerSmall />

@@ -11,7 +11,6 @@ const LockerInfoRenderer = (props) => {
   const { lockerAddress } = props;
   const [loading, setLoading] = useState(false);
   const blockchain = useSelector((state) => state.blockchain);
-  const currency = " " + process.env.REACT_APP_CURRENCY;
   const dispatch = useDispatch();
 
   const poolContext = usePoolContext();

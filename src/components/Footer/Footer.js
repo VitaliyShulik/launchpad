@@ -2,6 +2,7 @@ import React from "react";
 import { SocialIcon } from "react-social-icons";
 import IDOFactory from "../../contracts/IDOFactory.json";
 import LockerFactory from "../../contracts/TokenLockerFactory.json";
+import { networks } from "../../utils/chainInfo";
 import {
   Box,
   Column,
@@ -12,6 +13,8 @@ import {
 } from "./FooterStyle";
 
 const Footer = () => {
+  const networkId = process.env.REACT_APP_networkID || 5
+  const { explorer } = networks[networkId]
   return (
     <Box>
       <hr
@@ -30,31 +33,24 @@ const Footer = () => {
             <FooterLink
               target="_blank"
               href={
-                process.env.REACT_APP_Explorer +
+                explorer +
                 "address/" +
-                IDOFactory.networks[process.env.REACT_APP_networkID].address
+                IDOFactory.networks[networkId].address
               }
             >
-              {IDOFactory.networks[process.env.REACT_APP_networkID].address}
+              {IDOFactory.networks[networkId].address}
             </FooterLink>
-            {
-              process.env.REACT_APP_ENABLE_LOCKER === 'true' && (
-                <>
-                  <p>Locker Factory: </p>
-                  <FooterLink
-                    target="_blank"
-                    href={
-                      process.env.REACT_APP_Explorer +
-                      "address/" +
-                      LockerFactory.networks[process.env.REACT_APP_networkID].address
-                    }
-                  >
-                    {LockerFactory.networks[process.env.REACT_APP_networkID].address}
-                  </FooterLink>
-                </>
-              )
-
-            }
+              <p>Locker Factory: </p>
+              <FooterLink
+                target="_blank"
+                href={
+                  explorer +
+                  "address/" +
+                  LockerFactory.networks[networkId].address
+                }
+              >
+                {LockerFactory.networks[networkId].address}
+              </FooterLink>
             {/*  */}
           </Column>
           <Column fd="row" jc="space-evenly">

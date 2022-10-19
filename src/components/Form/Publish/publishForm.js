@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useStoreContext } from "../../../context/store";
 import * as s from "../../../styles/global";
-import createIDOFormModal from "./FormModal/createIDOFormModal";
 import IDOInfo from "./Step/idoInformation";
 import Preview from "./Step/preview";
 import ProjectInfo from "./Step/projectInfo";
@@ -16,13 +15,11 @@ import TokenVerify from "./Step/tokenVerify";
 function getSteps() {
   return ["Token verify", "IDO information", "Project information", "Submit"];
 }
-const { formId, formField } = createIDOFormModal;
 
 export default function StepprtForm() {
   const blockchain = useSelector((state) => state.blockchain);
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
-  const isLastStep = activeStep === steps.length - 1;
   const form = useForm();
   const context = useStoreContext();
 

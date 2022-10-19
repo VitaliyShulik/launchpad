@@ -5,6 +5,7 @@ import Web3Modal from "web3modal";
 import FeeToken from "../../contracts/FeeToken.json";
 import IDOFactory from "../../contracts/IDOFactory.json";
 import LockerFactory from "../../contracts/TokenLockerFactory.json";
+import { networks } from "../../utils/chainInfo";
 // log
 import { fetchData } from "../data/dataActions";
 
@@ -18,7 +19,7 @@ const providerOptions = {
 };
 
 const web3Modal = new Web3Modal({
-  network: process.env.REACT_APP_modalNetwork, // optional
+  network: process.env.REACT_APP_networkID, // optional
   cacheProvider: true, // optional
   providerOptions, // required
 });
@@ -102,7 +103,7 @@ export const connect = () => {
     } else {
       web3Modal.clearCachedProvider();
       dispatch(
-        connectFailed("Change network to " + process.env.REACT_APP_modalNetwork)
+        connectFailed("Change network to " + networks[process.env.REACT_APP_networkID || 5].name)
       );
     }
   };

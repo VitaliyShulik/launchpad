@@ -5,13 +5,15 @@ import { useSelector } from "react-redux";
 import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
+import { networks } from "../../utils/chainInfo";
 import { getRouterName } from "../../utils/utils";
 import TokenInfo from "./tokenInfo";
 
 const PoolInfoRenderer = (props) => {
   const contract = useSelector((state) => state.contract);
   const { idoAddress } = props;
-  const currency = " " + process.env.REACT_APP_CURRENCY;
+  const { baseCurrency } = networks[process.env.REACT_APP_networkID || 5]
+  const currency = " " + baseCurrency.symbol;
 
   const poolContext = usePoolContext();
 

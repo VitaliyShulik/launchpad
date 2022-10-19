@@ -11,6 +11,7 @@ import ERC20 from "../../contracts/ERC20.json";
 import { fetchData } from "../../redux/data/dataActions";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
+import { networks } from "../../utils/chainInfo";
 
 const styles = {
   root: {
@@ -177,6 +178,8 @@ const LockTokenForm = (props) => {
       });
   };
 
+  const { baseCurrency } = networks[process.env.REACT_APP_networkID || 5]
+
   return (
     <s.Card
       fd="column"
@@ -325,7 +328,7 @@ const LockTokenForm = (props) => {
       {"Fee : " +
         web3.utils.fromWei(fee) +
         " " +
-        process.env.REACT_APP_CURRENCY}
+        baseCurrency.symbol}
     </s.Card>
   );
 };

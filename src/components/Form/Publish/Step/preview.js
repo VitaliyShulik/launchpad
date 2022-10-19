@@ -8,7 +8,7 @@ import { useStoreContext } from "../../../../context/store";
 import ERC20 from "../../../../contracts/ERC20.json";
 import { fetchData } from "../../../../redux/data/dataActions";
 import * as s from "../../../../styles/global";
-import { chainRouter } from "../../../../utils/chainInfo";
+import { chainRouter, networks } from "../../../../utils/chainInfo";
 import SocialMediaModal from "../../../Modal/socialmediaModal";
 import ReadMore from "../../readMore";
 const axios = require("axios");
@@ -40,6 +40,9 @@ export default function Preview() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const networkId = process.env.REACT_APP_networkID || 5;
+
+  const { baseCurrency } = networks[networkId]
 
   const address = context.address[0];
   const icon = context.icon[0];
@@ -152,9 +155,9 @@ export default function Preview() {
       BigNumber(context.unlock[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
     ];
     const dexInfo = [
-      chainRouter[process.env.REACT_APP_networkID][0].ROUTER,
-      chainRouter[process.env.REACT_APP_networkID][0].FACTORY,
-      chainRouter[process.env.REACT_APP_networkID][0].WETH,
+      chainRouter[networkId][0].ROUTER,
+      chainRouter[networkId][0].FACTORY,
+      chainRouter[networkId][0].WETH,
     ];
 
     blockchain.IDOFactory.methods
@@ -267,7 +270,7 @@ export default function Preview() {
       <s.TextID>Token rate</s.TextID>
       <s.TextDescription>
         {"1 $" +
-          process.env.REACT_APP_CURRENCY +
+          baseCurrency.symbol +
           " -> " +
           BigNumber(context.tokenRate[0]).toFormat(2) +
           " $" +
@@ -279,20 +282,20 @@ export default function Preview() {
           <s.TextDescription>
             {BigNumber(context.softCap[0]).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrency.symbol}
           </s.TextDescription>
           <s.SpacerSmall />
           <s.TextID>Hard Cap</s.TextID>
           <s.TextDescription>
             {BigNumber(context.hardCap[0]).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrency.symbol}
           </s.TextDescription>
           <s.SpacerSmall />
           {/* <s.TextID>Pool router</s.TextID>
           <s.TextDescription>
             {
-              chainRouter[process.env.REACT_APP_networkID][context.router[0]]
+              chainRouter[networkId][context.router[0]]
                 .name
             }
           </s.TextDescription> */}
@@ -302,14 +305,14 @@ export default function Preview() {
           <s.TextDescription>
             {BigNumber(context.minETH[0]).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrency.symbol}
           </s.TextDescription>
           <s.SpacerSmall />
           <s.TextID>Maximum Buy</s.TextID>
           <s.TextDescription>
             {BigNumber(context.maxETH[0]).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrency.symbol}
           </s.TextDescription>
           {
             isAddLiquidityEnabled && <>
@@ -327,7 +330,7 @@ export default function Preview() {
           <s.TextID>Listing rate</s.TextID>
           <s.TextDescription>
             {"1 $" +
-              process.env.REACT_APP_CURRENCY +
+              baseCurrency.symbol +
               " -> " +
               BigNumber(context.listingRate[0]).toFormat(2) +
               " $" +

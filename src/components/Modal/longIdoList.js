@@ -3,7 +3,6 @@ import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import LongIdo from "../Card/longIdo";
-import PoolRenderer from "../Card/poolRenderer";
 
 const LongIdoList = (props) => {
   const [limit, setLimit] = useState(5);
@@ -21,9 +20,6 @@ const LongIdoList = (props) => {
   return (
     <s.Container ai="center">
       <s.Container ai="center">
-
-      {
-        process.env.REACT_APP_ENABLE_LOCKER === 'true' ?
         <s.Container
           jc="space-around"
           style={{ flexWrap: "wrap", marginTop: 20 }}
@@ -38,20 +34,8 @@ const LongIdoList = (props) => {
                 </s.Container>
               );
             })}
-        </s.Container> :
-        <s.Container
-          fd="row"
-          jc="space-around"
-          style={{ flexWrap: "wrap", marginTop: 20 }}
-        >
-          {userPoolAddresses.map((poolAddress, index) => {
-              if (index >= limit) {
-                return null;
-              }
-              return <PoolRenderer key={index} pool={allPools[poolAddress]}/>;
-            })}
         </s.Container>
-      }
+
       </s.Container>
       <s.SpacerSmall />
       {limit >= userPoolAddresses.length ? null : (

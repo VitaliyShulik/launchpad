@@ -6,6 +6,7 @@ import { LinkContainer } from "react-router-bootstrap";
 import "../../App.css";
 import { clearCache, connect } from "../../redux/blockchain/blockchainActions";
 import * as s from "../../styles/global";
+import { networks } from "../../utils/chainInfo";
 
 const Navigation = () => {
   const dispatch = useDispatch();
@@ -17,6 +18,9 @@ const Navigation = () => {
   } = useSelector((state) => state.data);
 
   const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
+
+  const networkId = process.env.REACT_APP_networkID || 5;
+  const { name: networkName, baseCurrency, explorer } = networks[networkId]
 
   return (
     <Navbar collapseOnSelect expand="lg" variant="dark" style={{ margin: 15 }}>
@@ -47,22 +51,19 @@ const Navigation = () => {
             <LinkContainer to="/launchpad">
               <Nav.Link>Launchpad</Nav.Link>
             </LinkContainer>
-            {
-              process.env.REACT_APP_ENABLE_LOCKER === 'true' &&
-              <LinkContainer to="/locker">
-                <Nav.Link>Locker</Nav.Link>
-              </LinkContainer>
-            }
+            <LinkContainer to="/locker">
+              <Nav.Link>Locker</Nav.Link>
+            </LinkContainer>
             <LinkContainer to="/account">
               <Nav.Link>Account</Nav.Link>
             </LinkContainer>
           </Nav>
           <Nav>
-            <Nav.Link>{process.env.REACT_APP_networkID}</Nav.Link>
+            <Nav.Link>{networkName}</Nav.Link>
             {ETHamount >= 0 ? (
               <NavDropdown
                 title={
-                  `$${process.env.REACT_APP_CURRENCY || 'ETH'} ` +
+                  `$${baseCurrency.symbol} ` +
                   BigNumber(ETHamount)
                     .dividedBy(10 ** 18)
                     .toFormat(2)
@@ -70,7 +71,7 @@ const Navigation = () => {
                 id="collasible-nav-dropdown"
               >
                 <Nav.Link
-                  href={`${process.env.REACT_APP_Explorer}address/${FeeToken._address}`}
+                  href={`${explorer}address/${FeeToken._address}`}
                   target="_blank"
                 >
                   {`$${FeeTokenSymbol} ` +

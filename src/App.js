@@ -16,11 +16,20 @@ import Publish from "./pages/publish";
 import { fetchContract } from "./redux/contract/contractAction";
 import { checkConnection } from "./redux/blockchain/blockchainActions";
 import { fetchData } from "./redux/data/dataActions";
+
+import { useStorageContract } from './hooks/useStorageContract';
+import { fetchDomainData } from "./utils/app";
+
 import * as s from "./styles/global";
+
 function App() {
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
+
+  const storage = useStorageContract();
+
+  const networkId = process.env.REACT_APP_networkID || 5
 
   useEffect(() => {
     if (blockchain.account !== null) {
@@ -30,8 +39,27 @@ function App() {
   }, [dispatch, blockchain.account]);
 
   useEffect(() => {
+    if (!storage) return
+
+    try {
+      const start = async () => {
+        const data = await fetchDomainData(networkId, storage)
+
+        if (data) {
+          console.log("domainData", data);
+        }
+      }
+
+      start()
+    } catch (error) {
+      console.error(error)
+    }
+  }, [networkId, storage,])
+
+  useEffect(() => {
     dispatch(fetchContract());
-    checkConnection(dispatch)
+    checkConnection(dispatch);
+
   }, []);
 
   return (

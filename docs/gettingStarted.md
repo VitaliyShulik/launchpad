@@ -3,8 +3,7 @@
 ## Preparation
 
 - Copy `.env.example`, rename it to `.env.production` and fill all constants
-- In `migrations/1_deployed.js` file replace **feeToken** token address to yours
-- In `contracts/IDOPool.sol` file replace **dev** address (required for **emergencyWithdraw** extra method)  to yours
+- In `migrations/1_deployed.js` file replace **feeToken.address** token address to yours
 - Create `.secret` file with your mnemonic phrase (ussualy it is a 12 word, required for deploy smart contracts)
 
 ## Installation

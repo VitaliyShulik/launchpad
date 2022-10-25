@@ -79,6 +79,18 @@ module.exports = {
       timeoutBlocks: 200,
       skipDryRun: true,
     },
+    kek: {
+      provider: function () {
+        return new HDWalletProvider(
+          mnemonic,
+          `https://mainnet.kekchain.com`
+        );
+      },
+      network_id: 103090,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+    },
   },
 
   // Set default mocha options here, use special reporters etc.

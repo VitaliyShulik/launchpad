@@ -11369,10 +11369,61 @@
       "links": {},
       "address": "0x2D62d8371024701E67bBEA0c87DEBD3927F1779e",
       "transactionHash": "0xca271acdf5c833e71424e5fad52ecec847facbd163fb9ccb6dbcf5ef68ec3b81"
+    },
+    "420420": {
+      "events": {
+        "0x4fd7b129e67605fe15d5e55ba0e969876d1549f11dc6aa106a702d51b27f5f4d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "lockerId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "lockerAddress",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "tokenAddress",
+              "type": "address"
+            }
+          ],
+          "name": "LockerCreated",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x9F5BcE99440cbD9c51b0bb734CC583911bD46F6d",
+      "transactionHash": "0xbfd7549d5958be1cca1ad248b311e4ed7e2583ed6b64bb30ff5a21557e73ea69"
     }
   },
   "schemaVersion": "3.4.8",
-  "updatedAt": "2022-09-23T10:44:02.614Z",
+  "updatedAt": "2022-10-21T12:58:30.792Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

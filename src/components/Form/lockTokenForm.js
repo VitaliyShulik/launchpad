@@ -8,7 +8,7 @@ import { Badge } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ERC20 from "../../contracts/ERC20.json";
-import { fetchData } from "../../redux/data/dataActions";
+import { fetchData } from "../../redux/userData/dataActions";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import { networks } from "../../utils/chainInfo";

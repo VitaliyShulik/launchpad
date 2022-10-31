@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useStoreContext } from "../../../../context/store";
 import ERC20 from "../../../../contracts/ERC20.json";
-import { fetchData } from "../../../../redux/data/dataActions";
+import { fetchData } from "../../../../redux/userData/dataActions";
 import * as s from "../../../../styles/global";
 import { chainRouter, networks } from "../../../../utils/chainInfo";
 import SocialMediaModal from "../../../Modal/socialmediaModal";
@@ -32,7 +32,7 @@ export default function Preview() {
   const {
     FeeTokenApproveToFactory,
     FeeTokenSymbol,
-  } = useSelector((state) => state.data);
+  } = useSelector((state) => state.userData);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

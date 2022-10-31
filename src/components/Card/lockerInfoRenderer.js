@@ -4,7 +4,7 @@ import Countdown from "react-countdown";
 import { useDispatch, useSelector } from "react-redux";
 import { usePoolContext } from "../../context/poolContext";
 import Locker from "../../contracts/TokenLocker.json";
-import { fetchData } from "../../redux/data/dataActions";
+import { fetchData } from "../../redux/userData/dataActions";
 import * as s from "../../styles/global";
 
 const LockerInfoRenderer = (props) => {

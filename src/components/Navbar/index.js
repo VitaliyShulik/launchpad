@@ -15,7 +15,7 @@ const Navigation = () => {
     ETHamount,
     FeeTokenamount,
     FeeTokenSymbol,
-  } = useSelector((state) => state.data);
+  } = useSelector((state) => state.userData);
 
   const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
 
@@ -56,6 +56,9 @@ const Navigation = () => {
             </LinkContainer>
             <LinkContainer to="/account">
               <Nav.Link>Account</Nav.Link>
+            </LinkContainer>
+            <LinkContainer to="/manage">
+              <Nav.Link>Manage</Nav.Link>
             </LinkContainer>
           </Nav>
           <Nav>

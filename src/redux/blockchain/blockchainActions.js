@@ -7,7 +7,7 @@ import IDOFactory from "../../contracts/IDOFactory.json";
 import LockerFactory from "../../contracts/TokenLockerFactory.json";
 import { networks } from "../../utils/chainInfo";
 // log
-import { fetchData } from "../data/dataActions";
+import { fetchData } from "../userData/dataActions";
 
 const providerOptions = {
   walletconnect: {

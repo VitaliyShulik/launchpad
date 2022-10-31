@@ -22,29 +22,25 @@ const fetchDataFailed = (payload) => {
 };
 
 const fetchUserData = async (account) => {
-  const idoFactoryAddress = await store.getState().blockchain.IDOFactory
-    ._address;
-  const FeeTokenamount = await store
-    .getState()
-    .blockchain.FeeToken.methods.balanceOf(account)
-    .call();
-  const FeeTokenSymbol = await store
-    .getState()
-    .blockchain.FeeToken.methods.symbol()
-    .call();
-  const FeeTokenApproveToFactory = await store
-    .getState()
-    .blockchain.FeeToken.methods.allowance(account, idoFactoryAddress)
-    .call();
-  const ethAmount = await store
-    .getState()
-    .blockchain.web3.eth.getBalance(account);
+  const {
+    IDOFactory,
+    FeeToken,
+    web3,
+  } = store.getState().blockchain
+
+  const idoFactoryAddress = IDOFactory._address;
+
+  const FeeTokenamount = await FeeToken.methods.balanceOf(account).call();
+  const FeeTokenSymbol = await FeeToken.methods.symbol().call();
+  const FeeTokenApproveToFactory = await FeeToken.methods.allowance(account, idoFactoryAddress).call();
+
+  const ETHamount = await web3.eth.getBalance(account);
 
   return {
     FeeTokenamount,
     FeeTokenSymbol,
     FeeTokenApproveToFactory,
-    ethAmount,
+    ETHamount,
   }
 }
 

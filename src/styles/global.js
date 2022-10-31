@@ -304,3 +304,15 @@ export const BlurTextField = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
 `;
+
+export const LoaderWrapper = styled.div`
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`

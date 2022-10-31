@@ -4,15 +4,13 @@ import Countdown from "react-countdown";
 import { useDispatch, useSelector } from "react-redux";
 import { usePoolContext } from "../../context/poolContext";
 import IDOPool from "../../contracts/IDOPool.json";
-import { fetchData } from "../../redux/data/dataActions";
+import { fetchData } from "../../redux/userData/dataActions";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import { networks } from "../../utils/chainInfo";
 
 const WithdrawETH = (props) => {
   const blockchain = useSelector((state) => state.blockchain);
-  const data = useSelector((state) => state.data);
-  const [price, setPrice] = useState("0");
   const [loading, setLoading] = useState(false);
   const { idoAddress } = props;
   const dispatch = useDispatch();

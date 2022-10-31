@@ -17,11 +17,11 @@ const LongIdo = (props) => {
 
   const idoInfo = usePoolContext().allPools[idoAddress];
 
-  useEffect(async () => {
+  useEffect(() => {
     if (idoInfo) {
-      setImage(getValidImageUrl(idoInfo.metadata.image));
+      setImage(getValidImageUrl(idoInfo.metadata.image || idoInfo.metadata.imageHash));
     }
-  }, [idoInfo.metadata.image]);
+  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash]);
 
   if (!idoInfo) {
     return (

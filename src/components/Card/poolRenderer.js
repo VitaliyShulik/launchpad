@@ -22,9 +22,11 @@ const PoolRenderer = (props) => {
   const hasEnded = parseInt(idoInfo.end) < (parseInt(Date.now() / 1000));
   const { baseCurrency } = networks[process.env.REACT_APP_networkID || 5]
 
-  useEffect(async () => {
-    setImage(getValidImageUrl(idoInfo.metadata.image));
-  }, [idoInfo]);
+  useEffect(() => {
+    if (idoInfo) {
+      setImage(getValidImageUrl(idoInfo.metadata.image || idoInfo.metadata.imageHash));
+    }
+  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash]);
 
   // if (!utils.isValidPool(idoInfo) || !idoInfo) {
   //   return (

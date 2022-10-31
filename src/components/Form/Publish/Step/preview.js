@@ -11,7 +11,6 @@ import * as s from "../../../../styles/global";
 import { chainRouter, networks } from "../../../../utils/chainInfo";
 import SocialMediaModal from "../../../Modal/socialmediaModal";
 import ReadMore from "../../readMore";
-const axios = require("axios");
 
 const projectId = process.env.REACT_APP_INFURA_IPFS_KEY;
 const projectSecret = process.env.REACT_APP_INFURA_IPFS_SECRET;
@@ -25,9 +24,6 @@ const ipfs = create({
       authorization: auth,
   },
 });
-
-const key = process.env.REACT_APP_PINATA_KEY;
-const secret = process.env.REACT_APP_PINATA_SECRET;
 
 export default function Preview() {
   const context = useStoreContext();
@@ -91,51 +87,51 @@ export default function Preview() {
   }, []);
 
   const pinJSONToIPFS = async (JSONBody) => {
-    const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
-    //making axios POST request to Pinata ⬇️
-    return axios
-      .post(url, JSONBody, {
-        headers: {
-          pinata_api_key: key,
-          pinata_secret_api_key: secret,
-        },
-      })
-      .then(function (response) {
-        return {
-          success: true,
-          pinataUrl:
-            "https://gateway.pinata.cloud/ipfs/" + response.data.IpfsHash,
-        };
-      })
-      .catch(function (error) {
-        console.log(error);
-        return {
-          success: false,
-          message: error.message,
-        };
-      });
+    try {
+      const JSONBodyString = JSON.stringify(JSONBody);
+      const response = await ipfs.add(JSONBodyString);
+      return {
+        success: true,
+        ipfsHash:
+          response.path,
+      };
+
+    } catch (error) {
+
+      console.log(error);
+      return {
+        success: false,
+        message: error.message,
+      };
+
+    }
   };
 
   const createIDO = async () => {
     setLoading(true);
+
     const iconAdded = await ipfs.add(icon);
-    let iconURL = `https://ipfs.infura.io/ipfs/${iconAdded.path}`;
-    const metadata = new Object();
-    metadata.image = iconURL;
-    metadata.description = context.description[0];
-    metadata.links = new Object();
-    metadata.links.website = context.website[0];
-    metadata.links.discord = context.discord[0];
-    metadata.links.telegram = context.telegram[0];
-    metadata.links.twitter = context.twitter[0];
-    const pinataResponse = await pinJSONToIPFS(metadata);
-    if (!pinataResponse.success) {
+
+    const metadata = {
+      imageHash: iconAdded.path,
+      description: context.description[0],
+      links: {
+        website: context.website[0],
+        discord: context.discord[0],
+        telegram: context.telegram[0],
+        twitter: context.twitter[0],
+      }
+    };
+
+    const ipfsResonse = await pinJSONToIPFS(metadata);
+
+    if (!ipfsResonse.success) {
       return {
         success: false,
         status: "😢 Something went wrong while uploading your tokenURI.",
       };
     }
-    const tokenURI = pinataResponse.pinataUrl;
+    const tokenURI = ipfsResonse.ipfsHash;
 
     const rewardToken = context.address[0];
     const tokenRate = blockchain.web3.utils.toWei(context.tokenRate[0]);

@@ -17,8 +17,10 @@ const TokenInfo = (props) => {
   const idoInfo = usePoolContext().allPools[idoAddress];
 
   useEffect(() => {
-    setImage(getValidImageUrl(idoInfo.metadata.image));
-  }, [idoInfo]);
+    if (idoInfo) {
+      setImage(getValidImageUrl(idoInfo.metadata.image || idoInfo.metadata.imageHash));
+    }
+  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash]);
 
   if (!idoInfo) {
     return null;

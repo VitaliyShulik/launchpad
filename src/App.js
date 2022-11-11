@@ -18,8 +18,7 @@ import { fetchContract } from "./redux/contract/contractAction";
 import { checkConnection } from "./redux/blockchain/blockchainActions";
 import { fetchData } from "./redux/userData/dataActions";
 
-import { useStorageContract } from './hooks/useStorageContract';
-import { fetchDomainData } from "./utils/app";
+import useAppData from "./hooks/useAppData";
 
 import * as s from "./styles/global";
 import Loader from "./components/Loader";
@@ -28,11 +27,13 @@ function App() {
   const dispatch = useDispatch();
   const blockchain = useSelector((state) => state.blockchain);
 
-  const [loading, setLoading] = useState(true);
+  const { domainData, isLoading } = useAppData();
 
-  const storage = useStorageContract();
-
-  const networkId = process.env.REACT_APP_networkID || 5
+  useEffect(() => {
+    console.log('isLoading', isLoading);
+    console.log('domainData', domainData);
+    // if (domainData) dispatch(retrieveAppData(domainData))
+  }, [domainData, isLoading, dispatch])
 
   useEffect(() => {
     if (blockchain.account !== null) {
@@ -42,39 +43,12 @@ function App() {
   }, [dispatch, blockchain.account]);
 
   useEffect(() => {
-    if (!storage) return
-
-    function timeout(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    try {
-      const start = async () => {
-        const data = await fetchDomainData(networkId, storage);
-
-        await timeout(5000)
-
-        if (data) {
-          console.log("domainData", data);
-        }
-
-        setLoading(false);
-      }
-
-      start()
-    } catch (error) {
-      console.error(error)
-    }
-  }, [networkId, storage,])
-
-  useEffect(() => {
     dispatch(fetchContract());
     checkConnection(dispatch);
-
   }, []);
 
   return (
-    loading ? (
+    isLoading ? (
       <s.LoaderWrapper>
         <Loader size="2.8rem" />
       </s.LoaderWrapper>

@@ -11,6 +11,7 @@ import { networks } from "../../utils/chainInfo";
 const Navigation = () => {
   const dispatch = useDispatch();
   const { account, FeeToken } = useSelector((state) => state.blockchain);
+  const { owner } = useSelector((state) => state.appSettings);
   const {
     ETHamount,
     FeeTokenamount,
@@ -20,7 +21,7 @@ const Navigation = () => {
   const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
 
   const networkId = process.env.REACT_APP_networkID || 5;
-  const { name: networkName, baseCurrency, explorer } = networks[networkId]
+  const { name: networkName, baseCurrency, explorer } = networks[networkId];
 
   return (
     <Navbar collapseOnSelect expand="lg" variant="dark" style={{ margin: 15 }}>
@@ -57,9 +58,11 @@ const Navigation = () => {
             <LinkContainer to="/account">
               <Nav.Link>Account</Nav.Link>
             </LinkContainer>
-            <LinkContainer to="/manage">
-              <Nav.Link>Manage</Nav.Link>
-            </LinkContainer>
+            {owner?.toLowerCase() === account?.toLowerCase() && (
+              <LinkContainer to="/manage">
+                <Nav.Link>Manage</Nav.Link>
+              </LinkContainer>
+            )}
           </Nav>
           <Nav>
             <Nav.Link>{networkName}</Nav.Link>

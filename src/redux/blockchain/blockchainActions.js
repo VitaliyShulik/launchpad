@@ -121,8 +121,9 @@ export const updateAccount = (account) => {
   };
 };
 
-export const checkConnection = (dispatch) => {
-  if (web3Modal.cachedProvider) {
-    dispatch(connect())
-  }
+export const checkConnection = () =>
+  (dispatch) => {
+    if (web3Modal.cachedProvider) {
+      dispatch(connect())
+    }
 }

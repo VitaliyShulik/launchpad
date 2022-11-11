@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Route, Routes } from "react-router-dom";
 import "./App.css";
@@ -17,6 +17,7 @@ import Manage from "./pages/manage";
 import { fetchContract } from "./redux/contract/contractAction";
 import { checkConnection } from "./redux/blockchain/blockchainActions";
 import { fetchData } from "./redux/userData/dataActions";
+import { setAppSettigns } from "./redux/appSettings/actions";
 
 import useAppData from "./hooks/useAppData";
 
@@ -30,9 +31,7 @@ function App() {
   const { domainData, isLoading } = useAppData();
 
   useEffect(() => {
-    console.log('isLoading', isLoading);
-    console.log('domainData', domainData);
-    // if (domainData) dispatch(retrieveAppData(domainData))
+    if (domainData) dispatch(setAppSettigns(domainData))
   }, [domainData, isLoading, dispatch])
 
   useEffect(() => {
@@ -44,7 +43,7 @@ function App() {
 
   useEffect(() => {
     dispatch(fetchContract());
-    checkConnection(dispatch);
+    dispatch(checkConnection());
   }, []);
 
   return (

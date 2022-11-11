@@ -7,12 +7,14 @@ import { useStorageContract } from './useStorageContract';
 const validArray = (arr) => Array.isArray(arr) && !!arr.length
 
 const defaultSettings = () => ({
-  admin: '',
-  contracts: {},
+  owner: '',
+  networksSettings: {},
   idoFactory: '',
   lockerFactory: '',
   feeToken: '',
-  domain: '',
+  webSocketUrl: '',
+  infuraIpfsKey: '',
+  infuraDedicatedGateway: '',
   projectName: '',
   logo: '',
   navigationLinks: [],
@@ -37,7 +39,7 @@ const parseSettings = (settings, chainId) => {
     const { ido_factory: parsedSettings } = settingsJSON
 
     const {
-      contracts,
+      networksSettings,
       domain,
       projectName,
       logo,
@@ -47,14 +49,20 @@ const parseSettings = (settings, chainId) => {
       disableSourceCopyright,
     } = parsedSettings
 
-    appSettings.contracts = contracts
+    appSettings.networksSettings = networksSettings
 
-    if (contracts[chainId]) {
-      const { idoFactory, lockerFactory, feeToken } = contracts[chainId]
+    if (networksSettings?.[chainId]) {
+      const {
+        idoFactory,
+        lockerFactory,
+        feeToken,
+        webSocketRPC
+      } = networksSettings[chainId]
 
       appSettings.idoFactory = idoFactory
       appSettings.lockerFactory = lockerFactory
       appSettings.feeToken = feeToken
+      appSettings.webSocketRPC = webSocketRPC
     }
 
     if (domain) appSettings.domain = domain
@@ -90,7 +98,7 @@ const fetchDomainData = async (
 
     const settings = parseSettings(info || '{}', chainId || 0)
 
-    fullData = { ...settings, admin: owner === ZERO_ADDRESS ? '' : owner }
+    fullData = { ...settings, owner: owner === ZERO_ADDRESS ? '' : owner }
 
     return fullData
   } catch (error) {

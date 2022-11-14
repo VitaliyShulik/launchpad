@@ -51,25 +51,40 @@ const updateAccountRequest = (payload) => {
   };
 };
 
-export const connect = () => {
-  return async (dispatch) => {
-    dispatch(connectRequest());
-    const provider = await web3Modal.connect();
+const changeChainRequest = () => {
+  return {
+    type: "CHANGE_CHAIN_REQUEST",
+  };
+};
+
+const changeChain = (payload) => {
+  return {
+    type: "CHANGE_CHAIN",
+    payload: payload,
+  };
+}
+
+const getConnectionData = async (provider) => {
+  try {
     let web3 = new Web3(provider);
     const networkId = process.env.REACT_APP_networkID;
-    const accounts = await web3.eth.getAccounts();
+    const [account] = await web3.eth.getAccounts();
     const chainId = await web3.eth.getChainId();
 
+    const isSupportedNetwork = networkId == chainId;
+
+    // Todo: get data from appSettings store
     const FeeTokenNetworkData = await FeeToken.networks[networkId];
     const IDOFactoryNetworkData = await IDOFactory.networks[networkId];
     const LockerFactoryNetworkData = await LockerFactory.networks[networkId];
 
-    if (
+    const hasSettingsData = (
       IDOFactoryNetworkData &&
       FeeTokenNetworkData &&
-      LockerFactoryNetworkData &&
-      networkId == chainId
-    ) {
+      LockerFactoryNetworkData
+    )
+
+    if (hasSettingsData && isSupportedNetwork) {
       const IDOFactoryContract = new web3.eth.Contract(
         IDOFactory.abi,
         IDOFactoryNetworkData.address
@@ -78,14 +93,58 @@ export const connect = () => {
         FeeToken.abi,
         FeeTokenNetworkData.address
       );
-
       const LockerFactoryContract = new web3.eth.Contract(
         LockerFactory.abi,
         LockerFactoryNetworkData.address
       );
+
+      return {
+        web3,
+        account,
+        isSupportedNetwork,
+        hasSettingsData,
+        IDOFactory: IDOFactoryContract,
+        FeeToken: FeeTokenContract,
+        LockerFactory: LockerFactoryContract,
+      }
+
+    }
+
+    return {
+      web3,
+      account,
+      isSupportedNetwork,
+      hasSettingsData,
+      IDOFactory: null,
+      FeeToken: null,
+      LockerFactory: null,
+    }
+
+  } catch (error) {
+    console.log('ConnectionError: ', error)
+  }
+}
+
+export const connect = () => {
+  return async (dispatch) => {
+    dispatch(connectRequest());
+    const provider = await web3Modal.connect();
+
+    const {
+      hasSettingsData,
+      account,
+      isSupportedNetwork,
+      IDOFactory: IDOFactoryContract,
+      FeeToken: FeeTokenContract,
+      LockerFactory: LockerFactoryContract,
+      web3,
+    } = await getConnectionData(provider);
+
+    if (hasSettingsData && isSupportedNetwork) {
       dispatch(
         connectSuccess({
-          account: accounts[0],
+          account,
+          isSupportedNetwork,
           IDOFactory: IDOFactoryContract,
           FeeToken: FeeTokenContract,
           LockerFactory: LockerFactoryContract,
@@ -96,14 +155,22 @@ export const connect = () => {
       provider.on("accountsChanged", (accounts) => {
         dispatch(updateAccount(accounts[0]));
       });
-      provider.on("chainChanged", () => {
-        clearCache();
+      provider.on("chainChanged", (chainId) => {
+        dispatch(changeChainRequest());
+        dispatch(changeChainId(chainId, provider));
+        // clearCache();
       });
       // Add listeners end
     } else {
       web3Modal.clearCachedProvider();
       dispatch(
-        connectFailed("Change network to " + networks[process.env.REACT_APP_networkID || 5].name)
+        connectFailed(
+          !isSupportedNetwork
+          ? "This network is not available, plese connect to " + networks[process.env.REACT_APP_networkID || 5].name
+          : !hasSettingsData
+            ? "The application is not configured with this network"
+            : "Unknown error"
+        )
       );
     }
   };
@@ -121,9 +188,42 @@ export const updateAccount = (account) => {
   };
 };
 
+export const changeChainId = (chainId, provider) =>
+  async (dispatch) => {
+
+    const {
+      hasSettingsData,
+      isSupportedNetwork,
+      IDOFactory: IDOFactoryContract,
+      FeeToken: FeeTokenContract,
+      LockerFactory: LockerFactoryContract,
+      web3,
+    } = await getConnectionData(provider);
+
+    if (hasSettingsData && isSupportedNetwork) {
+      dispatch(changeChain({
+        isSupportedNetwork,
+        IDOFactory: IDOFactoryContract,
+        FeeToken: FeeTokenContract,
+        LockerFactory: LockerFactoryContract,
+        web3,
+      }));
+    } else {
+      dispatch(
+        connectFailed(
+          !isSupportedNetwork
+          ? "This network is not available, plese connect to " + networks[process.env.REACT_APP_networkID || 5].name
+          : !hasSettingsData
+            ? "The application is not configured with this network"
+            : "Unknown error"
+        )
+      );
+    }
+  };
+
 export const checkConnection = () =>
   (dispatch) => {
     if (web3Modal.cachedProvider) {
       dispatch(connect())
     }
-}
+  };

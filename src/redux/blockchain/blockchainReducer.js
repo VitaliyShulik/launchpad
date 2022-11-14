@@ -5,6 +5,7 @@ const initialState = {
   IDOFactory: null,
   LockerFactory: null,
   web3: null,
+  chainId: null,
   errorMsg: "",
 };
 
@@ -24,6 +25,7 @@ const blockchainReducer = (state = initialState, action) => {
         IDOFactory: action.payload.IDOFactory,
         LockerFactory: action.payload.LockerFactory,
         web3: action.payload.web3,
+        chainId: action.payload.chainId,
       };
     case "CONNECTION_FAILED":
       return {
@@ -35,6 +37,23 @@ const blockchainReducer = (state = initialState, action) => {
       return {
         ...state,
         account: action.payload.account,
+      };
+    case "CHANGE_CHAIN_REQUEST":
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case "CHANGE_CHAIN":
+      return {
+        ...state,
+        loading: false,
+        isSupportedNetwork: action.payload.isSupportedNetwork,
+        FeeToken: action.payload.FeeToken,
+        IDOFactory: action.payload.IDOFactory,
+        LockerFactory: action.payload.LockerFactory,
+        web3: action.payload.web3,
+        chainId: action.payload.chainId,
       };
     default:
       return state;

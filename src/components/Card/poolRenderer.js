@@ -13,15 +13,28 @@ import imageSolid from "../../assets/images/image-solid.png"
 const PoolRenderer = (props) => {
   const contract = useSelector((state) => state.contract);
   const [image, setImage] = useState("");
-  const { pool: idoInfo } = props;
+  const {
+    pool: idoInfo,
+    pool: {
+      start,
+      end,
+      metadata,
+      idoAddress,
+      tokenName,
+      tokenSymbol,
+      softCap,
+      hardCap,
+      progress,
+    }
+  } = props;
 
   const card = useRef(null);
 
-  const isStarted = parseInt(idoInfo.start) < (parseInt(Date.now() / 1000));
-  const hasEnded = parseInt(idoInfo.end) < (parseInt(Date.now() / 1000));
+  const isStarted = parseInt(start) < (parseInt(Date.now() / 1000));
+  const hasEnded = parseInt(end) < (parseInt(Date.now() / 1000));
 
-  useEffect(async () => {
-    setImage(getValidImageUrl(idoInfo.metadata.image));
+  useEffect(() => {
+    if (metadata?.image) setImage(getValidImageUrl(metadata.image));
   }, [idoInfo]);
 
   // if (!utils.isValidPool(idoInfo) || !idoInfo) {
@@ -35,11 +48,12 @@ const PoolRenderer = (props) => {
   //     </s.Card>
   //   );
   // }
+  if (!idoAddress || !metadata || !tokenName || !tokenSymbol) return null;
 
   return (
     <s.Card ref={card} style={{ maxWidth: 500, margin: 20, minWidth: 400 }}>
       <NavLink
-        to={"/launchpad/" + idoInfo.idoAddress}
+        to={"/launchpad/" + idoAddress}
         style={{
           textDecoration: "none",
           color: "white",
@@ -62,9 +76,9 @@ const PoolRenderer = (props) => {
               style={{ textAlign: "center" }}
               fs={"26px"}
             >
-              {idoInfo.tokenName}
+              {tokenName}
             </s.TextDescriptionEllipsis>
-            <s.TextID>${idoInfo.tokenSymbol}</s.TextID>
+            <s.TextID>${tokenSymbol}</s.TextID>
           </s.Container>
         </s.UpperCard>
         <s.SpacerSmall />
@@ -80,14 +94,14 @@ const PoolRenderer = (props) => {
         <s.SpacerXSmall />
         <s.TextID>Description</s.TextID>
         <s.TextField>
-          <s.TextDescription>{idoInfo.metadata.description}</s.TextDescription>
+          <s.TextDescription>{metadata.description}</s.TextDescription>
           <s.BlurTextField></s.BlurTextField>
         </s.TextField>
         <s.SpacerSmall />
         <s.Container fd="row">
           <s.Container ai="center" flex={1}>
             <s.TextID fullWidth>Soft cap</s.TextID>
-            {BigNumber(contract.web3.utils.fromWei(idoInfo.softCap)).toFormat(
+            {BigNumber(contract.web3.utils.fromWei(softCap)).toFormat(
               2
             ) +
               " " +
@@ -95,7 +109,7 @@ const PoolRenderer = (props) => {
           </s.Container>
           <s.Container ai="center" flex={1}>
             <s.TextID fullWidth>Hard cap</s.TextID>
-            {BigNumber(contract.web3.utils.fromWei(idoInfo.hardCap)).toFormat(
+            {BigNumber(contract.web3.utils.fromWei(hardCap)).toFormat(
               2
             ) +
               " " +
@@ -114,15 +128,15 @@ const PoolRenderer = (props) => {
               <Countdown
                 date={
                   isStarted
-                    ? parseInt(idoInfo.end) * 1000
-                    : parseInt(idoInfo.start) * 1000
+                    ? parseInt(end) * 1000
+                    : parseInt(start) * 1000
                 }
               />
             </>
           )
         }
         <s.TextID>Progress</s.TextID>
-        <ProgressBar now={idoInfo.progress} />
+        <ProgressBar now={progress} />
       </NavLink>
     </s.Card>
   );

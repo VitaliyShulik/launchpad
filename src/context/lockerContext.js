@@ -14,9 +14,12 @@ export const PoolContextProvider = ({ children }) => {
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       allPoolAddress.map(async (address, index) => {
-        await utils.loadPoolData(address, contract.web3, account).then((e) => {
-          setAllPools((p) => ({ ...p, ...{ [address]: e } }));
-        });
+        try {
+          const poolData = await utils.loadPoolData(address, contract.web3, account);
+          setAllPools((currentPools) => ({ ...currentPools, ...{ [address]: poolData } }));
+        } catch (error) {
+          console.error(error);
+        }
       });
     }, 3000);
 

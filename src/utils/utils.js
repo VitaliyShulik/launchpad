@@ -253,5 +253,9 @@ export function getValidImageUrl(imageUrl) {
 
 export function getValidIPFSUrl(url) {
   const infuraDedicatedGateway = process.env.REACT_APP_INFURA_DEDICATED_GATEWAY;
-  return infuraDedicatedGateway && url.match('gateway.pinata.cloud') ? url.replace('https://gateway.pinata.cloud', infuraDedicatedGateway) : url;
+  const isURL = url.match('https');
+
+  return isURL
+    ? ( url.match('gateway.pinata.cloud') ? url.replace('https://gateway.pinata.cloud', infuraDedicatedGateway) : url )
+    : `${infuraDedicatedGateway}/ipfs/${url}`;
 }

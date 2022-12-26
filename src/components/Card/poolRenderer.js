@@ -34,8 +34,10 @@ const PoolRenderer = (props) => {
   const hasEnded = parseInt(end) < (parseInt(Date.now() / 1000));
 
   useEffect(() => {
-    if (metadata?.image) setImage(getValidImageUrl(metadata.image));
-  }, [idoInfo]);
+    if (idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash) {
+      setImage(getValidImageUrl(idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash));
+    }
+  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash]);
 
   // if (!utils.isValidPool(idoInfo) || !idoInfo) {
   //   return (

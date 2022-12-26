@@ -248,13 +248,26 @@ export function getTokenURI(uri) {
 
 export function getValidImageUrl(imageUrl) {
   const infuraDedicatedGateway = process.env.REACT_APP_INFURA_DEDICATED_GATEWAY;
-  return infuraDedicatedGateway && imageUrl.match('ipfs.infura.io') ? imageUrl.replace('https://ipfs.infura.io', infuraDedicatedGateway) : imageUrl;
+
+  if (!infuraDedicatedGateway || !imageUrl) {
+    console.error('The app has not "Infura Dedicated Gateway" option or imageUrl is not valid')
+    return ""
+  }
+
+  const isURL = imageUrl.match('https')
+  return isURL
+    ? ( imageUrl.match('ipfs.infura.io') ? imageUrl.replace('https://ipfs.infura.io', infuraDedicatedGateway) : imageUrl )
+    : `${infuraDedicatedGateway}/ipfs/${imageUrl}`;
 }
 
 export function getValidIPFSUrl(url) {
   const infuraDedicatedGateway = process.env.REACT_APP_INFURA_DEDICATED_GATEWAY;
-  const isURL = url.match('https');
+  if (!infuraDedicatedGateway || !url) {
+    console.error('The app has not "Infura Dedicated Gateway" option or url is not valid')
+    return ""
+  }
 
+  const isURL = url.match('https')
   return isURL
     ? ( url.match('gateway.pinata.cloud') ? url.replace('https://gateway.pinata.cloud', infuraDedicatedGateway) : url )
     : `${infuraDedicatedGateway}/ipfs/${url}`;

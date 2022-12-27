@@ -65,10 +65,9 @@ const TokenInfo = (props) => {
           style={{ paddingLeft: 20, marginBottom: 20 }}
         >
           <s.TextDescription
-            style={{ textAlign: "center", fontSize: 26 }}
+            style={{ textAlign: "center", fontSize: 26, whiteSpace: "nowrap" }}
             fs={"30px"}
             fw={"bold"}
-            style={{ whiteSpace: "nowrap" }}
           >
             {idoInfo.tokenName}
           </s.TextDescription>

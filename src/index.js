@@ -3,12 +3,17 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { HashRouter as Router } from "react-router-dom";
+import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core';
+import { NetworkContextName } from './constants';
+import getLibrary from './utils/getLibrary.js';
 import App from "./App";
 import { PoolContextProvider } from "./context/poolContext";
 import { StoreContextProvider } from "./context/store";
 import "./index.css";
 import store from "./redux/store";
 import reportWebVitals from "./reportWebVitals";
+
+const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName);
 
 const theme = createTheme({
   palette: {
@@ -40,17 +45,21 @@ const theme = createTheme({
 
 ReactDOM.render(
   <React.StrictMode>
-    <StoreContextProvider>
-      <ThemeProvider theme={theme}>
-        <Provider store={store}>
-          <PoolContextProvider>
-            <Router>
-              <App />
-            </Router>
-          </PoolContextProvider>
-        </Provider>
-      </ThemeProvider>
-    </StoreContextProvider>
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <Web3ProviderNetwork getLibrary={getLibrary}>
+        <StoreContextProvider>
+          <ThemeProvider theme={theme}>
+            <Provider store={store}>
+              <PoolContextProvider>
+                <Router>
+                  <App />
+                </Router>
+              </PoolContextProvider>
+            </Provider>
+          </ThemeProvider>
+        </StoreContextProvider>
+      </Web3ProviderNetwork>
+    </Web3ReactProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

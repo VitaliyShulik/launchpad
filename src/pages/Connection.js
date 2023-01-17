@@ -4,10 +4,7 @@ import { FaWallet } from 'react-icons/fa';
 import { useWeb3React } from '@web3-react/core';
 // import { networks } from '../constants/networksInfo';
 import { SUPPORTED_NETWORKS } from '../connectors';
-import {
-  NetworkContextName,
-//   ZERO_ADDRESS,
-} from '../constants';
+import { Web3Status } from '../components/Web3Status';
 import * as s from "../styles/global";
 // import Panel from './Panel'
 // import { ApplicationModal, setOpenModal } from '../state/application/actions'
@@ -82,59 +79,6 @@ const SupportedNetworksList = styled.ul`
     background-color: ${({ theme }) => theme.bg2};
   }
 `;
-
-function Web3StatusInner() {
-  const {
-    // chainId,
-    account,
-    // connector,
-    // error,
-    deactivate,
- } = useWeb3React();
-
-  // const toggleWalletModal = useWalletModalToggle()
-  const disconnect = () => deactivate()
-
-  return <s.Container ai="center">
-    {account == null ? (
-      <s.button
-        onClick={() => {
-          console.log('Connect');
-        //   toggleWalletModal();
-        }}
-      >
-        CONNECT
-      </s.button>
-    ) : (
-      <s.button
-        className="address text-collapse"
-        onClick={() => {
-          console.log('Disconnect');
-          disconnect();
-        }}
-      >
-        {account}
-      </s.button>
-    )}
-  </s.Container>
-}
-
-
-export function Web3Status() {
-  const { active } = useWeb3React();
-  const contextNetwork = useWeb3React(NetworkContextName);
-  console.log('contextNetwork', contextNetwork);
-
-  if (!contextNetwork.active && !active) {
-    return null;
-  }
-
-  return (
-    <>
-      <Web3StatusInner />
-    </>
-  );
-}
 
 
 // const unavailableOrZeroAddr = value => !value || value === ZERO_ADDRESS;

@@ -1,6 +1,6 @@
 // import { AbstractConnector } from '@web3-react/abstract-connector'
 import {
-//   UnsupportedChainIdError,
+  UnsupportedChainIdError,
   useWeb3React
 } from '@web3-react/core';
 // import { InjectedConnector } from '@web3-react/injected-connector'
@@ -10,43 +10,46 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 // import { CURRENCY } from 'assets/images'
 // import MetamaskIcon from 'assets/images/metamask.png'
-// import { ReactComponent as Close } from 'assets/images/x.svg'
+import { ReactComponent as Close } from '../../assets/images/x.svg'
 import {
 //   Network,
-//   injected,
+  injected,
   SUPPORTED_NETWORKS,
 //   newWalletlink,
 //   newWalletConnect
 } from '../../connectors';
-// import { SUPPORTED_WALLETS, WALLET_NAMES } from '../../constants';
+import { SUPPORTED_WALLETS, WALLET_NAMES } from '../../constants';
 // import { switchInjectedNetwork } from 'utils/wallet'
 import usePrevious from '../../hooks/usePrevious';
 import useWindowSize from '../../hooks/useWindowSize';
 // import useWordpressInfo from 'hooks/useWordpressInfo'
 // import AccountDetails from '../AccountDetails'
 // import { networks } from '../../constants/networksInfo';
-import { Modal } from '@mui/material';
-import { isMobile } from '../../utils/utils';
+import { Dialog, DialogTitle, DialogContent, useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { isMobile, shortenAddress } from '../../utils/utils';
+
+import * as s from "../../styles/global";
 // import Option from './Option'
 // import PendingView from './PendingView'
 // import { useIsDarkMode } from 'state/user/hooks'
 
-// const CloseIcon = styled.div`
-//   position: absolute;
-//   right: 1rem;
-//   top: 1rem;
+const CloseIcon = styled.div`
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
 
-//   &:hover {
-//     cursor: pointer;
-//     opacity: 0.5;
-//   }
-// `
+  &:hover {
+    cursor: pointer;
+    opacity: 0.5;
+  }
+`
 
-// const CloseColor = styled(Close)`
-//   path {
-//     stroke: ${({ theme }) => theme.text4};
-//   }
-// `
+const CloseColor = styled(Close)`
+  path {
+    stroke: white;
+  }
+`
 
 // const Wrapper = styled.div`
 //   ${({ theme }) => theme.flexColumnNoWrap}
@@ -55,51 +58,119 @@ import { isMobile } from '../../utils/utils';
 //   width: 100%;
 // `
 
-// const HeaderRow = styled.div`
-//   ${({ theme }) => theme.flexRowNoWrap};
-//   padding: 1rem 1rem;
-//   font-weight: 500;
-//   color: ${(props) => (props.color === 'blue' ? ({ theme }) => theme.primary1 : 'inherit')};
-//   ${({ theme }) => theme.mediaWidth.upToMedium`
-//     padding: 1rem;
-//   `};
-// `
+const HeaderRow = styled.div`
+  flex-flow: row nowrap;
+  padding: 1rem 1rem;
+  font-weight: 500;
+  color: ${(props) => (props.color === 'blue' ? ({ theme }) => theme.primary1 : 'inherit')};
+  @media (max-width: 960px) {
+    padding: 1rem;
+  };
+`;
 
-// const ContentWrapper = styled.div`
-//   background-color: ${({ theme }) => theme.bg2};
-//   padding: 2rem;
-//   border-bottom-left-radius: 20px;
-//   border-bottom-right-radius: 20px;
+const ContentWrapper = styled.div`
+  background-color: #232227;
+  padding: 1rem;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 
-//   ${({ theme }) => theme.mediaWidth.upToMedium`padding: 1rem`};
-// `
+  @media (max-width: 960px) {
+    padding: 1rem;
+  };
+`;
 
-// const Title = styled.h3`
-//   font-weight: 500;
-//   display: flex;
-//   align-items: center;
-//   margin: 0 0 0.6rem;
-//   padding: 0;
-// `
+const YourAccount = styled.div`
+  h5 {
+    margin: 0 0 1rem 0;
+    font-weight: 400;
+  }
 
-// const UpperSection = styled.div`
-//   position: relative;
+  h4 {
+    margin: 0;
+    font-weight: 500;
+  }
+`;
 
-//   h5 {
-//     margin: 0 0 0.5rem;
-//     font-size: 1rem;
-//     font-weight: 400;
-//   }
+const InfoCard = styled.div`
+  padding: 1rem;
+  border: 1px solid var(--secondary-color);
+  border-radius: 20px;
+  position: relative;
+  display: grid;
+  grid-row-gap: 12px;
+  margin-bottom: 20px;
+`;
 
-//   h5:last-child {
-//     margin-bottom: 0;
-//   }
+const AccountGroupingRow = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 400;
+  color: var(--text);
 
-//   h4 {
-//     margin-top: 0;
-//     font-weight: 500;
-//   }
-// `
+  div {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+`;
+
+const WalletName = styled.div`
+  width: initial;
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: var(--secondary-color);
+`;
+
+const AccountControl = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  width: 100%;
+  font-weight: 500;
+  font-size: 1.3rem;
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  p {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
+
+const Title = styled.h3`
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  margin: 0 0 0.6rem;
+  padding: 0;
+`
+
+const UpperSection = styled.div`
+  position: relative;
+
+  h5 {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  h5:last-child {
+    margin-bottom: 0;
+  }
+
+  h4 {
+    margin-top: 0;
+    font-weight: 500;
+  }
+`
 
 // const OptionsWrapped = styled.div`
 //   display: flex;
@@ -154,8 +225,11 @@ export default function WalletModal(props) {
   } = props;
   const { height } = useWindowSize();
 
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   // important that these are destructed from the account-specific web3-react context
-  const { active, chainId, account, connector, activate, error } = useWeb3React();
+  const { active, chainId, account, connector, activate, deactivate, error } = useWeb3React();
 //   const isDark = useIsDarkMode()
 //   const wordpressData = useWordpressInfo()
   const [availableNetworks, setAvailableNetworks] = useState([]);
@@ -357,120 +431,170 @@ export default function WalletModal(props) {
 //     return availableOptions
 //   }
 
-//   function getModalContent() {
-//     if (error) {
-//       return (
-//         <UpperSection>
-//           <CloseIcon onClick={closeModal}>
-//             <CloseColor />
-//           </CloseIcon>
-//           <HeaderRow>{error instanceof UnsupportedChainIdError ? 'Wrong Network' : 'Error connecting'}</HeaderRow>
-//           <ContentWrapper>
-//             {error instanceof UnsupportedChainIdError ? (
-//               <h5>Please switch your network or connect to the appropriate network.</h5>
-//             ) : (
-//               'Error connecting. Try refreshing the page.'
-//             )}
-//           </ContentWrapper>
-//         </UpperSection>
-//       )
-//     }
+  function formatConnectorName() {
+    const { ethereum } = window
+    const isMetaMask = !!(ethereum && ethereum.isMetaMask)
+    const name = Object.keys(SUPPORTED_WALLETS)
+      .filter(
+        (k) =>
+          SUPPORTED_WALLETS[k].connector === connector && (connector !== injected || isMetaMask === (k === 'METAMASK'))
+      )
+      .map((k) => SUPPORTED_WALLETS[k].name)[0]
+    return (
+      <WalletName>
+        Connectet with {name}
+      </WalletName>
+    )
+  }
 
-//     if (account && walletView === WALLET_VIEWS.ACCOUNT) {
-//       return (
-//         <AccountDetails
-//           toggleWalletModal={closeModal}
-//           pendingTransactions={pendingTransactions}
-//           confirmedTransactions={confirmedTransactions}
-//           ENSName={ENSName}
-//           openOptions={() => setWalletView(WALLET_VIEWS.OPTIONS)}
-//         />
-//       )
-//     }
+  function getModalContent() {
+    if (error) {
+      return (
+        <UpperSection>
+          <CloseIcon onClick={closeModal}>
+            <CloseColor />
+          </CloseIcon>
+          <HeaderRow>{error instanceof UnsupportedChainIdError ? 'Wrong Network' : 'Error connecting'}</HeaderRow>
+          <ContentWrapper>
+            {error instanceof UnsupportedChainIdError ? (
+              <h5>Please switch your network or connect to the appropriate network.</h5>
+            ) : (
+              'Error connecting. Try refreshing the page.'
+            )}
+          </ContentWrapper>
+        </UpperSection>
+      )
+    }
 
-//     const networkOptions = getNetworkOptions()
-//     const availableWallets = getAvailableWallets()
-//     const hasWallet = availableWallets.some((option) => option !== null)
+    if (account && walletView === WALLET_VIEWS.ACCOUNT) {
+      return (
+        <UpperSection>
+          <CloseIcon onClick={closeModal}>
+            <CloseColor />
+          </CloseIcon>
+          <HeaderRow>Account</HeaderRow>
+          <ContentWrapper>
+            <YourAccount>
+              <InfoCard>
+                <AccountGroupingRow>
+                    {formatConnectorName()}
+                    <div>
+                      <s.button
+                        secondary
+                        style={{ fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
+                        onClick={() => {
+                            console.log('disconnect')
+                            deactivate()
+                        }}
+                      >
+                        Disconnect
+                      </s.button>
+                      <s.button
+                        secondary
+                        style={{ fontSize: '.825rem', fontWeight: 400 }}
+                        onClick={() => {
+                            console.log('Change')
+                        }}
+                      >
+                        Change
+                      </s.button>
+                    </div>
+                </AccountGroupingRow>
 
-//     return (
-//       <UpperSection>
-//         <CloseIcon onClick={closeModal}>
-//           <CloseColor />
-//         </CloseIcon>
-//         {walletView !== WALLET_VIEWS.ACCOUNT ? (
-//           <HeaderRow color="blue">
-//             <HoverText
-//               onClick={() => {
-//                 setPendingError(false)
-//                 setWalletView(WALLET_VIEWS.ACCOUNT)
-//               }}
-//             >
-//               Back
-//             </HoverText>
-//           </HeaderRow>
-//         ) : (
-//           <HeaderRow>
-//             <HoverText>{t('connectWallet')}</HoverText>
-//           </HeaderRow>
-//         )}
-//         <ContentWrapper>
-//           {walletView === WALLET_VIEWS.PENDING ? (
-//             <PendingView
-//               connector={pendingWallet}
-//               error={pendingError}
-//               setPendingError={setPendingError}
-//               tryActivation={tryActivation}
-//             />
-//           ) : (
-//             <>
-//               {!Boolean(hasWallet) ? (
-//                 t('noConnectionMethodsAvailable')
-//               ) : (
-//                 <OptionsWrapped>
-//                   {availableNetworks.length > 1 ? (
-//                     <>
-//                       <div className="column">
-//                         <Title>1. {t('chooseNetwork')}</Title>
-//                         <Options isDark={isDark}>{networkOptions}</Options>
-//                       </div>
-//                       <div className="column">
-//                         <Title>2. {t('chooseWallet')}</Title>
-//                         <Options isDark={isDark} disabled={!currentChainId}>
-//                           {availableWallets}
-//                         </Options>
-//                       </div>
-//                     </>
-//                   ) : (
-//                     <div className="column">
-//                       <Title>{t('chooseWallet')}</Title>
-//                       <Options isDark={isDark} disabled={!currentChainId}>
-//                         {availableWallets}
-//                       </Options>
-//                     </div>
-//                   )}
-//                 </OptionsWrapped>
-//               )}
-//             </>
-//           )}
-//         </ContentWrapper>
-//       </UpperSection>
-//     )
-//   }
+                <AccountGroupingRow>
+                    <AccountControl>
+                      <p> {account && shortenAddress(account)}</p>
+                    </AccountControl>
+                </AccountGroupingRow>
 
-//   const CUSTOM_WINDOW_OVERFLOW_HEIGHT = 750
+              </InfoCard>
+            </YourAccount>
+          </ContentWrapper>
+        </UpperSection>
+      )
+    }
+
+    // const networkOptions = getNetworkOptions()
+    // const availableWallets = getAvailableWallets()
+    // const hasWallet = availableWallets.some((option) => option !== null)
+
+    // return (
+    //   <UpperSection>
+    //     <CloseIcon onClick={closeModal}>
+    //       <CloseColor />
+    //     </CloseIcon>
+    //     {walletView !== WALLET_VIEWS.ACCOUNT ? (
+    //       <HeaderRow color="blue">
+    //         <HoverText
+    //           onClick={() => {
+    //             setPendingError(false)
+    //             setWalletView(WALLET_VIEWS.ACCOUNT)
+    //           }}
+    //         >
+    //           Back
+    //         </HoverText>
+    //       </HeaderRow>
+    //     ) : (
+    //       <HeaderRow>
+    //         <HoverText>{t('connectWallet')}</HoverText>
+    //       </HeaderRow>
+    //     )}
+    //     <ContentWrapper>
+    //       {walletView === WALLET_VIEWS.PENDING ? (
+    //         <PendingView
+    //           connector={pendingWallet}
+    //           error={pendingError}
+    //           setPendingError={setPendingError}
+    //           tryActivation={tryActivation}
+    //         />
+    //       ) : (
+    //         <>
+    //           {!Boolean(hasWallet) ? (
+    //             t('noConnectionMethodsAvailable')
+    //           ) : (
+    //             <OptionsWrapped>
+    //               {availableNetworks.length > 1 ? (
+    //                 <>
+    //                   <div className="column">
+    //                     <Title>1. {t('chooseNetwork')}</Title>
+    //                     <Options isDark={isDark}>{networkOptions}</Options>
+    //                   </div>
+    //                   <div className="column">
+    //                     <Title>2. {t('chooseWallet')}</Title>
+    //                     <Options isDark={isDark} disabled={!currentChainId}>
+    //                       {availableWallets}
+    //                     </Options>
+    //                   </div>
+    //                 </>
+    //               ) : (
+    //                 <div className="column">
+    //                   <Title>{t('chooseWallet')}</Title>
+    //                   <Options isDark={isDark} disabled={!currentChainId}>
+    //                     {availableWallets}
+    //                   </Options>
+    //                 </div>
+    //               )}
+    //             </OptionsWrapped>
+    //           )}
+    //         </>
+    //       )}
+    //     </ContentWrapper>
+    //   </UpperSection>
+    // )
+  }
 
   return (
-    <Modal
+    <Dialog
       open={isOpen}
       onClose={closeModal}
+      fullScreen={fullScreen}
     //   overflow={height && height < CUSTOM_WINDOW_OVERFLOW_HEIGHT ? 'auto' : undefined}
     //   mobile={() => isMobile()}
     //   maxWidth={
     //     (walletView === WALLET_VIEWS.ACCOUNT && !active) || walletView === WALLET_VIEWS.OPTIONS ? 700 : undefined
     //   }
     >
-      <p>I'm Open</p>
-      {/* <Wrapper>{getModalContent()}</Wrapper> */}
-    </Modal>
+      {getModalContent()}
+  </Dialog>
   )
 }

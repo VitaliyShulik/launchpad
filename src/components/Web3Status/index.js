@@ -9,6 +9,7 @@ import WalletModal from '../WalletModal';
 
 
 import * as s from "../../styles/global";
+import { shortenAddress } from '../../utils/utils';
 
 
 export function Web3Status() {
@@ -51,10 +52,10 @@ export function Web3Status() {
             className="address text-collapse"
             onClick={() => {
               console.log('Disconnect');
-              disconnect();
+              setIsWaleltModalOpen(true);
             }}
           >
-            {account}
+            {shortenAddress(account)}
           </s.button>
         )}
       </s.Container>

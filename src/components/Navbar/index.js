@@ -6,6 +6,7 @@ import { LinkContainer } from "react-router-bootstrap";
 import "../../App.css";
 import { clearCache, connect } from "../../redux/blockchain/blockchainActions";
 import * as s from "../../styles/global";
+import { Web3Status } from "../Web3Status";
 
 const Navigation = () => {
   const dispatch = useDispatch();
@@ -83,27 +84,7 @@ const Navigation = () => {
               </NavDropdown>
             ) : null}
           </Nav>
-          <s.Container ai="center">
-            {account == null ? (
-              <s.button
-                onClick={() => {
-                  dispatch(connect());
-                }}
-              >
-                CONNECT
-              </s.button>
-            ) : (
-              <s.button
-                className="address text-collapse"
-                onClick={(e) => {
-                  e.preventDefault();
-                  dispatch(clearCache());
-                }}
-              >
-                {account}
-              </s.button>
-            )}
-          </s.Container>
+          <Web3Status />
         </Navbar.Collapse>
       </Container>
     </Navbar>

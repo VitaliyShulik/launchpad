@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Route, Routes } from "react-router-dom";
-import { useWeb3React } from "@web3-react/core";
+import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import "./App.css";
 import Web3ReactManager from "./components/Web3ReactManager";
 import { SUPPORTED_CHAIN_IDS } from "./connectors";
@@ -33,7 +33,7 @@ function App() {
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
 
-  const [isAvailableNetwork, setIsAvailableNetwork] = useState(true)
+  const [isAvailableNetwork, setIsAvailableNetwork] = useState(true);
 
   const isLockerEnabled = process.env.REACT_APP_ENABLE_LOCKER === 'true';
 
@@ -45,6 +45,10 @@ function App() {
   }, [dispatch, blockchain.account]);
 
   useEffect(() => {
+    if (error && error instanceof UnsupportedChainIdError) {
+      return setIsAvailableNetwork(false);
+    }
+
     if (chainId) {
       // const lowerAcc = account?.toLowerCase()
       // const appAdmin = wordpressData?.wpAdmin
@@ -70,7 +74,8 @@ function App() {
     // domainDataTrigger,
     // wordpressData,
     // admin,
-    // account
+    account,
+    error,
   ])
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FaWallet } from 'react-icons/fa';
 import { useWeb3React } from '@web3-react/core';
 // import { networks } from '../constants/networksInfo';
-import { SUPPORTED_NETWORKS } from '../connectors';
+import { SUPPORTED_NETWORKS, SUPPORTED_CHAIN_IDS } from '../connectors';
 import { Web3Status } from '../components/Web3Status';
 import * as s from "../styles/global";
 // import Panel from './Panel'
@@ -163,7 +163,7 @@ export default function Connection({
             // ) : (
             ( <>
                 <h3>Sorry, you can not use this network</h3>
-                {SUPPORTED_NETWORKS.length && (
+                {SUPPORTED_CHAIN_IDS.length && (
                   <>
                     <p>Available Networks</p>
                     <SupportedNetworksList>

@@ -13,7 +13,7 @@ export const WALLET_NAMES = {
   INJECTED: 'Injected',
   METAMASK: 'MetaMask',
   WALLET_CONNECT: 'WalletConnect',
-  WALLET_LINK: 'Coinbase Wallet',
+//   WALLET_LINK: 'Coinbase Wallet',
 }
 
 export const SUPPORTED_WALLETS = {

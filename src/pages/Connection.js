@@ -32,13 +32,13 @@ const BodyWrapper = styled.div`
   border-radius: 1.2rem;
   box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px, rgba(0, 0, 0, 0.04) 0px 16px 24px,
   rgba(0, 0, 0, 0.01) 0px 24px 32px;
-`;
-  // background-color: ${({ theme }) => theme.bg1};
 
-  // ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-  //   width: 90%;
-  // `}
-// `;
+  background-color: #1d1f24;
+
+  @media (max-width: 540px) {
+    width: 90%;
+  };
+`;
 
 const ContentWrapper = styled.div`
   margin: 0 auto;
@@ -55,8 +55,14 @@ const WalletIconWrapper = styled.div`
   background-color: ${({ theme }) => theme.text2};
 
   .icon {
-    color: ${({ theme }) => theme.bg1};
+    color: white;
   }
+`;
+
+const Title = styled.h3`
+  margin: 1.6rem 0;
+  text-align: center;
+  font-weight: 500;
 `;
 
 const NetworkStatus = styled.div`
@@ -191,7 +197,7 @@ export default function Connection({
             <WalletIconWrapper>
               <FaWallet size="2.4rem" className="icon" />
             </WalletIconWrapper>
-            <s.TextTitle>Connect your wallet to get started</s.TextTitle>
+            <Title>Connect your wallet to get started</Title>
             <NetworkStatus>
               <Web3Status />
             </NetworkStatus>

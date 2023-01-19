@@ -249,6 +249,10 @@ export const button = styled.button`
     border: var(--disable) 0.125em solid;
     text-shadow: none;
   }
+  :hover {
+    border: ${({ secondary }) => (secondary ? "var(--white)" : "none")} 0.125em solid;
+    color: ${({ secondary }) => (secondary ? "var(--white)" : "none")};
+  }
 `;
 
 export const ButtonSquare = styled.button`

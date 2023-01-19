@@ -3,35 +3,34 @@ import {
   UnsupportedChainIdError,
   useWeb3React
 } from '@web3-react/core';
-// import { InjectedConnector } from '@web3-react/injected-connector'
-// import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
+import { InjectedConnector } from '@web3-react/injected-connector'
+import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 import React, { useEffect, useState } from 'react';
 // import { isMobile } from '../../utils/utils';
 import styled from 'styled-components';
-// import { CURRENCY } from 'assets/images'
-// import MetamaskIcon from 'assets/images/metamask.png'
+import { CURRENCY } from '../../assets/images';
+import MetamaskIcon from '../../assets/images/metamask.png';
 import { ReactComponent as Close } from '../../assets/images/x.svg'
 import {
 //   Network,
   injected,
   SUPPORTED_NETWORKS,
 //   newWalletlink,
-//   newWalletConnect
+  newWalletConnect
 } from '../../connectors';
 import { SUPPORTED_WALLETS, WALLET_NAMES } from '../../constants';
-// import { switchInjectedNetwork } from 'utils/wallet'
 import usePrevious from '../../hooks/usePrevious';
-import useWindowSize from '../../hooks/useWindowSize';
+// import useWindowSize from '../../hooks/useWindowSize';
 // import useWordpressInfo from 'hooks/useWordpressInfo'
 // import AccountDetails from '../AccountDetails'
-// import { networks } from '../../constants/networksInfo';
-import { Dialog, DialogTitle, DialogContent, useMediaQuery } from '@mui/material';
+import { networks } from '../../constants/networksInfo';
+import { Dialog, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { isMobile, shortenAddress } from '../../utils/utils';
+import { isMobile, switchInjectedNetwork } from '../../utils/utils';
 
 import * as s from "../../styles/global";
-// import Option from './Option'
-// import PendingView from './PendingView'
+import Option from './Option';
+import PendingView from './PendingView';
 // import { useIsDarkMode } from 'state/user/hooks'
 
 const CloseIcon = styled.div`
@@ -62,7 +61,7 @@ const HeaderRow = styled.div`
   flex-flow: row nowrap;
   padding: 1rem 1rem;
   font-weight: 500;
-  color: ${(props) => (props.color === 'blue' ? ({ theme }) => theme.primary1 : 'inherit')};
+  color: 'inherit';
   @media (max-width: 960px) {
     padding: 1rem;
   };
@@ -145,13 +144,13 @@ const AccountControl = styled.div`
   }
 `;
 
-const Title = styled.h3`
+const Title = styled.h4`
   font-weight: 500;
   display: flex;
   align-items: center;
   margin: 0 0 0.6rem;
   padding: 0;
-`
+`;
 
 const UpperSection = styled.div`
   position: relative;
@@ -170,47 +169,47 @@ const UpperSection = styled.div`
     margin-top: 0;
     font-weight: 500;
   }
-`
+`;
 
-// const OptionsWrapped = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   overflow-y: auto;
-//   max-height: 38rem;
+const OptionsWrapped = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: 38rem;
 
-//   .column {
-//     :not(:last-child) {
-//       margin-bottom: 1rem;
-//     }
-//   }
+  .column {
+    :not(:last-child) {
+      margin-bottom: 1rem;
+    }
+  }
 
-//   ${({ theme }) => theme.mediaWidth.upToSmall`
-//     flex-direction: column;
-//   `};
+  @media (max-width: 720px) {
+    flex-direction: column;
+  };
 
-//   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
-//     max-height: 45rem;
-//   `};
-// `
-//
-// const Options = styled.div<{ disabled?: boolean; isDark: boolean }>`
-//   display: flex;
-//   flex-wrap: wrap;
-//   overflow-y: auto;
-//   max-height: 23rem;
-//   padding: 0.6rem;
-//   border-radius: 0.8rem;
-//   border: 1px solid ${({ theme, isDark }) => (isDark ? theme.bg1 : theme.bg3)};
-//   box-shadow: inset 0 0 0.2rem ${({ theme, isDark }) => (isDark ? theme.bg1 : theme.bg3)};
+  @media (max-width: 540px) {
+    max-height: 45rem;
+  };
+`;
 
-//   ${({ disabled }) => (disabled ? 'pointer-events: none; opacity: 0.6' : '')};
-// `
+const Options = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  max-height: 23rem;
+  padding: 0.6rem;
+  border-radius: 0.8rem;
+  border: 1px solid #1d1f24;
+  box-shadow: inset 0 0 0.2rem #1d1f24;
 
-// const HoverText = styled.div`
-//   :hover {
-//     cursor: pointer;
-//   }
-// `
+  ${({ disabled }) => (disabled ? 'pointer-events: none; opacity: 0.6' : '')};
+`;
+
+const HoverText = styled.div`
+  :hover {
+    cursor: pointer;
+  }
+`;
 
 const WALLET_VIEWS = {
   OPTIONS: 'options',
@@ -223,7 +222,7 @@ export default function WalletModal(props) {
     isOpen,
     closeModal,
   } = props;
-  const { height } = useWindowSize();
+//   const { height } = useWindowSize();
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -256,8 +255,8 @@ export default function WalletModal(props) {
   }, [availableNetworks]);
 
   const [walletView, setWalletView] = useState(WALLET_VIEWS.ACCOUNT);
-//   const [pendingWallet, setPendingWallet] = useState();
-//   const [pendingError, setPendingError] = useState();
+  const [pendingWallet, setPendingWallet] = useState();
+  const [pendingError, setPendingError] = useState();
 
   const previousAccount = usePrevious(account);
 
@@ -271,7 +270,7 @@ export default function WalletModal(props) {
   // always reset to account view
   useEffect(() => {
     if (isOpen) {
-    //   setPendingError(false)
+      setPendingError(false)
       setWalletView(WALLET_VIEWS.ACCOUNT);
     }
   }, [isOpen]);
@@ -285,151 +284,151 @@ export default function WalletModal(props) {
     }
   }, [setWalletView, active, error, connector, isOpen, activePrevious, connectorPrevious]);
 
-//   const tryActivation = async (connector) => {
-//     setPendingWallet(connector) // set wallet for pending view
-//     setWalletView(WALLET_VIEWS.PENDING)
+  const tryActivation = async (connector) => {
+    setPendingWallet(connector) // set wallet for pending view
+    setWalletView(WALLET_VIEWS.PENDING)
 
-//     if (connector instanceof InjectedConnector) {
-//       const result = await switchInjectedNetwork(currentChainId)
+    if (connector instanceof InjectedConnector) {
+      const result = await switchInjectedNetwork(currentChainId)
 
-//       if (!result) {
-//         return setWalletView(WALLET_VIEWS.ACCOUNT)
-//       }
-//     } // if the connector is walletconnect and the user has already tried to connect, manually reset the connector
-//     else if (connector instanceof WalletConnectConnector && connector.walletConnectProvider?.wc?.uri) {
-//       connector.walletConnectProvider = undefined
-//     }
+      if (!result) {
+        return setWalletView(WALLET_VIEWS.ACCOUNT)
+      }
+    } // if the connector is walletconnect and the user has already tried to connect, manually reset the connector
+    else if (connector instanceof WalletConnectConnector && connector.walletConnectProvider?.wc?.uri) {
+      connector.walletConnectProvider = undefined
+    }
 
-//     connector &&
-//       activate(connector, undefined, true).catch((error) => {
-//         if (error instanceof UnsupportedChainIdError) {
-//           activate(connector) // a little janky...can't use setError because the connector isn't set
-//         } else {
-//           setPendingError(true)
-//         }
-//       })
-//   }
+    connector &&
+      activate(connector, undefined, true).catch((error) => {
+        if (error instanceof UnsupportedChainIdError) {
+          activate(connector) // a little janky...can't use setError because the connector isn't set
+        } else {
+          setPendingError(true)
+        }
+      })
+  }
 
-//   function getNetworkOptions() {
-//     return availableNetworks.map(({ chainId }) => (
-//       <Option
-//         onClick={() => setCurrentChainId(Number(chainId))}
-//         id={`connect-network-${chainId}`}
-//         key={chainId}
-//         active={currentChainId === Number(chainId)}
-//         color={networks[chainId]?.color || ''}
-//         header={networks[chainId].name}
-//         subheader={null}
-//         icon={CURRENCY[chainId] ?? ''}
-//         size={45}
-//       />
-//     ))
-//   }
+  function getNetworkOptions() {
+    return availableNetworks.map(({ chainId }) => (
+      <Option
+        onClick={() => setCurrentChainId(Number(chainId))}
+        id={`connect-network-${chainId}`}
+        key={chainId}
+        active={currentChainId === Number(chainId)}
+        color={networks[chainId]?.color || ''}
+        header={networks[chainId].name}
+        subheader={null}
+        icon={CURRENCY[chainId] ?? ''}
+        size={45}
+      />
+    ))
+  }
 
-//   function returnUpdatedConnector(option) {
-//     switch (option.name) {
-//       case WALLET_NAMES.WALLET_CONNECT:
-//         return newWalletConnect(currentChainId)
-//       case WALLET_NAMES.WALLET_LINK:
-//         return newWalletlink(currentChainId)
-//       default:
-//         return
-//     }
-//   }
+  function returnUpdatedConnector(option) {
+    switch (option.name) {
+      case WALLET_NAMES.WALLET_CONNECT:
+        return newWalletConnect(currentChainId)
+    //   case WALLET_NAMES.WALLET_LINK:
+    //     return newWalletlink(currentChainId)
+      default:
+        return
+    }
+  }
 
-//   function getAvailableWallets() {
-//     const isMetamask = window.ethereum && window.ethereum.isMetaMask
-//     const availableOptions = Object.keys(SUPPORTED_WALLETS).map((key) => {
-//       const option = SUPPORTED_WALLETS[key]
+  function getAvailableWallets() {
+    const isMetamask = window.ethereum && window.ethereum.isMetaMask
+    const availableOptions = Object.keys(SUPPORTED_WALLETS).map((key) => {
+      const option = SUPPORTED_WALLETS[key]
 
-//       if (option.name !== WALLET_NAMES.METAMASK && currentChainId) {
-//         const newConnector = returnUpdatedConnector(option)
+      if (option.name !== WALLET_NAMES.METAMASK && currentChainId) {
+        const newConnector = returnUpdatedConnector(option)
 
-//         if (newConnector) option.connector = newConnector
-//       }
+        if (newConnector) option.connector = newConnector
+      }
 
-//       // check for mobile options
-//       if (isMobile) {
-//         if (!window.web3 && !window.ethereum && option.mobile) {
-//           return (
-//             <Option
-//               onClick={() => {
-//                 ;(currentChainId !== chainId || option.connector !== connector) &&
-//                   !option.href &&
-//                   tryActivation(option.connector)
-//               }}
-//               id={`connect-${key}`}
-//               key={key}
-//               active={option.connector && option.connector === connector}
-//               color={option.color}
-//               link={option.href}
-//               header={option.name}
-//               subheader={null}
-//               size={45}
-//               icon={require('../../assets/images/' + option.iconName)}
-//             />
-//           )
-//         }
-//         return null
-//       }
+      // check for mobile options
+      if (isMobile) {
+        if (!window.web3 && !window.ethereum && option.mobile) {
+          return (
+            <Option
+              onClick={() => {
+                ;(currentChainId !== chainId || option.connector !== connector) &&
+                  !option.href &&
+                  tryActivation(option.connector)
+              }}
+              id={`connect-${key}`}
+              key={key}
+              active={option.connector && option.connector === connector}
+              color={option.color}
+              link={option.href}
+              header={option.name}
+              subheader={null}
+              size={45}
+              icon={require('../../assets/images/' + option.iconName)}
+            />
+          )
+        }
+        return null
+      }
 
-//       // overwrite injected when needed
-//       if (option.connector === injected) {
-//         // don't show injected if there's no injected provider
-//         if (!(window.web3 || window.ethereum)) {
-//           if (option.name === WALLET_NAMES.METAMASK) {
-//             return (
-//               <Option
-//                 id={`connect-${key}`}
-//                 key={key}
-//                 color={'#E8831D'}
-//                 header={'Install Metamask'}
-//                 subheader={null}
-//                 link={'https://metamask.io/'}
-//                 icon={MetamaskIcon}
-//                 size={45}
-//               />
-//             )
-//           }
+      // overwrite injected when needed
+      if (option.connector === injected) {
+        // don't show injected if there's no injected provider
+        if (!(window.web3 || window.ethereum)) {
+          if (option.name === WALLET_NAMES.METAMASK) {
+            return (
+              <Option
+                id={`connect-${key}`}
+                key={key}
+                color={'#E8831D'}
+                header={'Install Metamask'}
+                subheader={null}
+                link={'https://metamask.io/'}
+                icon={MetamaskIcon}
+                size={45}
+              />
+            )
+          }
 
-//           return null //dont want to return install twice
-//         }
-//         // don't return metamask if injected provider isn't metamask
-//         else if (option.name === WALLET_NAMES.METAMASK && !isMetamask) {
-//           return null
-//         }
-//         // likewise for generic
-//         else if (option.name === WALLET_NAMES.INJECTED && isMetamask) {
-//           return null
-//         }
-//       }
+          return null //dont want to return install twice
+        }
+        // don't return metamask if injected provider isn't metamask
+        else if (option.name === WALLET_NAMES.METAMASK && !isMetamask) {
+          return null
+        }
+        // likewise for generic
+        else if (option.name === WALLET_NAMES.INJECTED && isMetamask) {
+          return null
+        }
+      }
 
-//       // return rest of options
-//       return (
-//         !isMobile &&
-//         !option.mobileOnly && (
-//           <Option
-//             id={`connect-${key}`}
-//             onClick={() => {
-//               ;(currentChainId !== chainId || option.connector !== connector) &&
-//                 !option.href &&
-//                 tryActivation(option.connector)
-//             }}
-//             key={key}
-//             active={option.connector === connector}
-//             color={option.color}
-//             link={option.href}
-//             header={option.name}
-//             subheader={null} //use option.descriptio to bring back multi-line
-//             icon={require('../../assets/images/' + option.iconName)}
-//             size={45}
-//           />
-//         )
-//       )
-//     })
+      // return rest of options
+      return (
+        !isMobile &&
+        !option.mobileOnly && (
+          <Option
+            id={`connect-${key}`}
+            onClick={() => {
+              ;(currentChainId !== chainId || option.connector !== connector) &&
+                !option.href &&
+                tryActivation(option.connector)
+            }}
+            key={key}
+            active={option.connector === connector}
+            color={option.color}
+            link={option.href}
+            header={option.name}
+            subheader={null} //use option.descriptio to bring back multi-line
+            icon={require('../../assets/images/' + option.iconName)}
+            size={45}
+          />
+        )
+      )
+    })
 
-//     return availableOptions
-//   }
+    return availableOptions
+  }
 
   function formatConnectorName() {
     const { ethereum } = window
@@ -442,7 +441,7 @@ export default function WalletModal(props) {
       .map((k) => SUPPORTED_WALLETS[k].name)[0]
     return (
       <WalletName>
-        Connectet with {name}
+        Connected with {name}
       </WalletName>
     )
   }
@@ -477,34 +476,33 @@ export default function WalletModal(props) {
             <YourAccount>
               <InfoCard>
                 <AccountGroupingRow>
-                    {formatConnectorName()}
+                  {formatConnectorName()}
                     <div>
                       <s.button
                         secondary
-                        style={{ fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
+                        style={{ padding: '4px 6px', fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
                         onClick={() => {
-                            console.log('disconnect')
-                            deactivate()
+                          deactivate();
                         }}
                       >
                         Disconnect
                       </s.button>
                       <s.button
                         secondary
-                        style={{ fontSize: '.825rem', fontWeight: 400 }}
+                        style={{ padding: '4px 6px', fontSize: '.825rem', fontWeight: 400 }}
                         onClick={() => {
-                            console.log('Change')
+                          setWalletView(WALLET_VIEWS.OPTIONS);
                         }}
-                      >
-                        Change
-                      </s.button>
-                    </div>
+                    >
+                      Change
+                    </s.button>
+                  </div>
                 </AccountGroupingRow>
 
                 <AccountGroupingRow>
-                    <AccountControl>
-                      <p> {account && shortenAddress(account)}</p>
-                    </AccountControl>
+                  <AccountControl>
+                    <p>{account}</p>
+                  </AccountControl>
                 </AccountGroupingRow>
 
               </InfoCard>
@@ -514,73 +512,73 @@ export default function WalletModal(props) {
       )
     }
 
-    // const networkOptions = getNetworkOptions()
-    // const availableWallets = getAvailableWallets()
-    // const hasWallet = availableWallets.some((option) => option !== null)
+    const networkOptions = getNetworkOptions()
+    const availableWallets = getAvailableWallets()
+    const hasWallet = availableWallets.some((option) => option !== null)
 
-    // return (
-    //   <UpperSection>
-    //     <CloseIcon onClick={closeModal}>
-    //       <CloseColor />
-    //     </CloseIcon>
-    //     {walletView !== WALLET_VIEWS.ACCOUNT ? (
-    //       <HeaderRow color="blue">
-    //         <HoverText
-    //           onClick={() => {
-    //             setPendingError(false)
-    //             setWalletView(WALLET_VIEWS.ACCOUNT)
-    //           }}
-    //         >
-    //           Back
-    //         </HoverText>
-    //       </HeaderRow>
-    //     ) : (
-    //       <HeaderRow>
-    //         <HoverText>{t('connectWallet')}</HoverText>
-    //       </HeaderRow>
-    //     )}
-    //     <ContentWrapper>
-    //       {walletView === WALLET_VIEWS.PENDING ? (
-    //         <PendingView
-    //           connector={pendingWallet}
-    //           error={pendingError}
-    //           setPendingError={setPendingError}
-    //           tryActivation={tryActivation}
-    //         />
-    //       ) : (
-    //         <>
-    //           {!Boolean(hasWallet) ? (
-    //             t('noConnectionMethodsAvailable')
-    //           ) : (
-    //             <OptionsWrapped>
-    //               {availableNetworks.length > 1 ? (
-    //                 <>
-    //                   <div className="column">
-    //                     <Title>1. {t('chooseNetwork')}</Title>
-    //                     <Options isDark={isDark}>{networkOptions}</Options>
-    //                   </div>
-    //                   <div className="column">
-    //                     <Title>2. {t('chooseWallet')}</Title>
-    //                     <Options isDark={isDark} disabled={!currentChainId}>
-    //                       {availableWallets}
-    //                     </Options>
-    //                   </div>
-    //                 </>
-    //               ) : (
-    //                 <div className="column">
-    //                   <Title>{t('chooseWallet')}</Title>
-    //                   <Options isDark={isDark} disabled={!currentChainId}>
-    //                     {availableWallets}
-    //                   </Options>
-    //                 </div>
-    //               )}
-    //             </OptionsWrapped>
-    //           )}
-    //         </>
-    //       )}
-    //     </ContentWrapper>
-    //   </UpperSection>
-    // )
+    return (
+      <UpperSection>
+        <CloseIcon onClick={closeModal}>
+          <CloseColor />
+        </CloseIcon>
+        {walletView !== WALLET_VIEWS.ACCOUNT ? (
+          <HeaderRow>
+            <HoverText
+              onClick={() => {
+                setPendingError(false)
+                setWalletView(WALLET_VIEWS.ACCOUNT)
+              }}
+            >
+              Back
+            </HoverText>
+          </HeaderRow>
+        ) : (
+          <HeaderRow>
+            Connect Wallet
+          </HeaderRow>
+        )}
+        <ContentWrapper>
+          {walletView === WALLET_VIEWS.PENDING ? (
+            <PendingView
+              connector={pendingWallet}
+              error={pendingError}
+              setPendingError={setPendingError}
+              tryActivation={tryActivation}
+            />
+          ) : (
+            <>
+              {!Boolean(hasWallet) ? (
+                "No connection methods available"
+              ) : (
+                <OptionsWrapped>
+                  {availableNetworks.length > 1 ? (
+                    <>
+                      <div className="column">
+                        <Title>1. Choose Network</Title>
+                        <Options>{networkOptions}</Options>
+                      </div>
+                      <div className="column">
+                        <Title>2. Choose Wallet</Title>
+                        <Options disabled={!currentChainId}>
+                          {availableWallets}
+                        </Options>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="column">
+                      <Title>Choose Wallet</Title>
+                      <Options disabled={!currentChainId}>
+                        {availableWallets}
+                      </Options>
+                    </div>
+                  )}
+                </OptionsWrapped>
+              )}
+            </>
+          )}
+        </ContentWrapper>
+      </UpperSection>
+    )
   }
 
   return (

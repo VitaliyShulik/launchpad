@@ -19,7 +19,6 @@ export function Web3Status() {
     account,
     // connector,
     // error,
-    deactivate,
   } = useWeb3React();
 
   const [isWaleltModalOpen, setIsWaleltModalOpen] = useState(false);
@@ -27,7 +26,6 @@ export function Web3Status() {
   const contextNetwork = useWeb3React(NetworkContextName);
 
   // const toggleWalletModal = useWalletModalToggle()
-  const disconnect = () => deactivate()
 
   if (!contextNetwork.active && !active) {
     return null;
@@ -51,7 +49,6 @@ export function Web3Status() {
           <s.button
             className="address text-collapse"
             onClick={() => {
-              console.log('Disconnect');
               setIsWaleltModalOpen(true);
             }}
           >

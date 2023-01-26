@@ -1,10 +1,12 @@
 import BigNumber from "bignumber.js";
-import { getAddress } from '@ethersproject/address'
+import { getAddress } from '@ethersproject/address';
+import { Contract } from '@ethersproject/contracts';
 import ERC20 from "../contracts/ERC20.json";
 import IDOPool from "../contracts/IDOPool.json";
 import Locker from "../contracts/TokenLocker.json";
 import { chainRouter } from "./chainInfo";
 import { networks } from '../constants/networksInfo';
+import { ZERO_ADDRESS } from '../constants';
 
 export function randomIntFromInterval(min, max) {
   // min and max included
@@ -179,7 +181,7 @@ export const loadPoolData = async (idoAddress, web3, account) => {
 };
 
 export const getTokenData = async (tokenAddress, web3) => {
-  if (!web3.utils.isAddress(tokenAddress)) {
+  if (isAddress(tokenAddress)) {
     return null;
   }
   const token = new web3.eth.Contract(ERC20.abi, tokenAddress);
@@ -361,4 +363,20 @@ export const switchInjectedNetwork = async (chainId) => {
 
     return false
   }
+}
+
+export function getSigner(library, account) {
+  return library.getSigner(account).connectUnchecked()
+}
+
+export function getProviderOrSigner(library, account) {
+  return account ? getSigner(library, account) : library
+}
+
+export function getContract(address, ABI, library, account = '') {
+  if (!isAddress(address) || address === ZERO_ADDRESS) {
+    throw Error(`Invalid 'address' parameter '${address}'.`);
+  }
+
+  return new Contract(address, ABI, getProviderOrSigner(library, account));
 }

@@ -1,10 +1,10 @@
 import BigNumber from "bignumber.js";
 import React, { useState } from "react";
 import Countdown from "react-countdown";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { useApplicationContext } from "../../context/applicationContext";
 import { usePoolContext } from "../../context/poolContext";
 import IDOPool from "../../contracts/IDOPool.json";
-import { fetchData } from "../../redux/data/dataActions";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 
@@ -14,7 +14,10 @@ const WithdrawETH = (props) => {
   const [price, setPrice] = useState("0");
   const [loading, setLoading] = useState(false);
   const { idoAddress } = props;
-  const dispatch = useDispatch();
+
+  const {
+    triggerUpdateAccountData,
+  } = useApplicationContext();
 
   const idoInfo = usePoolContext().allPools[idoAddress];
 
@@ -56,7 +59,7 @@ const WithdrawETH = (props) => {
         .then((receipt) => {
           setLoading(false);
           console.log(receipt);
-          dispatch(fetchData(blockchain.account));
+          triggerUpdateAccountData();
         });
     } catch (err) {
       console.log(err);
@@ -84,7 +87,7 @@ const WithdrawETH = (props) => {
         .then((receipt) => {
           setLoading(false);
           console.log(receipt);
-          dispatch(fetchData(blockchain.account));
+          triggerUpdateAccountData();
         });
     } catch (err) {
       console.log(err);
@@ -112,7 +115,7 @@ const WithdrawETH = (props) => {
         .then((receipt) => {
           setLoading(false);
           console.log(receipt);
-          dispatch(fetchData(blockchain.account));
+          triggerUpdateAccountData();
         });
     } catch (err) {
       console.log(err);

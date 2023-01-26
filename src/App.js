@@ -1,6 +1,6 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import "./App.css";
@@ -19,30 +19,24 @@ import LockToken from "./pages/lockToken";
 import Publish from "./pages/publish";
 import { fetchContract } from "./redux/contract/contractAction";
 import { checkConnection } from "./redux/blockchain/blockchainActions";
-import { fetchData } from "./redux/data/dataActions";
 import * as s from "./styles/global";
 
 function App() {
   const dispatch = useDispatch();
-  const { active, chainId, library, account, error } = useWeb3React()
+  const { active, chainId, library, account, error } = useWeb3React();
   console.log('App > active', active)
   console.log('App > chainId', chainId)
   console.log('App > library', library)
   console.log('App > account', account)
   console.log('App > error', error)
-  const blockchain = useSelector((state) => state.blockchain);
-  const data = useSelector((state) => state.data);
 
   const [isAvailableNetwork, setIsAvailableNetwork] = useState(true);
 
   const isLockerEnabled = process.env.REACT_APP_ENABLE_LOCKER === 'true';
 
   useEffect(() => {
-    if (blockchain.account !== null) {
-      dispatch(fetchData(blockchain.account));
-    }
     fetchContract();
-  }, [dispatch, blockchain.account]);
+  }, [dispatch, account]);
 
   useEffect(() => {
     if (error && error instanceof UnsupportedChainIdError) {
@@ -100,11 +94,6 @@ function App() {
             <Navigation />
             <s.Container ai="center">
               <s.Container w="85%" style={{ minHeight: 600 }}>
-                <s.Container ai="center">
-                  <s.TextID style={{ color: "red" }}>
-                    {blockchain.errorMsg !== "" ? blockchain.errorMsg : null}
-                  </s.TextID>
-                </s.Container>
 
                 <Outlet />
                 <Routes>
@@ -112,7 +101,7 @@ function App() {
                   <Route path="/launchpad" element={<Launchpad />} />
                   <Route
                     path="/home"
-                    element={<Home blockchain={blockchain} data={data} />}
+                    element={<Home />}
                   />
                   <Route path="/launchpad/:idoAddress" element={<LaunchpadInfo />} />
                   <Route path="/publish" element={<Publish />} />

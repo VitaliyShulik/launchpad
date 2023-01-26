@@ -5,12 +5,12 @@ import TextField from "@mui/material/TextField";
 import BigNumber from "bignumber.js";
 import React, { useEffect, useState } from "react";
 import { Badge } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ERC20 from "../../contracts/ERC20.json";
-import { fetchData } from "../../redux/data/dataActions";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
+import { useApplicationContext } from "../../context/applicationContext";
 
 const styles = {
   root: {
@@ -39,8 +39,12 @@ const LockTokenForm = (props) => {
   const [tokenLoading, setTokenLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const { web3, account, LockerFactory, } = useSelector((state) => state.blockchain);
-  const dispatch = useDispatch();
+
   const navigate = useNavigate();
+
+  const {
+    triggerUpdateAccountData,
+  } = useApplicationContext();
 
   useEffect(() => {
     if (decimals > 0) {
@@ -152,7 +156,7 @@ const LockTokenForm = (props) => {
         setLoading(false);
         console.log(receipt);
         setTokenApprove(amount);
-        dispatch(fetchData(account));
+        triggerUpdateAccountData();
       });
   };
 
@@ -170,7 +174,7 @@ const LockTokenForm = (props) => {
       })
       .then((receipt) => {
         setLoading(false);
-        dispatch(fetchData(account));
+        triggerUpdateAccountData();
         if (receipt?.events?.LockerCreated?.returnValues?.lockerAddress){
           navigate(`../locker/${receipt.events.LockerCreated.returnValues.lockerAddress}`)
         }

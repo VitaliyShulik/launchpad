@@ -1,21 +1,25 @@
 import BigNumber from "bignumber.js";
 import React from "react";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import { useWeb3React } from "@web3-react/core";
 import { LinkContainer } from "react-router-bootstrap";
 import "../../App.css";
-import { clearCache, connect } from "../../redux/blockchain/blockchainActions";
+import { useApplicationContext } from "../../context/applicationContext";
+import { networks } from '../../constants/networksInfo';
 import * as s from "../../styles/global";
 import { Web3Status } from "../Web3Status";
+import Loader from "../Loader";
 
 const Navigation = () => {
-  const dispatch = useDispatch();
-  const { account, FeeToken } = useSelector((state) => state.blockchain);
+  const { chainId } = useWeb3React();
   const {
     ETHamount,
+    isNativeCoinBalanceFetching,
+    FeeTokenAddress,
     FeeTokenamount,
     FeeTokenSymbol,
-  } = useSelector((state) => state.data);
+    isFeeTokenDataFetching,
+  } = useApplicationContext();
 
   const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
 
@@ -59,30 +63,37 @@ const Navigation = () => {
             </LinkContainer>
           </Nav>
           <Nav>
-            <Nav.Link>{process.env.REACT_APP_networkID}</Nav.Link>
-            {ETHamount >= 0 ? (
-              <NavDropdown
-                title={
-                  `$${process.env.REACT_APP_CURRENCY || 'ETH'} ` +
-                  BigNumber(ETHamount)
-                    .dividedBy(10 ** 18)
-                    .toFormat(2)
-                }
-                id="collasible-nav-dropdown"
-              >
-                <Nav.Link
-                  href={`${process.env.REACT_APP_Explorer}address/${FeeToken._address}`}
-                  target="_blank"
-                >
-                  {`$${FeeTokenSymbol} ` +
-                    BigNumber(FeeTokenamount)
+            <Nav.Link>{networks[chainId].name}</Nav.Link>
+            {isNativeCoinBalanceFetching ?
+              <Loader/> :
+              (
+                <NavDropdown
+                  title={
+                    `$${networks[chainId].baseCurrency.symbol} ` +
+                    BigNumber(ETHamount)
                       .dividedBy(10 ** 18)
-                      .toFormat(0)}
-                </Nav.Link>
-                {/* <NavDropdown.Item href="#action/3.3"></NavDropdown.Item> */}
-                <NavDropdown.Divider />
-              </NavDropdown>
-            ) : null}
+                      .toFormat(2)
+                  }
+                  id="collasible-nav-dropdown"
+                >
+                  <Nav.Link
+                    href={`${networks[chainId].explorer}/address/${FeeTokenAddress}`}
+                    target="_blank"
+                  >
+                    {
+                      isFeeTokenDataFetching ?
+                        <Loader /> :
+                        `$${FeeTokenSymbol} ` +
+                          BigNumber(FeeTokenamount)
+                            .dividedBy(10 ** 18)
+                            .toFormat(0)
+                    }
+                  </Nav.Link>
+                  {/* <NavDropdown.Item href="#action/3.3"></NavDropdown.Item> */}
+                  <NavDropdown.Divider />
+                </NavDropdown>
+              )
+            }
           </Nav>
           <Web3Status />
         </Navbar.Collapse>

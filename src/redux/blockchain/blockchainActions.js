@@ -6,7 +6,6 @@
 // import IDOFactory from "../../contracts/IDOFactory.json";
 // import LockerFactory from "../../contracts/TokenLockerFactory.json";
 // log
-import { fetchData } from "../data/dataActions";
 
 // const providerOptions = {
 //   walletconnect: {
@@ -116,7 +115,7 @@ export const clearCache = () => {
 export const updateAccount = (account) => {
   return async (dispatch) => {
     dispatch(updateAccountRequest({ account: account }));
-    dispatch(fetchData(account));
+    // dispatch(fetchData(account));
   };
 };
 

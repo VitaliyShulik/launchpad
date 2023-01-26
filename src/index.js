@@ -9,6 +9,7 @@ import getLibrary from './utils/getLibrary.js';
 import App from "./App";
 import { PoolContextProvider } from "./context/poolContext";
 import { StoreContextProvider } from "./context/store";
+import { ApplicationContextProvider } from "./context/applicationContext";
 import "./index.css";
 import store from "./redux/store";
 import reportWebVitals from "./reportWebVitals";
@@ -47,17 +48,19 @@ ReactDOM.render(
   <React.StrictMode>
     <Web3ReactProvider getLibrary={getLibrary}>
       <Web3ProviderNetwork getLibrary={getLibrary}>
-        <StoreContextProvider>
-          <ThemeProvider theme={theme}>
-            <Provider store={store}>
-              <PoolContextProvider>
-                <Router>
-                  <App />
-                </Router>
-              </PoolContextProvider>
-            </Provider>
-          </ThemeProvider>
-        </StoreContextProvider>
+        <Provider store={store}>
+          <StoreContextProvider>
+            <PoolContextProvider>
+              <ApplicationContextProvider>
+                <ThemeProvider theme={theme}>
+                  <Router>
+                    <App />
+                  </Router>
+                </ThemeProvider>
+              </ApplicationContextProvider>
+            </PoolContextProvider>
+          </StoreContextProvider>
+        </Provider>
       </Web3ProviderNetwork>
     </Web3ReactProvider>
   </React.StrictMode>,

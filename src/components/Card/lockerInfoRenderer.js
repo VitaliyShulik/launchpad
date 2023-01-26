@@ -1,18 +1,19 @@
 import BigNumber from "bignumber.js";
 import React, { useState } from "react";
 import Countdown from "react-countdown";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { useApplicationContext } from "../../context/applicationContext";
 import { usePoolContext } from "../../context/poolContext";
 import Locker from "../../contracts/TokenLocker.json";
-import { fetchData } from "../../redux/data/dataActions";
 import * as s from "../../styles/global";
 
 const LockerInfoRenderer = (props) => {
   const { lockerAddress } = props;
   const [loading, setLoading] = useState(false);
+  const {
+    triggerUpdateAccountData,
+  } = useApplicationContext();
   const blockchain = useSelector((state) => state.blockchain);
-  const currency = " " + process.env.REACT_APP_CURRENCY;
-  const dispatch = useDispatch();
 
   const poolContext = usePoolContext();
   let lockerInfo = poolContext.allLocker[lockerAddress];
@@ -42,7 +43,7 @@ const LockerInfoRenderer = (props) => {
       .then((receipt) => {
         setLoading(false);
         console.log(receipt);
-        dispatch(fetchData(blockchain.account));
+        triggerUpdateAccountData();
       });
   };
 

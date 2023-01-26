@@ -2,10 +2,10 @@ import { TextField } from "@mui/material";
 import BigNumber from "bignumber.js";
 import React, { useEffect, useState } from "react";
 import { Badge } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import { useApplicationContext } from "../../context/applicationContext";
 import { usePoolContext } from "../../context/poolContext";
 import IDOPool from "../../contracts/IDOPool.json";
-import { fetchData } from "../../redux/data/dataActions";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import ProgressBar from "../Modal/ProgressBar";
@@ -16,7 +16,9 @@ const BuyTokenCard = (props) => {
   const [price, setPrice] = useState("0");
   const [loading, setLoading] = useState(false);
   const { idoAddress } = props;
-  const dispatch = useDispatch();
+  const {
+    triggerUpdateAccountData,
+  } = useApplicationContext();
   const currency = " " + process.env.REACT_APP_CURRENCY;
   const idoInfo = usePoolContext().allPools[idoAddress];
 
@@ -56,7 +58,7 @@ const BuyTokenCard = (props) => {
         .then((receipt) => {
           setLoading(false);
           console.log(receipt);
-          dispatch(fetchData(blockchain.account));
+          triggerUpdateAccountData();
         });
     } catch (err) {
       console.log(err);
@@ -84,7 +86,7 @@ const BuyTokenCard = (props) => {
         .then((receipt) => {
           setLoading(false);
           console.log(receipt);
-          dispatch(fetchData(blockchain.account));
+          triggerUpdateAccountData();
         });
     } catch (err) {
       console.log(err);
@@ -112,7 +114,7 @@ const BuyTokenCard = (props) => {
         .then((receipt) => {
           setLoading(false);
           console.log(receipt);
-          dispatch(fetchData(blockchain.account));
+          triggerUpdateAccountData();
         });
     } catch (err) {
       console.log(err);

@@ -1,3 +1,4 @@
+import { useWeb3React } from "@web3-react/core";
 import React, { createContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { utils } from "../utils";
@@ -13,7 +14,7 @@ export const PoolContextProvider = ({ children }) => {
   const [allLocker, setAllLocker] = useState({});
   const dispatch = useDispatch();
   const contract = useSelector((state) => state.contract);
-  const { account } = useSelector((state) => state.blockchain);
+  const { account } = useWeb3React();
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {

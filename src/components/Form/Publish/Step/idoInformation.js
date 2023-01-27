@@ -9,8 +9,14 @@ import * as s from "../../../../styles/global";
 import { chainRouter } from "../../../../utils/chainInfo";
 import { timeout } from "../../../../utils/utils";
 import { NumberField } from "../../../FormField";
+import { useApplicationContext } from '../../../../context/applicationContext';
+
 export default function IDOInfo() {
   const context = useStoreContext();
+
+  const {
+    baseCurrencySymbol,
+  } = useApplicationContext();
 
   const {
     isAddLiquidityEnabled: [isAddLiquidityEnabled, setIsAddLiquidityEnabled],
@@ -21,7 +27,7 @@ export default function IDOInfo() {
       <s.TextTitle fullWidth>IDO Information</s.TextTitle>
       <s.SpacerSmall />
       <s.TextID>
-        If I pay 1 {process.env.REACT_APP_CURRENCY} how much token I will get?
+        If I pay 1 {baseCurrencySymbol} how much token I will get?
       </s.TextID>
       <NumberField
         value={BigNumber(context.tokenRate[0]).toFixed()}
@@ -151,7 +157,7 @@ export default function IDOInfo() {
       {
         isAddLiquidityEnabled && <>
           <s.TextID>
-            If I pay 1 {process.env.REACT_APP_CURRENCY} how much token I will get
+            If I pay 1 {baseCurrencySymbol} how much token I will get
             after presale?
           </s.TextID>
           <NumberField

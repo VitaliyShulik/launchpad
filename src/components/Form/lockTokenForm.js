@@ -44,6 +44,7 @@ const LockTokenForm = (props) => {
 
   const {
     triggerUpdateAccountData,
+    baseCurrencySymbol,
   } = useApplicationContext();
 
   useEffect(() => {
@@ -329,7 +330,7 @@ const LockTokenForm = (props) => {
       {"Fee : " +
         web3.utils.fromWei(fee) +
         " " +
-        process.env.REACT_APP_CURRENCY}
+        baseCurrencySymbol}
     </s.Card>
   );
 };

@@ -1,7 +1,11 @@
 import React from "react";
+import { useApplicationContext } from "../../context/applicationContext";
 import * as s from "../../styles/global";
 
-const PreviewForm = (props) => {
+const PreviewForm = () => {
+  const {
+    baseCurrencySymbol,
+  } = useApplicationContext();
   return (
     <s.Container>
       <s.TextTitle style={{ width: 640 }}>Preview</s.TextTitle>
@@ -21,11 +25,11 @@ const PreviewForm = (props) => {
         style={{ marginTop: 20, flexWrap: "wrap" }}
       >
         <s.TextDescription>
-          Min {process.env.REACT_APP_CURRENCY} Purchase
+          Min {baseCurrencySymbol} Purchase
         </s.TextDescription>
         <s.Input readOnly />
         <s.TextDescription>
-          Max {process.env.REACT_APP_CURRENCY} Purchase
+          Max {baseCurrencySymbol} Purchase
         </s.TextDescription>
         <s.Input readOnly />
       </s.Container>

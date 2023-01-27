@@ -1,18 +1,18 @@
 import BigNumber from "bignumber.js";
 import React from "react";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { useWeb3React } from "@web3-react/core";
 import { LinkContainer } from "react-router-bootstrap";
 import "../../App.css";
 import { useApplicationContext } from "../../context/applicationContext";
-import { networks } from '../../constants/networksInfo';
 import * as s from "../../styles/global";
 import { Web3Status } from "../Web3Status";
 import Loader from "../Loader";
 
 const Navigation = () => {
-  const { chainId } = useWeb3React();
   const {
+    chainName,
+    networkExplorer,
+    baseCurrencySymbol,
     ETHamount,
     isNativeCoinBalanceFetching,
     FeeTokenAddress,
@@ -22,6 +22,8 @@ const Navigation = () => {
   } = useApplicationContext();
 
   const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
+
+  const hasFeeToken = !isFeeTokenDataFetching && FeeTokenSymbol && FeeTokenAddress
 
   return (
     <Navbar collapseOnSelect expand="lg" variant="dark" style={{ margin: 15 }}>
@@ -63,21 +65,34 @@ const Navigation = () => {
             </LinkContainer>
           </Nav>
           <Nav>
-            <Nav.Link>{networks[chainId].name}</Nav.Link>
-            {isNativeCoinBalanceFetching ?
-              <Loader/> :
-              (
+            <Nav.Link>{chainName}</Nav.Link>
+
+            {
+              !hasFeeToken ? (
+                <Nav.Link>
+                  {
+                    isNativeCoinBalanceFetching ?
+                      <Loader/> :
+                      `$${baseCurrencySymbol} ` +
+                        BigNumber(ETHamount)
+                          .dividedBy(10 ** 18)
+                          .toFormat(2)
+                  }
+                </Nav.Link>
+              ) : (
                 <NavDropdown
                   title={
-                    `$${networks[chainId].baseCurrency.symbol} ` +
-                    BigNumber(ETHamount)
-                      .dividedBy(10 ** 18)
-                      .toFormat(2)
+                    isNativeCoinBalanceFetching ?
+                      <Loader/> :
+                      `$${baseCurrencySymbol} ` +
+                        BigNumber(ETHamount)
+                          .dividedBy(10 ** 18)
+                          .toFormat(2)
                   }
                   id="collasible-nav-dropdown"
                 >
                   <Nav.Link
-                    href={`${networks[chainId].explorer}/address/${FeeTokenAddress}`}
+                    href={`${networkExplorer}/address/${FeeTokenAddress}`}
                     target="_blank"
                   >
                     {

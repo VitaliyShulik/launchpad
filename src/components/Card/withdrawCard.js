@@ -17,6 +17,7 @@ const WithdrawETH = (props) => {
 
   const {
     triggerUpdateAccountData,
+    baseCurrencySymbol,
   } = useApplicationContext();
 
   const idoInfo = usePoolContext().allPools[idoAddress];
@@ -153,7 +154,7 @@ const WithdrawETH = (props) => {
           <s.TextDescription>
             {BigNumber(web3.utils.fromWei(idoInfo.balance)).toFixed(2) +
               " " +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.TextDescription>
         </s.Container>
         <s.button

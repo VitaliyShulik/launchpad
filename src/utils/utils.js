@@ -13,9 +13,9 @@ export function randomIntFromInterval(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-export function getRouterName(router, factory, weth) {
+export function getRouterName(router, factory, weth, chainId) {
   let name = "";
-  chainRouter[process.env.REACT_APP_networkID].map((item, index) => {
+  chainRouter[chainId].map((item, index) => {
     if (item.factory == factory && item.router == router && weth == weth) {
       name = item.name;
     }

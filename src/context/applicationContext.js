@@ -2,14 +2,17 @@ import React, { createContext, useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import IDOFactory from '../contracts/IDOFactory.json';
 import FeeToken from "../contracts/FeeToken.json";
+import TokenLockerFactory from "../contracts/TokenLockerFactory.json";
 import { useTokenContract } from "../hooks/useContract";
+import { networks } from "../constants/networksInfo";
 
 export const Application = createContext({});
 
 export const ApplicationContextProvider = ({ children }) => {
   const { account, chainId, library } = useWeb3React();
 
-  // use blockchain storage state for IDOFactoryAddress
+  // use blockchain storage state for all contracts' addresses
+  const TokenLockerFactoryAddress = TokenLockerFactory?.networks?.[chainId]?.address;
   const IDOFactoryAddress = IDOFactory?.networks?.[chainId]?.address;
   const FeeTokenAddress = FeeToken?.networks?.[chainId]?.address;
 
@@ -24,6 +27,11 @@ export const ApplicationContextProvider = ({ children }) => {
   const [nativeCoinBalance, setNativeCoinBalance] = useState(0);
   const [isNativeCoinBalanceFetching, setIsNativeCoinBalanceFetching] = useState(false);
 
+  const baseCurrencySymbol = networks[chainId]?.baseCurrency?.symbol || networks[1].baseCurrency.symbol;
+  const chainName = networks[chainId]?.name || networks[1].name;
+  const networkExplorer = networks[chainId]?.explorer || networks[1].explorer;
+
+  const TokenLockerFactoryContract = useTokenContract(TokenLockerFactoryAddress);
   const FeeTokenContract = useTokenContract(FeeTokenAddress);
   const IDOFactoryContract = useTokenContract(IDOFactoryAddress);
 
@@ -46,7 +54,7 @@ export const ApplicationContextProvider = ({ children }) => {
     }
 
     if (account && chainId && FeeTokenContract) {
-        fetchFeeTokenData();
+      fetchFeeTokenData();
     } else {
       setFeeTokenSymbol('');
       setFeeTokenBalance(0);
@@ -77,6 +85,9 @@ export const ApplicationContextProvider = ({ children }) => {
 
   const value = {
     triggerUpdateAccountData,
+    chainName,
+    networkExplorer,
+    baseCurrencySymbol,
     ETHamount: nativeCoinBalance,
     isNativeCoinBalanceFetching,
 
@@ -89,6 +100,9 @@ export const ApplicationContextProvider = ({ children }) => {
 
     IDOFactoryContract,
     IDOFactoryAddress,
+
+    TokenLockerFactoryAddress,
+    TokenLockerFactoryContract,
   };
 
   return (

@@ -18,7 +18,6 @@ import LockerInfo from "./pages/lockerInfo";
 import LockToken from "./pages/lockToken";
 import Publish from "./pages/publish";
 import { fetchContract } from "./redux/contract/contractAction";
-import { checkConnection } from "./redux/blockchain/blockchainActions";
 import * as s from "./styles/global";
 
 function App() {
@@ -35,8 +34,8 @@ function App() {
   const isLockerEnabled = process.env.REACT_APP_ENABLE_LOCKER === 'true';
 
   useEffect(() => {
-    fetchContract();
-  }, [dispatch, account]);
+    fetchContract(chainId);
+  }, [dispatch, account, chainId]);
 
   useEffect(() => {
     if (error && error instanceof UnsupportedChainIdError) {
@@ -73,9 +72,10 @@ function App() {
   ])
 
   useEffect(() => {
-    dispatch(fetchContract());
-    checkConnection(dispatch)
-  }, []);
+    if (chainId) {
+      dispatch(fetchContract(chainId));
+    }
+  }, [chainId]);
 
   return (
     <Web3ReactManager>

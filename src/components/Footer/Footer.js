@@ -1,5 +1,6 @@
 import React from "react";
 import { SocialIcon } from "react-social-icons";
+import { useApplicationContext } from "../../context/applicationContext";
 import IDOFactory from "../../contracts/IDOFactory.json";
 import LockerFactory from "../../contracts/TokenLockerFactory.json";
 import {
@@ -12,6 +13,11 @@ import {
 } from "./FooterStyle";
 
 const Footer = () => {
+  const {
+    networkExplorer,
+    IDOFactoryAddress,
+    TokenLockerFactoryAddress,
+  } = useApplicationContext();
   return (
     <Box>
       <hr
@@ -30,12 +36,12 @@ const Footer = () => {
             <FooterLink
               target="_blank"
               href={
-                process.env.REACT_APP_Explorer +
-                "address/" +
-                IDOFactory.networks[process.env.REACT_APP_networkID].address
+                networkExplorer +
+                "/address/" +
+                IDOFactoryAddress
               }
             >
-              {IDOFactory.networks[process.env.REACT_APP_networkID].address}
+              {IDOFactoryAddress}
             </FooterLink>
             {
               process.env.REACT_APP_ENABLE_LOCKER === 'true' && (
@@ -44,12 +50,12 @@ const Footer = () => {
                   <FooterLink
                     target="_blank"
                     href={
-                      process.env.REACT_APP_Explorer +
-                      "address/" +
-                      LockerFactory.networks[process.env.REACT_APP_networkID].address
+                      networkExplorer +
+                      "/address/" +
+                      TokenLockerFactoryAddress
                     }
                   >
-                    {LockerFactory.networks[process.env.REACT_APP_networkID].address}
+                    {TokenLockerFactoryAddress}
                   </FooterLink>
                 </>
               )

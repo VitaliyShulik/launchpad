@@ -18,8 +18,8 @@ const BuyTokenCard = (props) => {
   const { idoAddress } = props;
   const {
     triggerUpdateAccountData,
+    baseCurrencySymbol
   } = useApplicationContext();
-  const currency = " " + process.env.REACT_APP_CURRENCY;
   const idoInfo = usePoolContext().allPools[idoAddress];
 
   if (!blockchain.account) {
@@ -144,13 +144,13 @@ const BuyTokenCard = (props) => {
       <PoolCountdown start={idoInfo.start} end={idoInfo.end} />
       <s.Container fd="row" jc="space-between" style={{ marginTop: 10 }}>
         <s.Card style={{ padding: 0 }}>
-          <s.TextID>{"Minimum" + currency}</s.TextID>
+          <s.TextID>{"Minimum " + baseCurrencySymbol}</s.TextID>
           <s.TextDescription>
             {BigNumber(web3.utils.fromWei(idoInfo.min)).toFormat(2)}
           </s.TextDescription>
         </s.Card>
         <s.Card style={{ padding: 0 }}>
-          <s.TextID>Maximum{currency}</s.TextID>
+          <s.TextID>Maximum {baseCurrencySymbol}</s.TextID>
           <s.TextDescription>
             {BigNumber(web3.utils.fromWei(idoInfo.max)).toFormat(2)}
           </s.TextDescription>
@@ -184,11 +184,11 @@ const BuyTokenCard = (props) => {
       </s.Container>
       <s.Container fd="row" jc="space-between" ai="center">
         <s.Container flex={4}>
-          <s.TextID>My invested {process.env.REACT_APP_CURRENCY}</s.TextID>
+          <s.TextID>My invested {baseCurrencySymbol}</s.TextID>
           <s.TextDescription>
             {BigNumber(web3.utils.fromWei(idoInfo.userData.totalInvestedETH)).toFormat(
               2
-            ) + currency}
+            ) + " " + baseCurrencySymbol}
           </s.TextDescription>
         </s.Container>
         <s.Container flex={1}>
@@ -217,7 +217,7 @@ const BuyTokenCard = (props) => {
         <s.Container flex={4} style={{ marginRight: 20 }}>
           <TextField
             fullWidth
-            label={"Buy with" + currency}
+            label={"Buy with " + baseCurrencySymbol}
             type={"tel"}
             onChange={(e) => {
               e.preventDefault();

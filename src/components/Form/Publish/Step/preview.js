@@ -1,16 +1,17 @@
 import BigNumber from "bignumber.js";
 import { create } from "ipfs-http-client";
 import React, { useEffect, useState } from "react";
+import { useWeb3React } from "@web3-react/core";
 import { FaImage } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useStoreContext } from "../../../../context/store";
-import ERC20 from "../../../../contracts/ERC20.json";
-import { fetchData } from "../../../../redux/data/dataActions";
 import * as s from "../../../../styles/global";
 import { chainRouter } from "../../../../utils/chainInfo";
 import SocialMediaModal from "../../../Modal/socialmediaModal";
+import { useApplicationContext } from "../../../../context/applicationContext";
+import { useTokenContract } from "../../../../hooks/useContract";
 import ReadMore from "../../readMore";
+import { isAddress } from "../../../../utils/utils";
 
 const projectId = process.env.REACT_APP_INFURA_IPFS_KEY;
 const projectSecret = process.env.REACT_APP_INFURA_IPFS_SECRET;
@@ -28,20 +29,26 @@ const ipfs = create({
 export default function Preview() {
   const context = useStoreContext();
   const token = context.tokenInformation[0];
-  const blockchain = useSelector((state) => state.blockchain);
+  const { account, chainId, library } = useWeb3React();
   const {
-    FeeTokenApproveToFactory,
+    baseCurrencySymbol,
+    IDOFactoryContract,
+    IDOFactoryAddress,
+    TokenLockerFactoryAddress,
+    FeeTokenContract,
     FeeTokenSymbol,
-  } = useSelector((state) => state.data);
-  const dispatch = useDispatch();
+    FeeTokenApproveToFactory,
+    triggerUpdateAccountData,
+    isFeeTokenDataFetching,
+  } = useApplicationContext();
   const navigate = useNavigate();
 
-  const networkId = process.env.REACT_APP_networkID || 5;
-
-  const address = context.address[0];
+  const tokenAddress = context.address[0];
+  const tokenContract = useTokenContract(tokenAddress);
   const icon = context.icon[0];
   const [IDOFactoryFee, sesIDOFactoryFee] = useState("0");
   const [tokenApprove, setTokenApprove] = useState("");
+  const [isTokenApprovalFetching, setIsTokenApprovalFetching] = useState(false);
   const [loading, setLoading] = useState(false);
   const tokenRate = BigNumber(context.tokenRate[0]);
   const hardCap = BigNumber(context.hardCap[0]);
@@ -59,25 +66,32 @@ export default function Preview() {
       )
     );
 
-  useEffect(async () => {
-    if (blockchain.web3) {
-      if (blockchain.web3.utils.isAddress(address)) {
-        const web3 = blockchain.web3;
-        const token = new web3.eth.Contract(ERC20.abi, address);
-        let tokenApproval = await token.methods
-          .allowance(blockchain.account, blockchain.IDOFactory._address)
+  useEffect(() => {
+    const checkTokenApproval = async () => {
+      setIsTokenApprovalFetching(true);
+      try {
+        let tokenApproval = await tokenContract.methods
+          .allowance(account, IDOFactoryAddress)
           .call();
         setTokenApprove(tokenApproval);
+      } catch (error) {
+        console.log('checkTokenApproval error: ', error);
+      } finally {
+        setIsTokenApprovalFetching(false);
       }
+    }
+    if (isAddress(tokenAddress) && tokenContract) {
+      checkTokenApproval();
     } else {
       setTokenApprove("");
     }
-  }, [blockchain.web3]);
+  }, [account, library, IDOFactoryAddress, tokenContract, tokenAddress]);
 
   useEffect(() => {
     const fetchIDOFactoryFee = async () => {
-      const { IDOFactory } = blockchain;
-      const IDOFactoryFee = await IDOFactory?.methods?.feeAmount().call() || "0";
+      console.log('IDOFactoryContract', IDOFactoryContract)
+      const IDOFactoryFee = await IDOFactoryContract?.feeAmount().call() || "0";
+      console.log('IDOFactoryFee', IDOFactoryFee)
       sesIDOFactoryFee(IDOFactoryFee);
     }
 
@@ -132,14 +146,14 @@ export default function Preview() {
     const tokenURI = ipfsResonse.ipfsHash;
 
     const rewardToken = context.address[0];
-    const tokenRate = blockchain.web3.utils.toWei(context.tokenRate[0]);
-    const listingRate = blockchain.web3.utils.toWei(isAddLiquidityEnabled ? context.listingRate[0] : "0");
+    const tokenRate = library.utils.toWei(context.tokenRate[0]);
+    const listingRate = library.utils.toWei(isAddLiquidityEnabled ? context.listingRate[0] : "0");
     const finInfo = [
       tokenRate,
-      blockchain.web3.utils.toWei(context.softCap[0]),
-      blockchain.web3.utils.toWei(context.hardCap[0]),
-      blockchain.web3.utils.toWei(context.minETH[0]),
-      blockchain.web3.utils.toWei(context.maxETH[0]),
+      library.utils.toWei(context.softCap[0]),
+      library.utils.toWei(context.hardCap[0]),
+      library.utils.toWei(context.minETH[0]),
+      library.utils.toWei(context.maxETH[0]),
       listingRate,
       parseInt(isAddLiquidityEnabled ? context.liquidityPercentage[0] : 0),
     ];
@@ -149,22 +163,22 @@ export default function Preview() {
       BigNumber(context.unlock[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
     ];
     const dexInfo = [
-      chainRouter[networkId][0].ROUTER,
-      chainRouter[networkId][0].FACTORY,
-      chainRouter[networkId][0].WETH,
+      chainRouter[chainId][0].ROUTER,
+      chainRouter[chainId][0].FACTORY,
+      chainRouter[chainId][0].WETH,
     ];
 
-    blockchain.IDOFactory.methods
+    IDOFactoryContract
       .createIDO(
         rewardToken,
         finInfo,
         timestamps,
         dexInfo,
-        blockchain.LockerFactory._address,
+        TokenLockerFactoryAddress,
         tokenURI
       )
       .send({
-        from: blockchain.account,
+        from: account,
       })
       .once("error", (err) => {
         setLoading(false);
@@ -173,21 +187,20 @@ export default function Preview() {
       .then((receipt) => {
         setLoading(false);
         console.log(receipt);
-        dispatch(fetchData(blockchain.account));
+        triggerUpdateAccountData();
         if (receipt?.events?.IDOCreated?.returnValues?.idoPool){
           navigate(`../locker/${receipt.events.IDOCreated.returnValues.idoPool}`)
         }
       });
   };
 
-  const approveToken = async (_address, amount, tokenContract = null) => {
+  const approveToken = async (amount, tokenContract) => {
     setLoading(true);
-    const web3 = blockchain.web3;
-    const token = tokenContract || await new web3.eth.Contract(ERC20.abi, _address);
+    const token = tokenContract
     token.methods
-      .approve(blockchain.IDOFactory._address, amount)
+      .approve(IDOFactoryAddress, amount)
       .send({
-        from: blockchain.account,
+        from: account,
       })
       .once("error", (err) => {
         setLoading(false);
@@ -197,7 +210,7 @@ export default function Preview() {
         setLoading(false);
         console.log(receipt);
         setTokenApprove(amount);
-        dispatch(fetchData(blockchain.account));
+        triggerUpdateAccountData();
       });
   };
 
@@ -264,7 +277,7 @@ export default function Preview() {
       <s.TextID>Token rate</s.TextID>
       <s.TextDescription>
         {"1 $" +
-          process.env.REACT_APP_CURRENCY +
+          baseCurrencySymbol +
           " -> " +
           BigNumber(context.tokenRate[0]).toFormat(2) +
           " $" +
@@ -276,20 +289,20 @@ export default function Preview() {
           <s.TextDescription>
             {BigNumber(context.softCap[0]).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.TextDescription>
           <s.SpacerSmall />
           <s.TextID>Hard Cap</s.TextID>
           <s.TextDescription>
             {BigNumber(context.hardCap[0]).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.TextDescription>
           <s.SpacerSmall />
           {/* <s.TextID>Pool router</s.TextID>
           <s.TextDescription>
             {
-              chainRouter[process.env.REACT_APP_networkID][context.router[0]]
+              chainRouter[chainId][context.router[0]]
                 .name
             }
           </s.TextDescription> */}
@@ -299,14 +312,14 @@ export default function Preview() {
           <s.TextDescription>
             {BigNumber(context.minETH[0]).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.TextDescription>
           <s.SpacerSmall />
           <s.TextID>Maximum Buy</s.TextID>
           <s.TextDescription>
             {BigNumber(context.maxETH[0]).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.TextDescription>
           {
             isAddLiquidityEnabled && <>
@@ -324,7 +337,7 @@ export default function Preview() {
           <s.TextID>Listing rate</s.TextID>
           <s.TextDescription>
             {"1 $" +
-              process.env.REACT_APP_CURRENCY +
+              baseCurrencySymbol +
               " -> " +
               BigNumber(context.listingRate[0]).toFormat(2) +
               " $" +
@@ -352,7 +365,7 @@ export default function Preview() {
             disabled={loading}
             onClick={(e) => {
               e.preventDefault();
-              approveToken('', IDOFactoryFee, blockchain.FeeToken);
+              approveToken(IDOFactoryFee, FeeTokenContract);
             }}
           >
             {loading ? ". . ." : `APPROVE ${FeeTokenSymbol}`}
@@ -363,7 +376,7 @@ export default function Preview() {
             disabled={loading}
             onClick={(e) => {
               e.preventDefault();
-              approveToken(address, BigNumber(requiredToken).toFixed(0));
+              approveToken(BigNumber(requiredToken).toFixed(0), tokenContract);
             }}
           >
             {loading ? ". . ." : `APPROVE ${token.tokenSymbol}`}
@@ -382,7 +395,7 @@ export default function Preview() {
         )}
       </s.Container>
 
-      {IDOFactoryFee && IDOFactoryFee !== "0" && `Create IDO fee : ${blockchain.web3.utils.fromWei(IDOFactoryFee)} ${FeeTokenSymbol}`}
+      {IDOFactoryFee && IDOFactoryFee !== "0" && `Create IDO fee : ${library.utils.fromWei(IDOFactoryFee)} ${FeeTokenSymbol}`}
     </s.Container>
   );
 }

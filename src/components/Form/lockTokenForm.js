@@ -11,6 +11,7 @@ import { utils } from "../../utils";
 import { useApplicationContext } from "../../context/applicationContext";
 import { useWeb3React } from "@web3-react/core";
 import { useTokenContract } from "../../hooks/useContract";
+import Loader from "../Loader";
 
 const styles = {
   root: {
@@ -296,7 +297,7 @@ const LockTokenForm = () => {
               createLocker();
             }}
           >
-            {loading ? ". . ." : "LOCK"}
+            {loading ? <Loader /> : "LOCK"}
           </s.button>
         ) : (
           <s.button
@@ -312,7 +313,7 @@ const LockTokenForm = () => {
               approveToken(tokenDistributed);
             }}
           >
-            {loading ? ". . ." : "APPROVE TOKEN"}
+            {loading ? <Loader /> : "APPROVE TOKEN"}
           </s.button>
         )}
       </s.Container>

@@ -7,7 +7,7 @@ export const getWeb3Library = provider => {
 
 export default function getLibrary(provider) {
   const library = new Web3Provider(provider, 'any');
-  console.log('library', library);
   library.pollingInterval = 15000;
+  library.web3 = getWeb3Library(provider);
   return library;
 }

@@ -181,7 +181,7 @@ export const loadPoolData = async (idoAddress, web3, account) => {
 };
 
 export const getTokenData = async (tokenAddress, web3) => {
-  if (isAddress(tokenAddress)) {
+  if (!isAddress(tokenAddress)) {
     return null;
   }
   const token = new web3.eth.Contract(ERC20.abi, tokenAddress);

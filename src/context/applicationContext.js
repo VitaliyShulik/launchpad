@@ -3,7 +3,7 @@ import { useWeb3React } from "@web3-react/core";
 import IDOFactory from '../contracts/IDOFactory.json';
 import FeeToken from "../contracts/FeeToken.json";
 import TokenLockerFactory from "../contracts/TokenLockerFactory.json";
-import { useTokenContract } from "../hooks/useContract";
+import { useTokenContract, useLockerFactoryContract, useIDOFactoryContract } from "../hooks/useContract";
 import { networks } from "../constants/networksInfo";
 
 export const Application = createContext({});
@@ -31,9 +31,9 @@ export const ApplicationContextProvider = ({ children }) => {
   const chainName = networks[chainId]?.name || networks[1].name;
   const networkExplorer = networks[chainId]?.explorer || networks[1].explorer;
 
-  const TokenLockerFactoryContract = useTokenContract(TokenLockerFactoryAddress);
-  const FeeTokenContract = useTokenContract(FeeTokenAddress);
-  const IDOFactoryContract = useTokenContract(IDOFactoryAddress);
+  const TokenLockerFactoryContract = useLockerFactoryContract(TokenLockerFactoryAddress, true);
+  const IDOFactoryContract = useIDOFactoryContract(IDOFactoryAddress, true);
+  const FeeTokenContract = useTokenContract(FeeTokenAddress, true);
 
   useEffect(() => {
     const fetchFeeTokenData = async () => {

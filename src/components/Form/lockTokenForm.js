@@ -5,12 +5,12 @@ import TextField from "@mui/material/TextField";
 import BigNumber from "bignumber.js";
 import React, { useEffect, useState } from "react";
 import { Badge } from "react-bootstrap";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import ERC20 from "../../contracts/ERC20.json";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import { useApplicationContext } from "../../context/applicationContext";
+import { useWeb3React } from "@web3-react/core";
+import { useTokenContract } from "../../hooks/useContract";
 
 const styles = {
   root: {
@@ -21,8 +21,9 @@ const styles = {
   },
 };
 
-const LockTokenForm = (props) => {
-  const [address, setAddress] = useState("");
+const LockTokenForm = () => {
+  const [tokenAddress, setTokenAddress] = useState("");
+  const [tokenAddressForChecking, setTokenAddressForChecking] = useState("");
   const [name, setName] = useState("");
   const [tokenApprove, setTokenApprove] = useState("0");
   const [tokenName, setTokenName] = useState("");
@@ -38,13 +39,19 @@ const LockTokenForm = (props) => {
   const [tokenDistributedInput, setTokenDistributedInput] = useState(0);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { web3, account, LockerFactory, } = useSelector((state) => state.blockchain);
+
+  const {account, library } = useWeb3React();
+
+  const tokenContract = useTokenContract(tokenAddress);
+  const tokenContractForChecking = useTokenContract(tokenAddressForChecking);
 
   const navigate = useNavigate();
 
   const {
     triggerUpdateAccountData,
     baseCurrencySymbol,
+    TokenLockerFactoryContract,
+    TokenLockerFactoryAddress,
   } = useApplicationContext();
 
   useEffect(() => {
@@ -56,16 +63,56 @@ const LockTokenForm = (props) => {
   }, [tokenDistributedInput, decimals]);
 
   useEffect(() => {
+    const checkAndSetTokensDetails = async () => {
+      setTokenLoading(true);
+      try {
+        const tokenDecimals = await tokenContractForChecking?.decimals();
+        if (tokenDecimals) {
+          setDecimals(tokenDecimals.toString());
+          setTokenName(await tokenContractForChecking?.name());
+          setTotalSupply(Number(await tokenContractForChecking?.totalSupply()));
+          setTokenSymbol(await tokenContractForChecking?.symbol());
+          setTokenApprove(Number(await tokenContractForChecking?.allowance(account, TokenLockerFactoryAddress)));
+
+          setTokenAddress(tokenAddressForChecking);
+          setDistributed();
+        } else {
+          setDecimals(-1);
+          await utils.timeout(100);
+      }
+      } catch (error) {
+        console.log('checkAndSetTokensDetails Error: ', error);
+        setDecimals(-1);
+      } finally {
+        setTokenLoading(false)
+      }
+    };
+
+    if (utils.isAddress(tokenAddressForChecking)) {
+      checkAndSetTokensDetails()
+    } else {
+      setTokenAddress("");
+      setTokenName("");
+      setTotalSupply("");
+      setTokenSymbol("");
+      setTokenApprove("0");
+      if(tokenAddressForChecking !== "") {
+        // TODO: show user Error address is not correct
+      }
+    }
+  }, [tokenContractForChecking])
+
+  useEffect(() => {
     const fethcLockerFee = async () => {
-      if (LockerFactory) {
-        const lockerFee = await LockerFactory.methods.fee().call();
-        setFee(lockerFee);
+      if (TokenLockerFactoryContract) {
+        const lockerFee = await TokenLockerFactoryContract.fee();
+        setFee(lockerFee.toString());
       } else {
         setFee("0");
       }
     }
     fethcLockerFee();
-  }, [LockerFactory]);
+  }, [TokenLockerFactoryContract]);
 
   if (account == null) {
     return null;
@@ -81,105 +128,54 @@ const LockTokenForm = (props) => {
     }
   };
 
-  const checkAndSetTokensDetails = async (tokenAddress) => {
-    if (web3.utils.isAddress(tokenAddress)) {
-      setTokenLoading(true);
-      try {
-        const token = await new web3.eth.Contract(ERC20.abi, tokenAddress);
-        if (token.methods.decimals()) {
-          await token.methods
-            .decimals()
-            .call()
-            .then(async (e) => {
-              setDecimals(parseInt(e));
-            });
-          await token.methods
-            .name()
-            .call()
-            .then(async (e) => {
-              setTokenName(e);
-            });
-          await token.methods
-            .totalSupply()
-            .call()
-            .then(async (e) => {
-              setTotalSupply(e);
-            });
-          await token.methods
-            .symbol()
-            .call()
-            .then(async (e) => {
-              setTokenSymbol(e);
-              return true;
-            });
-          await token.methods
-            .allowance(account, LockerFactory._address)
-            .call()
-            .then(async (e) => {
-              setTokenApprove(e);
-              return true;
-            });
-        } else {
-          setDecimals(-1);
-          await utils.timeout(100);
-          return false;
-      }
-      } catch (error) {
-        setDecimals(-1);
-        await utils.timeout(100);
-        return false;
-      } finally {
-        setTokenLoading(false)
-      }
-
-    } else {
-      setDecimals(-1);
-      await utils.timeout(100);
-      return false;
+  const approveToken = async (amount) => {
+    if (!tokenContract) {
+      return;
     }
-  };
+    setLoading(true);
 
-  const approveToken = async (_address, amount) => {
-    if (!_address || _address == "") {
-      return false;
-    }
-    const token = await new web3.eth.Contract(ERC20.abi, _address);
-    token.methods
-      .approve(LockerFactory._address, amount)
-      .send({
+    try {
+      const tx = await tokenContract.approve(TokenLockerFactoryAddress, amount, {
         from: account,
-      })
-      .once("error", (err) => {
-        setLoading(false);
-        console.log(err);
-      })
-      .then((receipt) => {
-        setLoading(false);
-        console.log(receipt);
-        setTokenApprove(amount);
-        triggerUpdateAccountData();
       });
+
+      await tx.wait();
+
+      setTokenApprove(amount);
+      triggerUpdateAccountData();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const createLocker = async () => {
     setLoading(true);
-    LockerFactory.methods
-      .createLocker(address, name, tokenDistributed, withdrawer, withdrawTime)
-      .send({
-        from: account,
-        value: fee,
-      })
-      .once("error", (err) => {
-        setLoading(false);
-        console.log(err);
-      })
-      .then((receipt) => {
-        setLoading(false);
-        triggerUpdateAccountData();
-        if (receipt?.events?.LockerCreated?.returnValues?.lockerAddress){
-          navigate(`../locker/${receipt.events.LockerCreated.returnValues.lockerAddress}`)
+    try {
+      const tx = await TokenLockerFactoryContract.createLocker(
+        tokenAddress,
+        name,
+        tokenDistributed,
+        withdrawer,
+        withdrawTime,
+        {
+          from: account,
+          value: fee,
         }
-      });
+      );
+
+      const receipt = await tx.wait();
+      triggerUpdateAccountData();
+      const LockerCreatedIndex = receipt?.events?.findIndex?.((i) => i?.event === "LockerCreated");
+      if (LockerCreatedIndex || LockerCreatedIndex === 0){
+        navigate(`../locker/${receipt.events[LockerCreatedIndex].args.lockerAddress}`)
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -192,7 +188,7 @@ const LockTokenForm = (props) => {
     >
       <s.TextTitle>Lock token</s.TextTitle>
       <s.SpacerSmall />
-      <s.TextDescription style={{ marginBottom: 20 }}>
+      <s.Container style={{ marginBottom: 20 }}>
         {tokenLoading ? (
           <Badge bg="secondary">Token Address Checking...</Badge>
         ) : (decimals > 0 &&
@@ -213,12 +209,11 @@ const LockTokenForm = (props) => {
             <s.SpacerXSmall />
             <Badge bg="success">{"Symbol: " + tokenSymbol}</Badge>
           </s.Container>
-        ) :  address !== "" ? (
+        ) :  (tokenAddress !== "" && (
           <Badge bg="danger">{"Contract not valid"}</Badge>
-        ) : (
-          ""
-        )}
-      </s.TextDescription>
+        ))
+        }
+      </s.Container>
       <TextField
         fullWidth
         id="name"
@@ -235,10 +230,7 @@ const LockTokenForm = (props) => {
         label={"Token address"}
         onChange={(e) => {
           e.preventDefault();
-          if (checkAndSetTokensDetails(e.target.value)) {
-            setAddress(e.target.value);
-            setDistributed();
-          }
+          setTokenAddressForChecking(e.target.value);
         }}
       ></TextField>
       <s.SpacerSmall />
@@ -293,8 +285,8 @@ const LockTokenForm = (props) => {
           <s.button
             disabled={
               loading ||
-              !web3.utils.isAddress(withdrawer) ||
-              !web3.utils.isAddress(address) ||
+              !utils.isAddress(withdrawer) ||
+              !utils.isAddress(tokenAddress) ||
               !(BigNumber(tokenDistributed) > 0) ||
               withdrawTime <= Date.now() / 1000
             }
@@ -310,17 +302,14 @@ const LockTokenForm = (props) => {
           <s.button
             disabled={
               loading ||
-              !address ||
+              !tokenAddress ||
               tokenDistributed <= 0 ||
               decimals <= 0
             }
             style={{ marginTop: 20 }}
             onClick={(e) => {
               e.preventDefault();
-              approveToken(
-                address,
-                tokenDistributed
-              );
+              approveToken(tokenDistributed);
             }}
           >
             {loading ? ". . ." : "APPROVE TOKEN"}
@@ -328,7 +317,7 @@ const LockTokenForm = (props) => {
         )}
       </s.Container>
       {"Fee : " +
-        web3.utils.fromWei(fee) +
+        library?.web3?.utils?.fromWei?.(fee) +
         " " +
         baseCurrencySymbol}
     </s.Card>

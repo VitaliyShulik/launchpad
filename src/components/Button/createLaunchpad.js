@@ -1,9 +1,8 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import { useWeb3React } from "@web3-react/core";
 import { NavLink } from "react-router-dom";
 
-const CreateLaunchpad = (props) => {
-  const blockchain = useSelector((state) => state.blockchain);
+const CreateLaunchpad = () => {
+  const { library } = useWeb3React();
 
   return (
     <div
@@ -14,7 +13,7 @@ const CreateLaunchpad = (props) => {
         justifyContent: "center",
       }}
     >
-      {blockchain.web3 ? (
+      {library ? (
         <NavLink
           to="/publish"
           style={{

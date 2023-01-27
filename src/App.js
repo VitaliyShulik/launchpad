@@ -22,12 +22,7 @@ import * as s from "./styles/global";
 
 function App() {
   const dispatch = useDispatch();
-  const { active, chainId, library, account, error } = useWeb3React();
-  console.log('App > active', active)
-  console.log('App > chainId', chainId)
-  console.log('App > library', library)
-  console.log('App > account', account)
-  console.log('App > error', error)
+  const { active, chainId, account, error } = useWeb3React();
 
   const [isAvailableNetwork, setIsAvailableNetwork] = useState(true);
 

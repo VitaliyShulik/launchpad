@@ -6,7 +6,6 @@ import BigNumber from "bignumber.js";
 import React from "react";
 import { useStoreContext } from "../../../../context/store";
 import * as s from "../../../../styles/global";
-import { chainRouter } from "../../../../utils/chainInfo";
 import { timeout } from "../../../../utils/utils";
 import { NumberField } from "../../../FormField";
 import { useApplicationContext } from '../../../../context/applicationContext';

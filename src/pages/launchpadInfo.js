@@ -4,7 +4,7 @@ import PoolInfoRenderer from "../components/Card/poolInfoRenderer";
 import IDOAction from "../components/Modal/idoActionModal";
 import * as s from "../styles/global";
 
-const LaunchpadInFo = (props) => {
+const LaunchpadInFo = () => {
   const { idoAddress } = useParams();
 
   return (

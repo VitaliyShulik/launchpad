@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import LockerFactory from '../contracts/TokenLockerFactory.json';
 import Locker from "../contracts/TokenLocker.json";
 import IDOFactory from '../contracts/IDOFactory.json';
+import IDOPool from "../contracts/IDOPool.json";
 import STORAGE from '../contracts/Storage.json';
 import ERC20 from '../contracts/ERC20.json';
 import { STORAGE_NETWORK_ID } from '../constants';
@@ -56,4 +57,8 @@ export function useIDOFactoryContract(address, withSignerIfPossible) {
 
 export function useTokenContract(tokenAddress, withSignerIfPossible) {
   return useContract(tokenAddress, ERC20.abi, withSignerIfPossible)
+}
+
+export function useIDOPoolContract(IDOAddress, withSignerIfPossible) {
+  return useContract(IDOAddress, IDOPool.abi, withSignerIfPossible)
 }

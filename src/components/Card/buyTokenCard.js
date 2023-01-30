@@ -1,18 +1,18 @@
 import { TextField } from "@mui/material";
+import { useWeb3React } from "@web3-react/core";
 import BigNumber from "bignumber.js";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Badge } from "react-bootstrap";
-import { useSelector } from "react-redux";
 import { useApplicationContext } from "../../context/applicationContext";
 import { usePoolContext } from "../../context/poolContext";
-import IDOPool from "../../contracts/IDOPool.json";
+import { useIDOPoolContract } from "../../hooks/useContract";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import ProgressBar from "../Modal/ProgressBar";
 import PoolCountdown from "../Utils/poolCountdown";
 
 const BuyTokenCard = (props) => {
-  const blockchain = useSelector((state) => state.blockchain);
+  const { account, library } = useWeb3React();
   const [price, setPrice] = useState("0");
   const [loading, setLoading] = useState(false);
   const { idoAddress } = props;
@@ -22,7 +22,9 @@ const BuyTokenCard = (props) => {
   } = useApplicationContext();
   const idoInfo = usePoolContext().allPools[idoAddress];
 
-  if (!blockchain.account) {
+  const IDOPoolContract = useIDOPoolContract(idoAddress);
+
+  if (!account) {
     return null;
   }
   if (!utils.isValidPool(idoInfo)) {
@@ -34,90 +36,62 @@ const BuyTokenCard = (props) => {
   if (!idoInfo?.userData) {
     return <s.TextDescription fullWidth>Loading</s.TextDescription>;
   }
-  const web3 = blockchain.web3;
 
   const buyToken = async (amount) => {
-    setLoading(true);
-    const web3 = blockchain.web3;
+    setLoading(true); // TODO: add action loader to the appropriate button
     try {
-      const IDOPoolContract = await new web3.eth.Contract(
-        IDOPool.abi,
-        idoAddress
-      );
+      const tx = await IDOPoolContract.pay({
+        from: account,
+        value: amount,
+      });
 
-      IDOPoolContract.methods
-        .pay()
-        .send({
-          from: blockchain.account,
-          value: amount,
-        })
-        .once("error", (err) => {
-          setLoading(false);
-          console.log(err);
-        })
-        .then((receipt) => {
-          setLoading(false);
-          console.log(receipt);
-          triggerUpdateAccountData();
-        });
+      const receipt = await tx.wait();
+
+      triggerUpdateAccountData();
+      // TODO: add trigger for update IDOInfo after actions
+      console.log("buyToken receipt", receipt);
     } catch (err) {
-      console.log(err);
+      console.log("buyToken Error: ", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const claimToken = async () => {
-    setLoading(true);
-    const web3 = blockchain.web3;
+    setLoading(true); // TODO: add action loader to the appropriate button
     try {
-      const IDOPoolContract = await new web3.eth.Contract(
-        IDOPool.abi,
-        idoAddress
-      );
+      const tx = IDOPoolContract.claim({
+        from: account,
+      });
 
-      IDOPoolContract.methods
-        .claim()
-        .send({
-          from: blockchain.account,
-        })
-        .once("error", (err) => {
-          setLoading(false);
-          console.log(err);
-        })
-        .then((receipt) => {
-          setLoading(false);
-          console.log(receipt);
-          triggerUpdateAccountData();
-        });
+      const receipt = await tx.wait();
+
+      triggerUpdateAccountData();
+      // TODO: add trigger for update IDOInfo after actions
+      console.log("claimToken receipt", receipt);
     } catch (err) {
-      console.log(err);
+      console.log("claimToken Error: ", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const refund = async () => {
-    setLoading(true);
-    const web3 = blockchain.web3;
+    setLoading(true); // TODO: add action loader to the appropriate button
     try {
-      const IDOPoolContract = await new web3.eth.Contract(
-        IDOPool.abi,
-        idoAddress
-      );
+      const tx = IDOPoolContract.refund({
+        from: account,
+      });
 
-      IDOPoolContract.methods
-        .refund()
-        .send({
-          from: blockchain.account,
-        })
-        .once("error", (err) => {
-          setLoading(false);
-          console.log(err);
-        })
-        .then((receipt) => {
-          setLoading(false);
-          console.log(receipt);
-          triggerUpdateAccountData();
-        });
+      const receipt = await tx.wait();
+
+      triggerUpdateAccountData();
+      // TODO: add trigger for update IDOInfo after actions
+      console.log("refund receipt", receipt);
     } catch (err) {
-      console.log(err);
+      console.log("refund Error: ", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -146,13 +120,13 @@ const BuyTokenCard = (props) => {
         <s.Card style={{ padding: 0 }}>
           <s.TextID>{"Minimum " + baseCurrencySymbol}</s.TextID>
           <s.TextDescription>
-            {BigNumber(web3.utils.fromWei(idoInfo.min)).toFormat(2)}
+            {BigNumber(library.web3.utils.fromWei(idoInfo.min)).toFormat(2)}
           </s.TextDescription>
         </s.Card>
         <s.Card style={{ padding: 0 }}>
           <s.TextID>Maximum {baseCurrencySymbol}</s.TextID>
           <s.TextDescription>
-            {BigNumber(web3.utils.fromWei(idoInfo.max)).toFormat(2)}
+            {BigNumber(library.web3.utils.fromWei(idoInfo.max)).toFormat(2)}
           </s.TextDescription>
         </s.Card>
       </s.Container>
@@ -186,7 +160,7 @@ const BuyTokenCard = (props) => {
         <s.Container flex={4}>
           <s.TextID>My invested {baseCurrencySymbol}</s.TextID>
           <s.TextDescription>
-            {BigNumber(web3.utils.fromWei(idoInfo.userData.totalInvestedETH)).toFormat(
+            {BigNumber(library.web3.utils.fromWei(idoInfo.userData.totalInvestedETH)).toFormat(
               2
             ) + " " + baseCurrencySymbol}
           </s.TextDescription>
@@ -223,7 +197,7 @@ const BuyTokenCard = (props) => {
               e.preventDefault();
               let val = BigNumber(e.target.value).absoluteValue().toFixed();
               if (!isNaN(val)) {
-                setPrice(web3.utils.toWei(val));
+                setPrice(library.web3.utils.toWei(val));
               } else {
                 setPrice("0");
               }
@@ -264,7 +238,7 @@ const BuyTokenCard = (props) => {
       <s.TextID>You will recieve</s.TextID>
       {BigNumber(idoInfo.tokenRate)
         .dividedBy(BigNumber(10).pow(BigNumber(idoInfo.tokenDecimals)))
-        .times(BigNumber(web3.utils.fromWei(price)))
+        .times(BigNumber(library.web3.utils.fromWei(price)))
         .toFormat(2)}
       {" $" + idoInfo.tokenSymbol}
     </s.Card>

@@ -2,7 +2,7 @@ import React from "react";
 import PublishForm from "../components/Form/Publish/publishForm";
 import * as s from "../styles/global";
 
-const Publish = (props) => {
+const Publish = () => {
   return (
     <s.Container ai="center">
       <s.TextTitle></s.TextTitle>

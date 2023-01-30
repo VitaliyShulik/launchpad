@@ -11,6 +11,7 @@ const LockerInfo = () => {
       <s.TextTitle>Locker Information</s.TextTitle>
       <s.SpacerMedium />
       <s.Container jc="space-around" fd="row">
+        {/* TODO: add loader depends on fetching all lockers */}
         <LockerInfoRenderer lockerAddress={lockerAddress} />
       </s.Container>
     </s.Container>

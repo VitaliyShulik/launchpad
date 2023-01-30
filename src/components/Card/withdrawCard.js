@@ -1,28 +1,28 @@
+import { useWeb3React } from "@web3-react/core";
 import BigNumber from "bignumber.js";
 import React, { useState } from "react";
 import Countdown from "react-countdown";
-import { useSelector } from "react-redux";
 import { useApplicationContext } from "../../context/applicationContext";
 import { usePoolContext } from "../../context/poolContext";
-import IDOPool from "../../contracts/IDOPool.json";
+import { useIDOPoolContract } from "../../hooks/useContract";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 
 const WithdrawETH = (props) => {
-  const blockchain = useSelector((state) => state.blockchain);
-  const data = useSelector((state) => state.data);
-  const [price, setPrice] = useState("0");
+  const { account, library } = useWeb3React();
   const [loading, setLoading] = useState(false);
   const { idoAddress } = props;
 
   const {
     triggerUpdateAccountData,
     baseCurrencySymbol,
+    TokenLockerFactoryContract,
   } = useApplicationContext();
 
   const idoInfo = usePoolContext().allPools[idoAddress];
+  const IDOPoolContract = useIDOPoolContract(idoAddress);
 
-  if (!blockchain.account || !idoInfo || !blockchain.web3) {
+  if (!account || !idoInfo || !library.web3) {
     return null;
   }
 
@@ -30,96 +30,67 @@ const WithdrawETH = (props) => {
     return null;
   }
 
-  if (idoInfo.owner.toLowerCase() !== blockchain.account.toLowerCase()) {
+  if (idoInfo.owner.toLowerCase() !== account.toLowerCase()) {
     return null;
   }
 
-  const web3 = blockchain.web3;
-
   const withdrawETH = async () => {
-    setLoading(true);
-    const web3 = blockchain.web3;
+    setLoading(true); // TODO: add action loader to the appropriate button
     try {
-      const IDOPoolContract = await new web3.eth.Contract(
-        IDOPool.abi,
-        idoAddress
-      );
-
       const isNeedLocker = parseInt(idoInfo.claim) > parseInt(Date.now() / 1000);
-      const lockerFactory = blockchain.LockerFactory;
-      IDOPoolContract.methods
-        .withdrawETH()
-        .send({
-          from: blockchain.account,
-          value: isNeedLocker ? await lockerFactory?.methods?.fee().call() : 0,
-        })
-        .once("error", (err) => {
-          setLoading(false);
-          console.log(err);
-        })
-        .then((receipt) => {
-          setLoading(false);
-          console.log(receipt);
-          triggerUpdateAccountData();
-        });
+
+      const tx = await IDOPoolContract.withdrawETH({
+        from: account,
+        value: isNeedLocker ? await TokenLockerFactoryContract.fee() : 0,
+      });
+
+      const receipt = await tx.wait();
+
+      triggerUpdateAccountData();
+      // TODO: add trigger for update IDOInfo after actions
+      console.log("withdrawETH receipt", receipt);
     } catch (err) {
-      console.log(err);
+      console.log("withdrawETH Error: ", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const withdrawToken = async () => {
-    setLoading(true);
-    const web3 = blockchain.web3;
+    setLoading(true); // TODO: add action loader to the appropriate button
     try {
-      const IDOPoolContract = await new web3.eth.Contract(
-        IDOPool.abi,
-        idoAddress
-      );
+      const tx = await IDOPoolContract.refundTokens({
+        from: account,
+      });
 
-      IDOPoolContract.methods
-        .refundTokens()
-        .send({
-          from: blockchain.account,
-        })
-        .once("error", (err) => {
-          setLoading(false);
-          console.log(err);
-        })
-        .then((receipt) => {
-          setLoading(false);
-          console.log(receipt);
-          triggerUpdateAccountData();
-        });
+      const receipt = await tx.wait();
+
+      triggerUpdateAccountData();
+      // TODO: add trigger for update IDOInfo after actions
+      console.log("withdrawToken receipt", receipt);
     } catch (err) {
-      console.log(err);
+      console.log("withdrawToken Error: ", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const withdrawUnsoldToken = async () => {
-    setLoading(true);
-    const web3 = blockchain.web3;
+    setLoading(true); // TODO: add action loader to the appropriate button
     try {
-      const IDOPoolContract = await new web3.eth.Contract(
-        IDOPool.abi,
-        idoAddress
-      );
+      const tx = await IDOPoolContract.withdrawNotSoldTokens({
+        from: account,
+      });
 
-      IDOPoolContract.methods
-        .withdrawNotSoldTokens()
-        .send({
-          from: blockchain.account,
-        })
-        .once("error", (err) => {
-          setLoading(false);
-          console.log(err);
-        })
-        .then((receipt) => {
-          setLoading(false);
-          console.log(receipt);
-          triggerUpdateAccountData();
-        });
+      const receipt = await tx.wait();
+
+      triggerUpdateAccountData();
+      // TODO: add trigger for update IDOInfo after actions
+      console.log("withdrawUnsoldToken receipt", receipt);
     } catch (err) {
-      console.log(err);
+      console.log("withdrawUnsoldToken Error: ", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -152,7 +123,7 @@ const WithdrawETH = (props) => {
         <s.Container flex={2}>
           <s.TextID>Total invested</s.TextID>
           <s.TextDescription>
-            {BigNumber(web3.utils.fromWei(idoInfo.balance)).toFixed(2) +
+            {BigNumber(library.web3.utils.fromWei(idoInfo.balance)).toFixed(2) +
               " " +
               baseCurrencySymbol}
           </s.TextDescription>

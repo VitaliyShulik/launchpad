@@ -1,6 +1,5 @@
 import BigNumber from "bignumber.js";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { usePoolContext } from "../../context/poolContext";
 import { getValidImageUrl } from "../../utils/utils";
 import * as s from "../../styles/global";
@@ -10,7 +9,6 @@ import SocialMediaModal from "../Modal/socialmediaModal";
 import imageSolid from "../../assets/images/image-solid.png"
 
 const TokenInfo = (props) => {
-  const contract = useSelector((state) => state.contract);
   const [image, setImage] = useState(null);
   const { idoAddress } = props;
 
@@ -54,7 +52,7 @@ const TokenInfo = (props) => {
           <img
             style={{ width: 100, height: 100, borderRadius: 20 }}
             src={image}
-            onError={(e) => {
+            onError={() => {
               setImage(imageSolid);
             }}
           ></img>

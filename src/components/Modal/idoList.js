@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import PoolRenderer from "../Card/poolRenderer";
 
 const IDOList = (props) => {
-  const [tallPools, settAllPools] = useState([]);
-  const [totalInvested, setTotalInvested] = useState(0);
   const [limit, setLimit] = useState(5);
   const [loading, setLoading] = useState(false);
-  const blockchain = useSelector((state) => state.blockchain);
-  const contract = useSelector((state) => state.contract);
 
   const { allPools } = usePoolContext();
   // sort IDOs by start time

@@ -1,17 +1,17 @@
 import { Checkbox } from "@mui/material";
+import { useWeb3React } from "@web3-react/core";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import CreateLaunchpad from "../components/Button/createLaunchpad";
 import CreateLocker from "../components/Button/createLocker";
 import LockerList from "../components/Modal/lockerList";
 import LongIdoList from "../components/Modal/longIdoList";
 import * as s from "../styles/global";
 
-const Account = (props) => {
-  const blockchain = useSelector((state) => state.blockchain);
+const Account = () => {
+  const { account } = useWeb3React();
   const [showZero, setShowZero] = useState(0);
 
-  if (!blockchain.account) {
+  if (!account) {
     return (
       <s.Container ai="center">
         <s.TextTitle>Account</s.TextTitle>

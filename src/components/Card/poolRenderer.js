@@ -9,6 +9,7 @@ import * as s from "../../styles/global";
 import ProgressBar from "../Modal/ProgressBar";
 
 import imageSolid from "../../assets/images/image-solid.png"
+import { useApplicationContext } from "../../context/applicationContext";
 
 const PoolRenderer = (props) => {
   const contract = useSelector((state) => state.contract);
@@ -27,6 +28,10 @@ const PoolRenderer = (props) => {
       progress,
     }
   } = props;
+
+  const {
+    baseCurrencySymbol
+  } = useApplicationContext();
 
   const card = useRef(null);
 
@@ -107,7 +112,7 @@ const PoolRenderer = (props) => {
               2
             ) +
               " " +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.Container>
           <s.Container ai="center" flex={1}>
             <s.TextID fullWidth>Hard cap</s.TextID>
@@ -115,7 +120,7 @@ const PoolRenderer = (props) => {
               2
             ) +
               " " +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.Container>
         </s.Container>
         <s.SpacerSmall />

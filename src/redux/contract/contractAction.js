@@ -1,5 +1,6 @@
 // log
 import Web3 from "web3";
+import { networks } from "../../constants/networksInfo";
 import IDOFactory from "../../contracts/IDOFactory.json";
 import LockerFactory from "../../contracts/TokenLockerFactory.json";
 
@@ -23,19 +24,21 @@ const fetchContractFailed = (payload) => {
   };
 };
 
-export const fetchContract = () => {
-  return async (dispatch) => {
+export const fetchContract = (chainId) => {
+  return (dispatch) => {
     dispatch(fetchContractRequest());
 
-    let web3 = new Web3(process.env.REACT_APP_WS);
-    const networkId = process.env.REACT_APP_networkID;
+    const networkWS = networks[chainId].wsrpc;
+    const IDOFactoryNetworkData = IDOFactory.networks[chainId];
+    const LockerFactoryNetworkData = LockerFactory.networks[chainId];
+
+    let web3 = new Web3(networkWS);
     try {
-      const IDOFactoryNetworkData = await IDOFactory.networks[networkId];
+      if (!networkWS || !IDOFactoryNetworkData?.address || !LockerFactoryNetworkData.address) throw Error("Network is now configured");
       const IDOFactoryContract = new web3.eth.Contract(
         IDOFactory.abi,
         IDOFactoryNetworkData.address
       );
-      const LockerFactoryNetworkData = await LockerFactory.networks[networkId];
       const LockerFactoryContract = new web3.eth.Contract(
         LockerFactory.abi,
         LockerFactoryNetworkData.address

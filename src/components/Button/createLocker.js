@@ -1,9 +1,8 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import { useWeb3React } from "@web3-react/core";
 import { NavLink } from "react-router-dom";
 
 const CreateLocker = (props) => {
-  const blockchain = useSelector((state) => state.blockchain);
+  const { library } = useWeb3React();
 
   return (
     <div
@@ -14,7 +13,7 @@ const CreateLocker = (props) => {
         justifyContent: "center",
       }}
     >
-      {blockchain.web3 ? (
+      {library ? (
         <NavLink
           to="/lock"
           style={{

@@ -1,14 +1,14 @@
+import { useWeb3React } from "@web3-react/core";
 import React from "react";
-import { useSelector } from "react-redux";
 import * as s from "../../styles/global";
 import BuyTokenCard from "../Card/buyTokenCard";
 import WithdrawETH from "../Card/withdrawCard";
 
 const IDOAction = (props) => {
   const { idoAddress, flex = 1 } = props;
-  const blockchain = useSelector((state) => state.blockchain);
+  const { account } = useWeb3React();
 
-  if (!blockchain.account || !idoAddress) {
+  if (!account || !idoAddress) {
     return null;
   }
   return (

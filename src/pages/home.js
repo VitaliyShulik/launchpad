@@ -1,7 +1,7 @@
 import React from "react";
 import * as s from "../styles/global";
 
-const Home = (props) => {
+const Home = () => {
   return (
     <s.Container ai="center">
       <s.Container ai="center">

@@ -11,8 +11,9 @@ const readOrHide = {
 
 const ReadMore = ({ children, max = 1000 }) => {
   const text = children.slice(0, max);
+  const textAfterSlice = text.slice(150);
   const [newText, setNewText] = useState(
-    text.split("\n").map((str, index) => (index <= 4 ? <p>{str}</p> : ""))
+    text.split("\n").map((str, index) => (index <= 4 ? <p key={index}>{str}</p> : ""))
   );
   const [isReadMore, setIsReadMore] = useState(true);
   const toggleReadMore = () => {
@@ -21,19 +22,19 @@ const ReadMore = ({ children, max = 1000 }) => {
 
   useEffect(() => {
     if (!isReadMore) {
-      setNewText(text.split("\n").map((str, index) => <p>{str}</p>));
+      setNewText(text.split("\n").map((str, index) => <p key={index}>{str}</p>));
     } else {
       setNewText(
-        text.split("\n").map((str, index) => (index <= 4 ? <p>{str}</p> : ""))
+        text.split("\n").map((str, index) => (index <= 4 ? <p key={index}>{str}</p> : ""))
       );
     }
   }, [isReadMore]);
 
   return (
     <p style={{ ...textStyle }} onClick={toggleReadMore}>
-      {isReadMore ? newText.slice(0, 150) : newText}
+      {isReadMore ? text.slice(0, 150) : newText}
       <span onClick={toggleReadMore} style={{ ...readOrHide }}>
-        {isReadMore ? "...read more" : " show less"}
+        {textAfterSlice && (isReadMore ? "...read more" : " show less")}
       </span>
     </p>
   );

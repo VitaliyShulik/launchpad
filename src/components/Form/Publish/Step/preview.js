@@ -1,16 +1,17 @@
 import BigNumber from "bignumber.js";
 import { create } from "ipfs-http-client";
 import React, { useEffect, useState } from "react";
+import { useWeb3React } from "@web3-react/core";
 import { FaImage } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useStoreContext } from "../../../../context/store";
-import ERC20 from "../../../../contracts/ERC20.json";
-import { fetchData } from "../../../../redux/data/dataActions";
 import * as s from "../../../../styles/global";
 import { chainRouter } from "../../../../utils/chainInfo";
 import SocialMediaModal from "../../../Modal/socialmediaModal";
+import { useApplicationContext } from "../../../../context/applicationContext";
+import { useTokenContract } from "../../../../hooks/useContract";
 import ReadMore from "../../readMore";
+import { isAddress } from "../../../../utils/utils";
 
 const projectId = process.env.REACT_APP_INFURA_IPFS_KEY;
 const projectSecret = process.env.REACT_APP_INFURA_IPFS_SECRET;
@@ -26,59 +27,86 @@ const ipfs = create({
 });
 
 export default function Preview() {
-  const context = useStoreContext();
-  const token = context.tokenInformation[0];
-  const blockchain = useSelector((state) => state.blockchain);
+  const { account, chainId, library } = useWeb3React();
   const {
-    FeeTokenApproveToFactory,
+    baseCurrencySymbol,
+    IDOFactoryContract,
+    IDOFactoryAddress,
+    TokenLockerFactoryAddress,
+    FeeTokenContract,
     FeeTokenSymbol,
-  } = useSelector((state) => state.data);
-  const dispatch = useDispatch();
+    FeeTokenApproveToFactory,
+    triggerUpdateAccountData,
+    isFeeTokenDataFetching,
+  } = useApplicationContext();
   const navigate = useNavigate();
 
-  const networkId = process.env.REACT_APP_networkID || 5;
+  const {
+    tokenInformation: [tokenInfo],
+    address: [tokenAddress],
+    icon: [icon, setIcon],
+    tokenRate: [tokenRate],
+    hardCap: [hardCap],
+    softCap: [softCap],
+    minETH: [minETH],
+    maxETH: [maxETH],
+    listingRate: [listingRate],
+    liquidityPercentage: [liquidityPercentage],
+    isAddLiquidityEnabled: [isAddLiquidityEnabled],
+    start: [start],
+    end: [end],
+    unlock: [unlock],
 
-  const address = context.address[0];
-  const icon = context.icon[0];
+    description: [description],
+    website: [website],
+    discord: [discord],
+    telegram: [telegram],
+    twitter: [twitter],
+  } = useStoreContext();
+
+  const tokenContract = useTokenContract(tokenAddress);
   const [IDOFactoryFee, sesIDOFactoryFee] = useState("0");
   const [tokenApprove, setTokenApprove] = useState("");
+  const [isTokenApprovalFetching, setIsTokenApprovalFetching] = useState(false);
   const [loading, setLoading] = useState(false);
-  const tokenRate = BigNumber(context.tokenRate[0]);
-  const hardCap = BigNumber(context.hardCap[0]);
-  const {
-    isAddLiquidityEnabled: [isAddLiquidityEnabled],
-  } = context;
-  const listingRate = BigNumber(isAddLiquidityEnabled ? context.listingRate[0] : 0);
-  const lp = BigNumber(isAddLiquidityEnabled ? context.liquidityPercentage[0] : 0);
-  const requiredToken = tokenRate
-    .times(hardCap)
-    .plus(hardCap.times(lp).dividedBy(100).times(listingRate))
+
+  const tokenRateBN = BigNumber(tokenRate);
+  const hardCapBN = BigNumber(hardCap);
+  const listingRateBN = BigNumber(isAddLiquidityEnabled ? listingRate : 0);
+  const lp = BigNumber(isAddLiquidityEnabled ? liquidityPercentage : 0);
+
+  const requiredToken = tokenRateBN
+    .times(hardCapBN)
+    .plus(hardCapBN.times(lp).dividedBy(100).times(listingRateBN))
     .times(
       BigNumber(10).pow(
-        BigNumber(parseInt(context.tokenInformation[0].tokenDecimals))
+        BigNumber(parseInt(tokenInfo.tokenDecimals))
       )
     );
 
-  useEffect(async () => {
-    if (blockchain.web3) {
-      if (blockchain.web3.utils.isAddress(address)) {
-        const web3 = blockchain.web3;
-        const token = new web3.eth.Contract(ERC20.abi, address);
-        let tokenApproval = await token.methods
-          .allowance(blockchain.account, blockchain.IDOFactory._address)
-          .call();
+  useEffect(() => {
+    const checkTokenApproval = async () => {
+      setIsTokenApprovalFetching(true);
+      try {
+        let tokenApproval = await tokenContract.allowance(account, IDOFactoryAddress);
         setTokenApprove(tokenApproval);
+      } catch (error) {
+        console.log('checkTokenApproval error: ', error);
+      } finally {
+        setIsTokenApprovalFetching(false);
       }
+    }
+    if (isAddress(tokenAddress) && tokenContract) {
+      checkTokenApproval();
     } else {
       setTokenApprove("");
     }
-  }, [blockchain.web3]);
+  }, [account, library, IDOFactoryAddress, tokenContract, tokenAddress]);
 
   useEffect(() => {
     const fetchIDOFactoryFee = async () => {
-      const { IDOFactory } = blockchain;
-      const IDOFactoryFee = await IDOFactory?.methods?.feeAmount().call() || "0";
-      sesIDOFactoryFee(IDOFactoryFee);
+      const IDOFactoryFee = await IDOFactoryContract?.feeAmount() || "0";
+      sesIDOFactoryFee(IDOFactoryFee.toString());
     }
 
     fetchIDOFactoryFee();
@@ -108,97 +136,102 @@ export default function Preview() {
   const createIDO = async () => {
     setLoading(true);
 
-    const iconAdded = await ipfs.add(icon);
+    try {
+      const iconAdded = await ipfs.add(icon);
 
-    const metadata = {
-      imageHash: iconAdded.path,
-      description: context.description[0],
-      links: {
-        website: context.website[0],
-        discord: context.discord[0],
-        telegram: context.telegram[0],
-        twitter: context.twitter[0],
-      }
-    };
-
-    const ipfsResonse = await pinJSONToIPFS(metadata);
-
-    if (!ipfsResonse.success) {
-      return {
-        success: false,
-        status: "😢 Something went wrong while uploading your tokenURI.",
-      };
-    }
-    const tokenURI = ipfsResonse.ipfsHash;
-
-    const rewardToken = context.address[0];
-    const tokenRate = blockchain.web3.utils.toWei(context.tokenRate[0]);
-    const listingRate = blockchain.web3.utils.toWei(isAddLiquidityEnabled ? context.listingRate[0] : "0");
-    const finInfo = [
-      tokenRate,
-      blockchain.web3.utils.toWei(context.softCap[0]),
-      blockchain.web3.utils.toWei(context.hardCap[0]),
-      blockchain.web3.utils.toWei(context.minETH[0]),
-      blockchain.web3.utils.toWei(context.maxETH[0]),
-      listingRate,
-      parseInt(isAddLiquidityEnabled ? context.liquidityPercentage[0] : 0),
-    ];
-    const timestamps = [
-      BigNumber(context.start[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
-      BigNumber(context.end[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
-      BigNumber(context.unlock[0].getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
-    ];
-    const dexInfo = [
-      chainRouter[networkId][0].ROUTER,
-      chainRouter[networkId][0].FACTORY,
-      chainRouter[networkId][0].WETH,
-    ];
-
-    blockchain.IDOFactory.methods
-      .createIDO(
-        rewardToken,
-        finInfo,
-        timestamps,
-        dexInfo,
-        blockchain.LockerFactory._address,
-        tokenURI
-      )
-      .send({
-        from: blockchain.account,
-      })
-      .once("error", (err) => {
-        setLoading(false);
-        console.log(err);
-      })
-      .then((receipt) => {
-        setLoading(false);
-        console.log(receipt);
-        dispatch(fetchData(blockchain.account));
-        if (receipt?.events?.IDOCreated?.returnValues?.idoPool){
-          navigate(`../locker/${receipt.events.IDOCreated.returnValues.idoPool}`)
+      const metadata = {
+        imageHash: iconAdded.path,
+        description,
+        links: {
+          website,
+          discord,
+          telegram,
+          twitter,
         }
-      });
+      };
+
+      const ipfsResonse = await pinJSONToIPFS(metadata);
+
+      if (!ipfsResonse.success) {
+        return {
+          success: false,
+          status: "😢 Something went wrong while uploading your tokenURI.",
+        };
+      }
+      const tokenURI = ipfsResonse.ipfsHash;
+
+      const rewardToken = tokenAddress;
+      const tokenRateWei = library.web3.utils.toWei(tokenRate);
+      const listingRateWei = library.web3.utils.toWei(isAddLiquidityEnabled ? listingRate : "0");
+      const finInfo = [
+        tokenRateWei,
+        library.web3.utils.toWei(softCap),
+        library.web3.utils.toWei(hardCap),
+        library.web3.utils.toWei(minETH),
+        library.web3.utils.toWei(maxETH),
+        listingRateWei,
+        parseInt(isAddLiquidityEnabled ? liquidityPercentage : 0),
+      ];
+      const timestamps = [
+        BigNumber(start.getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
+        BigNumber(end.getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
+        BigNumber(unlock.getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
+      ];
+      const dexInfo = [
+        chainRouter[chainId][0].ROUTER,
+        chainRouter[chainId][0].FACTORY,
+        chainRouter[chainId][0].WETH,
+      ];
+
+      const tx = await IDOFactoryContract
+        .createIDO(
+          rewardToken,
+          finInfo,
+          timestamps,
+          dexInfo,
+          TokenLockerFactoryAddress,
+          tokenURI,
+          {
+            from: account,
+          },
+        );
+
+      const receipt = await tx.wait();
+
+      console.log('createIDO receipt', receipt);
+
+      triggerUpdateAccountData();
+      const IDOCreatedIndex = receipt?.events?.findIndex?.((i) => i?.event === "IDOCreated");
+      if (IDOCreatedIndex || IDOCreatedIndex === 0){
+        navigate(`../launchpad/${receipt.events[IDOCreatedIndex].args.idoPool}`)
+      }
+    } catch (error) {
+      console.log("createIDO Error: ", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const approveToken = async (_address, amount, tokenContract = null) => {
+  const approveToken = async (amount, tokenContract) => {
+    if (!tokenContract) {
+      return;
+    }
     setLoading(true);
-    const web3 = blockchain.web3;
-    const token = tokenContract || await new web3.eth.Contract(ERC20.abi, _address);
-    token.methods
-      .approve(blockchain.IDOFactory._address, amount)
-      .send({
-        from: blockchain.account,
-      })
-      .once("error", (err) => {
-        setLoading(false);
-        console.log(err);
-      })
-      .then((receipt) => {
-        setLoading(false);
-        console.log(receipt);
-        setTokenApprove(amount);
-        dispatch(fetchData(blockchain.account));
+
+    try {
+      const tx = await tokenContract.approve(IDOFactoryAddress, amount, {
+        from: account,
       });
+
+      await tx.wait();
+
+      setTokenApprove(amount);
+      triggerUpdateAccountData();
+    } catch (error) {
+      console.log("approveToken Error: ", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -223,13 +256,13 @@ export default function Preview() {
             onChange={(e) => {
               e.preventDefault();
               const file = e.target.files[0];
-              context.icon[1](file);
+              setIcon(file);
             }}
           ></s.iconUpload>
-          {context.icon[0] !== "" ? (
+          {icon !== "" ? (
             <img
               style={{ width: 100, height: 100, borderRadius: 20 }}
-              src={URL.createObjectURL(context.icon[0])}
+              src={URL.createObjectURL(icon)}
             />
           ) : (
             <FaImage style={{ width: 100, height: 100, padding: 20 }} />
@@ -237,59 +270,59 @@ export default function Preview() {
         </div>
       </s.Container>
       <SocialMediaModal
-        website={context.website[0]}
-        discord={context.discord[0]}
-        telegram={context.telegram[0]}
-        twitter={context.twitter[0]}
+        website={website}
+        discord={discord}
+        telegram={telegram}
+        twitter={twitter}
       />
       <s.SpacerSmall />
       <s.TextID>Description</s.TextID>
-      <ReadMore>{context.description[0]}</ReadMore>
+      <ReadMore max={2000}>{description}</ReadMore>
 
       <s.TextID>Token address</s.TextID>
       <s.TextDescriptionEllipsis>
-        {token.tokenAddress}
+        {tokenInfo.tokenAddress}
       </s.TextDescriptionEllipsis>
       <s.TextID>Token name</s.TextID>
-      <s.TextDescription>{token.tokenName}</s.TextDescription>
+      <s.TextDescription>{tokenInfo.tokenName}</s.TextDescription>
       <s.TextID>Total supply</s.TextID>
       <s.TextDescription>
-        {BigNumber(token.totalSupply)
-          .dividedBy(10 ** token.tokenDecimals)
+        {BigNumber(tokenInfo.totalSupply)
+          .dividedBy(10 ** tokenInfo.tokenDecimals)
           .toFormat(0) +
           " $" +
-          token.tokenSymbol}
+          tokenInfo.tokenSymbol}
       </s.TextDescription>
       <s.TextTitle fullWidth>IDO information</s.TextTitle>
       <s.TextID>Token rate</s.TextID>
       <s.TextDescription>
         {"1 $" +
-          process.env.REACT_APP_CURRENCY +
+          baseCurrencySymbol +
           " -> " +
-          BigNumber(context.tokenRate[0]).toFormat(2) +
+          tokenRateBN.toFormat(2) +
           " $" +
-          token.tokenSymbol}
+          tokenInfo.tokenSymbol}
       </s.TextDescription>
       <s.Container fd={"row"} jc="space-between">
         <s.Container flex={1} style={{ marginLeft: 10, marginRight: 10 }}>
           <s.TextID>Soft Cap</s.TextID>
           <s.TextDescription>
-            {BigNumber(context.softCap[0]).toFormat(2) +
+            {BigNumber(softCap).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.TextDescription>
           <s.SpacerSmall />
           <s.TextID>Hard Cap</s.TextID>
           <s.TextDescription>
-            {BigNumber(context.hardCap[0]).toFormat(2) +
+            {hardCapBN.toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.TextDescription>
           <s.SpacerSmall />
           {/* <s.TextID>Pool router</s.TextID>
           <s.TextDescription>
             {
-              chainRouter[process.env.REACT_APP_networkID][context.router[0]]
+              chainRouter[chainId][context.router[0]]
                 .name
             }
           </s.TextDescription> */}
@@ -297,23 +330,23 @@ export default function Preview() {
         <s.Container flex={1} style={{ marginLeft: 10, marginRight: 10 }}>
           <s.TextID>Minimum Buy</s.TextID>
           <s.TextDescription>
-            {BigNumber(context.minETH[0]).toFormat(2) +
+            {BigNumber(minETH).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.TextDescription>
           <s.SpacerSmall />
           <s.TextID>Maximum Buy</s.TextID>
           <s.TextDescription>
-            {BigNumber(context.maxETH[0]).toFormat(2) +
+            {BigNumber(maxETH).toFormat(2) +
               " $" +
-              process.env.REACT_APP_CURRENCY}
+              baseCurrencySymbol}
           </s.TextDescription>
           {
             isAddLiquidityEnabled && <>
               <s.SpacerSmall />
               <s.TextID>Liquidity %</s.TextID>
               <s.TextDescription>
-                {BigNumber(context.liquidityPercentage[0]).toFixed(0) + " %"}
+                {BigNumber(liquidityPercentage).toFixed(0) + " %"}
               </s.TextDescription>
             </>
           }
@@ -324,11 +357,11 @@ export default function Preview() {
           <s.TextID>Listing rate</s.TextID>
           <s.TextDescription>
             {"1 $" +
-              process.env.REACT_APP_CURRENCY +
+              baseCurrencySymbol +
               " -> " +
-              BigNumber(context.listingRate[0]).toFormat(2) +
+              BigNumber(listingRate).toFormat(2) +
               " $" +
-              token.tokenSymbol}
+              tokenInfo.tokenSymbol}
           </s.TextDescription>
           (TokenRate * HardCap) + ((HardCap * LP%) * ListingRate)
         </>
@@ -338,12 +371,12 @@ export default function Preview() {
           requiredToken
             .dividedBy(
               BigNumber(10).pow(
-                BigNumber(parseInt(context.tokenInformation[0].tokenDecimals))
+                BigNumber(parseInt(tokenInfo.tokenDecimals))
               )
             )
             .toFormat() +
           " $" +
-          token.tokenSymbol}
+          tokenInfo.tokenSymbol}
       </s.TextDescription>
       <s.Container ai="center">
         {BigNumber(FeeTokenApproveToFactory).lt(BigNumber(IDOFactoryFee)) ? (
@@ -352,7 +385,7 @@ export default function Preview() {
             disabled={loading}
             onClick={(e) => {
               e.preventDefault();
-              approveToken('', IDOFactoryFee, blockchain.FeeToken);
+              approveToken(IDOFactoryFee, FeeTokenContract);
             }}
           >
             {loading ? ". . ." : `APPROVE ${FeeTokenSymbol}`}
@@ -363,10 +396,10 @@ export default function Preview() {
             disabled={loading}
             onClick={(e) => {
               e.preventDefault();
-              approveToken(address, BigNumber(requiredToken).toFixed(0));
+              approveToken(BigNumber(requiredToken).toFixed(0), tokenContract);
             }}
           >
-            {loading ? ". . ." : `APPROVE ${token.tokenSymbol}`}
+            {loading ? ". . ." : `APPROVE ${tokenInfo.tokenSymbol}`}
           </s.button>
         ) : (
           <s.button
@@ -382,7 +415,7 @@ export default function Preview() {
         )}
       </s.Container>
 
-      {IDOFactoryFee && IDOFactoryFee !== "0" && `Create IDO fee : ${blockchain.web3.utils.fromWei(IDOFactoryFee)} ${FeeTokenSymbol}`}
+      {IDOFactoryFee && IDOFactoryFee !== "0" && `Create IDO fee : ${library.web3.utils.fromWei(IDOFactoryFee)} ${FeeTokenSymbol}`}
     </s.Container>
   );
 }

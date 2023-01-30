@@ -1,32 +1,28 @@
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
 import Stepper from "@mui/material/Stepper";
+import { useWeb3React } from "@web3-react/core";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
 import { useStoreContext } from "../../../context/store";
 import * as s from "../../../styles/global";
-import createIDOFormModal from "./FormModal/createIDOFormModal";
 import IDOInfo from "./Step/idoInformation";
 import Preview from "./Step/preview";
 import ProjectInfo from "./Step/projectInfo";
 import TokenVerify from "./Step/tokenVerify";
 
-//สำหรับใส่ชื่อ Step
 function getSteps() {
   return ["Token verify", "IDO information", "Project information", "Submit"];
 }
-const { formId, formField } = createIDOFormModal;
 
-export default function StepprtForm() {
-  const blockchain = useSelector((state) => state.blockchain);
+export default function StepsForm() {
+  const { account } = useWeb3React();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
-  const isLastStep = activeStep === steps.length - 1;
   const form = useForm();
   const context = useStoreContext();
 
-  if (!blockchain.account) {
+  if (!account) {
     return null;
   }
 
@@ -44,11 +40,11 @@ export default function StepprtForm() {
 
   const onSubmit = (data) => {
     console.log(data);
-    if (activeStep == 0) {
+    if (activeStep === 0) {
       if (!context.tokenFormValidate()) {
         return false;
       }
-    } else if (activeStep == 1) {
+    } else if (activeStep === 1) {
       if (!context.idoFormValidate()) {
         return false;
       }
@@ -56,17 +52,17 @@ export default function StepprtForm() {
     handleNext();
   };
 
-  //สำหรับ get Step ตาม index
+  //get Step by index
   function getStepContent(stepIndex) {
     switch (stepIndex) {
       case 0:
-        return <TokenVerify formProps={form} blockchain={blockchain} />;
+        return <TokenVerify />;
       case 1:
-        return <IDOInfo formProps={form} blockchain={blockchain} />;
+        return <IDOInfo />;
       case 2:
-        return <ProjectInfo formProps={form} blockchain={blockchain} />;
+        return <ProjectInfo />;
       case 3:
-        return <Preview formProps={form} blockchain={blockchain} />;
+        return <Preview />;
       default:
         return "Unknown stepIndex";
     }

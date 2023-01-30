@@ -1,18 +1,23 @@
+import { useWeb3React } from "@web3-react/core";
 import BigNumber from "bignumber.js";
 import React, { useState } from "react";
 import Countdown from "react-countdown";
-import { useDispatch, useSelector } from "react-redux";
+import { useApplicationContext } from "../../context/applicationContext";
 import { usePoolContext } from "../../context/poolContext";
-import Locker from "../../contracts/TokenLocker.json";
-import { fetchData } from "../../redux/data/dataActions";
+import { useLockerContract } from "../../hooks/useContract";
 import * as s from "../../styles/global";
+import Loader from "../Loader";
 
 const LockerInfoRenderer = (props) => {
   const { lockerAddress } = props;
   const [loading, setLoading] = useState(false);
-  const blockchain = useSelector((state) => state.blockchain);
-  const currency = " " + process.env.REACT_APP_CURRENCY;
-  const dispatch = useDispatch();
+  const {
+    triggerUpdateAccountData,
+  } = useApplicationContext();
+
+  const { account } = useWeb3React();
+
+  const LockerContract = useLockerContract(lockerAddress, true)
 
   const poolContext = usePoolContext();
   let lockerInfo = poolContext.allLocker[lockerAddress];
@@ -25,25 +30,21 @@ const LockerInfoRenderer = (props) => {
 
   const withdraw = async () => {
     setLoading(true);
-    const web3 = blockchain.web3;
-    const LockerContract = await new web3.eth.Contract(
-      Locker.abi,
-      lockerAddress
-    );
-    LockerContract.methods
-      .withdrawTokenAll()
-      .send({
-        from: blockchain.account,
-      })
-      .once("error", (err) => {
-        setLoading(false);
-        console.log(err);
-      })
-      .then((receipt) => {
-        setLoading(false);
-        console.log(receipt);
-        dispatch(fetchData(blockchain.account));
+
+    try {
+      const tx = await LockerContract.withdrawTokenAll({
+        from: account,
       });
+
+      await tx.wait();
+
+      triggerUpdateAccountData();
+      // TODO: add trigger for update lockerInfo after withdraw
+    } catch (error) {
+      console.log('locker withdraw Error', )
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,20 +107,21 @@ const LockerInfoRenderer = (props) => {
           )}
         </s.Container>
         <s.SpacerSmall />
-        {blockchain.account ? (
+        {account ? (
           <s.Container flex={1} ai="center">
             <s.button
               disabled={
+                loading ||
                 BigNumber(lockerInfo.balance).lte(0) ||
                 !BigNumber(lockerInfo.time).lt(Date.now() / 1000) ||
-                blockchain.account.toLowerCase() !== lockerInfo.withdrawer.toLowerCase()
+                account.toLowerCase() !== lockerInfo.withdrawer.toLowerCase()
               }
               onClick={(e) => {
                 e.preventDefault();
                 withdraw();
               }}
             >
-              WITHDRAW
+              {loading ? <Loader /> : "WITHDRAW" }
             </s.button>
           </s.Container>
         ) : null}

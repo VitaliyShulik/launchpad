@@ -7,6 +7,7 @@
     "@date-io/date-fns": "^2.13.1",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
+    "@ethersproject/contracts": "^5.7.0",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
@@ -50,12 +51,11 @@
     "react-redux": "^7.2.6",
     "react-router-bootstrap": "^0.26.0",
     "react-router-dom": "^6.0.2",
-    "react-scripts": "^5.0.0",
+    "react-scripts": "5.0.1",
     "react-social-icons": "^5.6.1",
     "read-more-react": "^1.0.10",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1",
-    "serve": "^13.0.2",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "styled-components": "^5.3.3",
@@ -63,7 +63,6 @@
     "utf-8": "^2.0.0",
     "web-vitals": "^1.0.1",
     "web3": "^1.6.1",
-    "web3modal": "^1.9.4",
     "yup": "^0.32.11"
   },
   "resolutions": {
@@ -100,6 +99,12 @@
     ]
   },
   "devDependencies": {
+    "@ethersproject/address": "^5.7.0",
+    "@ethersproject/providers": "^5.7.2",
+    "@web3-react/core": "6.1.9",
+    "@web3-react/injected-connector": "6.0.7",
+    "@web3-react/walletconnect-connector": "6.1.4",
+    "ethers": "~4.0.4",
     "react-app-rewired": "^2.2.1",
     "truffle-plugin-verify": "^0.5.27"
   }

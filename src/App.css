@@ -18,6 +18,7 @@
   --blue: #1e90ff;
   --white: #ffffff;
   --text: #FFFFFF;
+  --secondary-color: #989b9c;
   --text-secondary: #232227;
   --button: #005987;
 
@@ -63,7 +64,6 @@
   width: 100%;
   padding-right: 32px;
   text-overflow: ellipsis;
-  max-width: 150px;
 }
 
 

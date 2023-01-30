@@ -1,22 +1,29 @@
 import BigNumber from "bignumber.js";
 import React from "react";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
 import { LinkContainer } from "react-router-bootstrap";
 import "../../App.css";
-import { clearCache, connect } from "../../redux/blockchain/blockchainActions";
+import { useApplicationContext } from "../../context/applicationContext";
 import * as s from "../../styles/global";
+import { Web3Status } from "../Web3Status";
+import Loader from "../Loader";
 
 const Navigation = () => {
-  const dispatch = useDispatch();
-  const { account, FeeToken } = useSelector((state) => state.blockchain);
   const {
+    chainName,
+    networkExplorer,
+    baseCurrencySymbol,
     ETHamount,
+    isNativeCoinBalanceFetching,
+    FeeTokenAddress,
     FeeTokenamount,
     FeeTokenSymbol,
-  } = useSelector((state) => state.data);
+    isFeeTokenDataFetching,
+  } = useApplicationContext();
 
   const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
+
+  const hasFeeToken = !isFeeTokenDataFetching && FeeTokenSymbol && FeeTokenAddress
 
   return (
     <Navbar collapseOnSelect expand="lg" variant="dark" style={{ margin: 15 }}>
@@ -58,52 +65,52 @@ const Navigation = () => {
             </LinkContainer>
           </Nav>
           <Nav>
-            <Nav.Link>{process.env.REACT_APP_networkID}</Nav.Link>
-            {ETHamount >= 0 ? (
-              <NavDropdown
-                title={
-                  `$${process.env.REACT_APP_CURRENCY || 'ETH'} ` +
-                  BigNumber(ETHamount)
-                    .dividedBy(10 ** 18)
-                    .toFormat(2)
-                }
-                id="collasible-nav-dropdown"
-              >
-                <Nav.Link
-                  href={`${process.env.REACT_APP_Explorer}address/${FeeToken._address}`}
-                  target="_blank"
-                >
-                  {`$${FeeTokenSymbol} ` +
-                    BigNumber(FeeTokenamount)
-                      .dividedBy(10 ** 18)
-                      .toFormat(0)}
+            <Nav.Link>{chainName}</Nav.Link>
+
+            {
+              !hasFeeToken ? (
+                <Nav.Link>
+                  {
+                    isNativeCoinBalanceFetching ?
+                      <Loader/> :
+                      `$${baseCurrencySymbol} ` +
+                        BigNumber(ETHamount)
+                          .dividedBy(10 ** 18)
+                          .toFormat(2)
+                  }
                 </Nav.Link>
-                {/* <NavDropdown.Item href="#action/3.3"></NavDropdown.Item> */}
-                <NavDropdown.Divider />
-              </NavDropdown>
-            ) : null}
+              ) : (
+                <NavDropdown
+                  title={
+                    isNativeCoinBalanceFetching ?
+                      <Loader/> :
+                      `$${baseCurrencySymbol} ` +
+                        BigNumber(ETHamount)
+                          .dividedBy(10 ** 18)
+                          .toFormat(2)
+                  }
+                  id="collasible-nav-dropdown"
+                >
+                  <Nav.Link
+                    href={`${networkExplorer}/address/${FeeTokenAddress}`}
+                    target="_blank"
+                  >
+                    {
+                      isFeeTokenDataFetching ?
+                        <Loader /> :
+                        `$${FeeTokenSymbol} ` +
+                          BigNumber(FeeTokenamount)
+                            .dividedBy(10 ** 18)
+                            .toFormat(0)
+                    }
+                  </Nav.Link>
+                  {/* <NavDropdown.Item href="#action/3.3"></NavDropdown.Item> */}
+                  <NavDropdown.Divider />
+                </NavDropdown>
+              )
+            }
           </Nav>
-          <s.Container ai="center">
-            {account == null ? (
-              <s.button
-                onClick={() => {
-                  dispatch(connect());
-                }}
-              >
-                CONNECT
-              </s.button>
-            ) : (
-              <s.button
-                className="address text-collapse"
-                onClick={(e) => {
-                  e.preventDefault();
-                  dispatch(clearCache());
-                }}
-              >
-                {account}
-              </s.button>
-            )}
-          </s.Container>
+          <Web3Status />
         </Navbar.Collapse>
       </Container>
     </Navbar>

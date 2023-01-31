@@ -6,6 +6,10 @@
 - In `migrations/1_deployed.js` file replace **feeToken.address** token address to yours
 - Create `.secret` file with your mnemonic phrase (ussualy it is a 12 word, required for deploy smart contracts)
 
+## Add new EVM-like network
+
+This section is not ready...
+
 ## Installation
 
 1. Install dependencies

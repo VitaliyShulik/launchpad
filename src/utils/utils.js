@@ -380,3 +380,9 @@ export function getContract(address, ABI, library, account = '') {
 
   return new Contract(address, ABI, getProviderOrSigner(library, account));
 }
+
+export const getCurrentDomain = () => {
+  return 'dev-launchpad'; // window.location.hostname || document.location.host || '';
+}
+
+export const validateArray = arr => Array.isArray(arr) && !!arr.length;

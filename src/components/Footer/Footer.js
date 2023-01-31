@@ -1,8 +1,6 @@
 import React from "react";
 import { SocialIcon } from "react-social-icons";
 import { useApplicationContext } from "../../context/applicationContext";
-import IDOFactory from "../../contracts/IDOFactory.json";
-import LockerFactory from "../../contracts/TokenLockerFactory.json";
 import {
   Box,
   Column,

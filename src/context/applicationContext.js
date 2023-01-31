@@ -6,6 +6,7 @@ import FeeToken from "../contracts/FeeToken.json";
 import TokenLockerFactory from "../contracts/TokenLockerFactory.json";
 import { useTokenContract, useLockerFactoryContract, useIDOFactoryContract } from "../hooks/useContract";
 import { networks } from "../constants/networksInfo";
+import useDomainData from "../hooks/useDomainData";
 
 export const Application = createContext({});
 
@@ -24,6 +25,14 @@ export const ApplicationContextProvider = ({ children }) => {
   const networkExplorer = networks[chainId]?.explorer;
 
   const [isAvailableNetwork, setIsAvailableNetwork] = useState(true);
+
+  const {
+    domain,
+    domainSettings,
+    isDomainDataFetching,
+    isDomainDataFetched,
+    triggerDomainData,
+  } = useDomainData();
 
   useEffect(() => {
     if (error && error instanceof UnsupportedChainIdError) {
@@ -148,6 +157,13 @@ export const ApplicationContextProvider = ({ children }) => {
 
     TokenLockerFactoryAddress,
     TokenLockerFactoryContract,
+
+    domain,
+    domainSettings,
+    isDomainDataFetching,
+    isDomainDataFetched,
+
+    triggerDomainData,
   };
 
   return (

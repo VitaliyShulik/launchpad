@@ -10,6 +10,7 @@ import Loader from "../Loader";
 
 const Navigation = () => {
   const {
+    isLockerEnabled,
     chainName,
     networkExplorer,
     baseCurrencySymbol,
@@ -55,7 +56,7 @@ const Navigation = () => {
               <Nav.Link>Launchpad</Nav.Link>
             </LinkContainer>
             {
-              process.env.REACT_APP_ENABLE_LOCKER === 'true' &&
+              isLockerEnabled &&
               <LinkContainer to="/locker">
                 <Nav.Link>Locker</Nav.Link>
               </LinkContainer>

@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
-import { useWeb3React } from "@web3-react/core";
+import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
+import { SUPPORTED_CHAIN_IDS } from "../connectors";
 import IDOFactory from '../contracts/IDOFactory.json';
 import FeeToken from "../contracts/FeeToken.json";
 import TokenLockerFactory from "../contracts/TokenLockerFactory.json";
@@ -9,12 +10,54 @@ import { networks } from "../constants/networksInfo";
 export const Application = createContext({});
 
 export const ApplicationContextProvider = ({ children }) => {
-  const { account, chainId, library } = useWeb3React();
+  const { account, chainId, library, error } = useWeb3React();
 
   // use blockchain storage state for all contracts' addresses
   const TokenLockerFactoryAddress = TokenLockerFactory?.networks?.[chainId]?.address;
   const IDOFactoryAddress = IDOFactory?.networks?.[chainId]?.address;
   const FeeTokenAddress = FeeToken?.networks?.[chainId]?.address;
+
+  const isLockerEnabled = process.env.REACT_APP_ENABLE_LOCKER === 'true';
+
+  const chainName = networks[chainId]?.name;
+  const baseCurrencySymbol = networks[chainId]?.baseCurrency?.symbol;
+  const networkExplorer = networks[chainId]?.explorer;
+
+  const [isAvailableNetwork, setIsAvailableNetwork] = useState(true);
+
+  useEffect(() => {
+    if (error && error instanceof UnsupportedChainIdError) {
+      return setIsAvailableNetwork(false);
+    }
+
+    if (chainId) {
+      // const lowerAcc = account?.toLowerCase()
+      // const appAdmin = wordpressData?.wpAdmin
+      //   ? wordpressData?.wpAdmin?.toLowerCase() === lowerAcc
+      //   : admin && admin !== ZERO_ADDRESS
+      //   ? admin.toLowerCase() === lowerAcc
+      //   : true
+
+      // const accessToStorageNetwork = appAdmin && chainId === STORAGE_NETWORK_ID
+
+      // const networkIsFine =
+      //   !wordpressData?.wpNetworkIds?.length
+      //   || accessToStorageNetwork
+      //   || wordpressData.wpNetworkIds.includes(chainId);
+
+      setIsAvailableNetwork(
+        Boolean(SUPPORTED_CHAIN_IDS.includes(Number(chainId))
+        // && networkIsFine
+      ))
+    }
+  }, [
+    chainId,
+    // domainDataTrigger,
+    // wordpressData,
+    // admin,
+    account,
+    error,
+  ]);
 
   const [shouldUpdateAccountData, setShouldUpdateAccountData] = useState(false);
   const triggerUpdateAccountData = () => setShouldUpdateAccountData(!shouldUpdateAccountData);
@@ -27,12 +70,27 @@ export const ApplicationContextProvider = ({ children }) => {
   const [nativeCoinBalance, setNativeCoinBalance] = useState(0);
   const [isNativeCoinBalanceFetching, setIsNativeCoinBalanceFetching] = useState(false);
 
-  const baseCurrencySymbol = networks[chainId]?.baseCurrency?.symbol || networks[1].baseCurrency.symbol;
-  const chainName = networks[chainId]?.name || networks[1].name;
-  const networkExplorer = networks[chainId]?.explorer || networks[1].explorer;
+  useEffect(() => {
+    const fetchNativeCoinBalance = async () => {
+      setIsNativeCoinBalanceFetching(true);
 
-  const TokenLockerFactoryContract = useLockerFactoryContract(TokenLockerFactoryAddress, true);
-  const IDOFactoryContract = useIDOFactoryContract(IDOFactoryAddress, true);
+      try {
+        const accountBalance = await library.getBalance(account);
+        setNativeCoinBalance(Number(accountBalance));
+      } catch (error) {
+        console.log('fetchNativeCoinBalance Error: ', error);
+      } finally {
+        setIsNativeCoinBalanceFetching(false);
+      }
+    }
+
+    if (account && library && chainId) {
+      fetchNativeCoinBalance()
+    } else {
+      setNativeCoinBalance(0);
+    }
+  }, [account, library, chainId, shouldUpdateAccountData])
+
   const FeeTokenContract = useTokenContract(FeeTokenAddress, true);
 
   useEffect(() => {
@@ -62,41 +120,28 @@ export const ApplicationContextProvider = ({ children }) => {
     }
   }, [account, chainId, FeeTokenContract, IDOFactoryAddress, shouldUpdateAccountData]);
 
-  useEffect(() => {
-    const fetchNativeCoinBalance = async () => {
-      setIsNativeCoinBalanceFetching(true);
-
-      try {
-        const accountBalance = await library.getBalance(account);
-        setNativeCoinBalance(Number(accountBalance));
-      } catch (error) {
-        console.log('fetchNativeCoinBalance Error: ', error);
-      } finally {
-        setIsNativeCoinBalanceFetching(false);
-      }
-    }
-
-    if (account && library && chainId) {
-      fetchNativeCoinBalance()
-    } else {
-      setNativeCoinBalance(0);
-    }
-  }, [account, library, chainId, shouldUpdateAccountData])
+  const TokenLockerFactoryContract = useLockerFactoryContract(TokenLockerFactoryAddress, true);
+  const IDOFactoryContract = useIDOFactoryContract(IDOFactoryAddress, true);
 
   const value = {
-    triggerUpdateAccountData,
+    isLockerEnabled,
+
+    isAvailableNetwork,
     chainName,
     networkExplorer,
     baseCurrencySymbol,
+
+    triggerUpdateAccountData,
     ETHamount: nativeCoinBalance,
     isNativeCoinBalanceFetching,
 
-    FeeTokenContract,
-    FeeTokenAddress,
     FeeTokenamount: feeTokenBalance,
     FeeTokenSymbol: feeTokenSymbol,
     FeeTokenApproveToFactory: feeTokenApproveToFactory,
     isFeeTokenDataFetching,
+
+    FeeTokenContract,
+    FeeTokenAddress,
 
     IDOFactoryContract,
     IDOFactoryAddress,

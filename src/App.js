@@ -1,11 +1,10 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Outlet, Route, Routes } from "react-router-dom";
-import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
+import { useWeb3React } from "@web3-react/core";
 import "./App.css";
 import Web3ReactManager from "./components/Web3ReactManager";
-import { SUPPORTED_CHAIN_IDS } from "./connectors";
 import Connection from "./pages/Connection";
 import Footer from "./components/Footer/Footer";
 import Navigation from "./components/Navbar";
@@ -19,58 +18,22 @@ import LockToken from "./pages/lockToken";
 import Publish from "./pages/publish";
 import { fetchContract } from "./redux/contract/contractAction";
 import * as s from "./styles/global";
+import { useApplicationContext } from "./context/applicationContext";
 
 function App() {
   const dispatch = useDispatch();
-  const { active, chainId, account, error } = useWeb3React();
+  const { active, chainId, account } = useWeb3React();
 
-  const [isAvailableNetwork, setIsAvailableNetwork] = useState(true);
-
-  const isLockerEnabled = process.env.REACT_APP_ENABLE_LOCKER === 'true';
-
-  useEffect(() => {
-    fetchContract(chainId);
-  }, [dispatch, account, chainId]);
-
-  useEffect(() => {
-    if (error && error instanceof UnsupportedChainIdError) {
-      return setIsAvailableNetwork(false);
-    }
-
-    if (chainId) {
-      // const lowerAcc = account?.toLowerCase()
-      // const appAdmin = wordpressData?.wpAdmin
-      //   ? wordpressData?.wpAdmin?.toLowerCase() === lowerAcc
-      //   : admin && admin !== ZERO_ADDRESS
-      //   ? admin.toLowerCase() === lowerAcc
-      //   : true
-
-      // const accessToStorageNetwork = appAdmin && chainId === STORAGE_NETWORK_ID
-
-      // const networkIsFine =
-      //   !wordpressData?.wpNetworkIds?.length
-      //   || accessToStorageNetwork
-      //   || wordpressData.wpNetworkIds.includes(chainId);
-
-      setIsAvailableNetwork(
-        Boolean(SUPPORTED_CHAIN_IDS.includes(Number(chainId))
-        // && networkIsFine
-      ))
-    }
-  }, [
-    chainId,
-    // domainDataTrigger,
-    // wordpressData,
-    // admin,
-    account,
-    error,
-  ])
+  const {
+    isAvailableNetwork,
+    isLockerEnabled,
+  } = useApplicationContext();
 
   useEffect(() => {
     if (chainId) {
       dispatch(fetchContract(chainId));
     }
-  }, [chainId]);
+  }, [dispatch, account, chainId]);
 
   return (
     <Web3ReactManager>

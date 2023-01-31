@@ -14,6 +14,7 @@ import {
 
 const Footer = () => {
   const {
+    isLockerEnabled,
     networkExplorer,
     IDOFactoryAddress,
     TokenLockerFactoryAddress,
@@ -44,7 +45,7 @@ const Footer = () => {
               {IDOFactoryAddress}
             </FooterLink>
             {
-              process.env.REACT_APP_ENABLE_LOCKER === 'true' && (
+              isLockerEnabled && (
                 <>
                   <p>Locker Factory: </p>
                   <FooterLink

@@ -64,6 +64,55 @@ export const Container = styled.div`
   flex-wrap: wrap;
 `;
 
+export const Wrapper = styled.section`
+  width: 100%;
+  padding: 6vh 0 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1;
+`;
+
+export const BodyWrapper = styled.div`
+  position: relative;
+  max-width: 30rem;
+  width: 100%;
+  border-radius: 1.2rem;
+  box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px, rgba(0, 0, 0, 0.04) 0px 16px 24px,
+  rgba(0, 0, 0, 0.01) 0px 24px 32px;
+
+  background-color: #1d1f24;
+
+  @media (max-width: 540px) {
+    width: 90%;
+  };
+`;
+
+export const ContentWrapper = styled.div`
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.8rem;
+`;
+
+export const LoaderWrapper = styled.div`
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1d1f24;
+`;
+
 export const Card = styled.div`
   display: ${({ display }) => (display ? display : "flex")};
   flex: ${({ flex }) => (flex ? flex : "1 0 25%")};

@@ -19,14 +19,17 @@ import Publish from "./pages/publish";
 import { fetchContract } from "./redux/contract/contractAction";
 import * as s from "./styles/global";
 import { useApplicationContext } from "./context/applicationContext";
+import Loader from "./components/Loader";
 
 function App() {
   const dispatch = useDispatch();
   const { active, chainId, account } = useWeb3React();
 
   const {
-    isAvailableNetwork,
+    isAppConfigured,
     isLockerEnabled,
+    isDomainDataFetching,
+    isDomainDataFetched,
   } = useApplicationContext();
 
   useEffect(() => {
@@ -47,39 +50,52 @@ function App() {
             }}
           />
         </s.Container> */}
-        {active ? (
-          <>
-            <Navigation />
-            <s.Container ai="center">
-              <s.Container w="85%" style={{ minHeight: 600 }}>
+        {!active ?
+          <Connection />
+          : (isDomainDataFetching || !isDomainDataFetched) ? (
+            <s.LoaderWrapper>
+              <Loader size="2.8rem" />
+            </s.LoaderWrapper>
+            ) : !isAppConfigured ? (
+              <>
+                <s.Wrapper>
+                  <s.BodyWrapper>
+                    <s.ContentWrapper>
+                      The app is not configured
+                    </s.ContentWrapper>
+                  </s.BodyWrapper>
+                </s.Wrapper>
+              </>
+            ) : (
+              <>
+                <Navigation />
+                <s.Container ai="center">
+                  <s.Container w="85%" style={{ minHeight: 600 }}>
 
-                <Outlet />
-                <Routes>
-                  <Route path="/" element={<Launchpad />} />
-                  <Route path="/launchpad" element={<Launchpad />} />
-                  <Route
-                    path="/home"
-                    element={<Home />}
-                  />
-                  <Route path="/launchpad/:idoAddress" element={<LaunchpadInfo />} />
-                  <Route path="/publish" element={<Publish />} />
-                  <Route path="/lock" element={<LockToken />} />
-                  <Route path="/account" element={<Account />} />
-                  { isLockerEnabled && <Route path="/locker" element={<Locker />} /> }
-                  { isLockerEnabled && <Route path="/locker/:lockerAddress" element={<LockerInfo /> } /> }
-                </Routes>
-                <s.SpacerLarge />
-                <s.SpacerLarge />
-                <s.SpacerLarge />
-              </s.Container>
-              <Footer />
-            </s.Container>
-          </>
-        ) : (
-          <Connection
-            isAvailableNetwork={isAvailableNetwork}
-          />
-        )}
+                    <Outlet />
+                    <Routes>
+                      <Route path="/" element={<Launchpad />} />
+                      <Route path="/launchpad" element={<Launchpad />} />
+                      <Route
+                        path="/home"
+                        element={<Home />}
+                      />
+                      <Route path="/launchpad/:idoAddress" element={<LaunchpadInfo />} />
+                      <Route path="/publish" element={<Publish />} />
+                      <Route path="/lock" element={<LockToken />} />
+                      <Route path="/account" element={<Account />} />
+                      { isLockerEnabled && <Route path="/locker" element={<Locker />} /> }
+                      { isLockerEnabled && <Route path="/locker/:lockerAddress" element={<LockerInfo /> } /> }
+                    </Routes>
+                    <s.SpacerLarge />
+                    <s.SpacerLarge />
+                    <s.SpacerLarge />
+                  </s.Container>
+                  <Footer />
+                </s.Container>
+              </>
+            )
+        }
       </s.Screen>
     </Web3ReactManager>
   );

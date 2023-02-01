@@ -95,22 +95,6 @@ export const chainRouter = {
       ROUTER: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
     },
   ],
-  1337: [
-    {
-      name: "Uniswap",
-      FACTORY: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
-      WETH: "0xc778417e063141139fce010982780140aa0cd5ab",
-      ROUTER: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
-    },
-  ],
-  420420: [
-    {
-      name: "KeKSwap",
-      FACTORY: "0x1D18FCCe41A059F35f27A633C0297f2Bd2a4a41c",
-      WETH: "0x71eC0cB8f7Dd4F4C5bD4204015c4C287fbDaA04A",
-      ROUTER: "0xBf11d3be6533271Eac764D546cd5E0Fe71c29aB1",
-    },
-  ],
 };
 
 

@@ -28,6 +28,7 @@ export const ApplicationContextProvider = ({ children }) => {
 
   const {
     domain,
+    isAdmin,
     domainSettings,
     isDomainDataFetching,
     isDomainDataFetched,
@@ -132,13 +133,18 @@ export const ApplicationContextProvider = ({ children }) => {
   const TokenLockerFactoryContract = useLockerFactoryContract(TokenLockerFactoryAddress, true);
   const IDOFactoryContract = useIDOFactoryContract(IDOFactoryAddress, true);
 
-  const isAppConfigured = TokenLockerFactoryAddress && IDOFactoryAddress && networks[chainId]?.wsrpc;
+  const isAppConfigured =
+    TokenLockerFactoryAddress
+    && IDOFactoryAddress
+    && networks[chainId]?.wsrpc
+    && domainSettings?.admin;
 
   const value = {
     isAppConfigured,
     isLockerEnabled,
 
     domain,
+    isAdmin,
     domainSettings,
     isDomainDataFetching,
     isDomainDataFetched,

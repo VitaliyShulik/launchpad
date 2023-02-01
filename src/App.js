@@ -20,6 +20,7 @@ import { fetchContract } from "./redux/contract/contractAction";
 import * as s from "./styles/global";
 import { useApplicationContext } from "./context/applicationContext";
 import Loader from "./components/Loader";
+import Manage from "./pages/Manage";
 
 function App() {
   const dispatch = useDispatch();
@@ -57,15 +58,7 @@ function App() {
               <Loader size="2.8rem" />
             </s.LoaderWrapper>
             ) : !isAppConfigured ? (
-              <>
-                <s.Wrapper>
-                  <s.BodyWrapper>
-                    <s.ContentWrapper>
-                      The app is not configured
-                    </s.ContentWrapper>
-                  </s.BodyWrapper>
-                </s.Wrapper>
-              </>
+              <Manage />
             ) : (
               <>
                 <Navigation />

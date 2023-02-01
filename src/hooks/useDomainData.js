@@ -38,8 +38,9 @@ const parseSettings = (settings, chainId) => {
 }
 
 export default function useDomainData() {
-  const { chainId } = useWeb3React();
+  const { chainId, account } = useWeb3React();
 
+  const [isAdmin, setIsAdmin] = useState(false);
   const [domainSettings, setDomainSettings] = useState(null);
   const [isDomainDataFetching, setIsDomainDataFetching] = useState(false);
   const [isDomainDataFetched, setIsDomainDataFetched] = useState(false);
@@ -75,8 +76,16 @@ export default function useDomainData() {
     }
   }, [chainId, domainDataTrigger]);
 
+  useEffect(() => {
+    if (domainSettings?.admin && account) {
+      setIsAdmin(account.toLowerCase() === domainSettings.admin.toLowerCase());
+    }
+
+  }, [account, domainSettings]);
+
   return {
     domain,
+    isAdmin,
     domainSettings,
     isDomainDataFetching,
     isDomainDataFetched,

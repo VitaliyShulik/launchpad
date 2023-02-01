@@ -113,6 +113,23 @@ export const LoaderWrapper = styled.div`
   background-color: #1d1f24;
 `;
 
+export const IconWrapper = styled.div`
+  padding: 0.6rem;
+  border-radius: 50%;
+  background-color: ${({ theme }) => theme.text2};
+
+  .icon {
+    color: white;
+  }
+`;
+
+export const Title = styled.h1`
+  line-height: 1.6rem;
+  font-size: 1.4rem;
+  text-align: center;
+`;
+
+
 export const Card = styled.div`
   display: ${({ display }) => (display ? display : "flex")};
   flex: ${({ flex }) => (flex ? flex : "1 0 25%")};

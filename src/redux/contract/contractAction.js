@@ -34,7 +34,7 @@ export const fetchContract = (chainId) => {
 
     let web3 = new Web3(networkWS);
     try {
-      if (!networkWS || !IDOFactoryNetworkData?.address || !LockerFactoryNetworkData.address) throw Error("Network is now configured");
+      if (!networkWS || !IDOFactoryNetworkData?.address || !LockerFactoryNetworkData.address) throw Error("Network is not configured");
       const IDOFactoryContract = new web3.eth.Contract(
         IDOFactory.abi,
         IDOFactoryNetworkData.address

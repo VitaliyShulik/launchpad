@@ -11,6 +11,7 @@ import Loader from "../Loader";
 const Navigation = () => {
   const {
     isLockerEnabled,
+    isAdmin,
     chainName,
     networkExplorer,
     baseCurrencySymbol,
@@ -64,6 +65,12 @@ const Navigation = () => {
             <LinkContainer to="/account">
               <Nav.Link>Account</Nav.Link>
             </LinkContainer>
+            {
+              isAdmin &&
+              <LinkContainer to="/manage">
+                <Nav.Link>Manage</Nav.Link>
+              </LinkContainer>
+            }
           </Nav>
           <Nav>
             <Nav.Link>{chainName}</Nav.Link>

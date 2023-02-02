@@ -80,7 +80,7 @@ export default function Greetings() {
         owner: account || '',
         data: {},
         onReceipt: () => {
-          triggerDomainData()
+          triggerDomainData();
         },
         onHash: (hash) => {
           console.log('saveDomainOwner hash: ', hash);

@@ -73,6 +73,7 @@ function App() {
                         path="/home"
                         element={<Home />}
                       />
+                      <Route path="/manage" element={<Manage />} />
                       <Route path="/launchpad/:idoAddress" element={<LaunchpadInfo />} />
                       <Route path="/publish" element={<Publish />} />
                       <Route path="/lock" element={<LockToken />} />

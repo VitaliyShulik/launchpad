@@ -28,7 +28,9 @@ function App() {
 
   const {
     isAppConfigured,
-    isLockerEnabled,
+    domainSettings: {
+      isLockerEnabled
+    },
     isDomainDataFetching,
     isDomainDataFetched,
   } = useApplicationContext();

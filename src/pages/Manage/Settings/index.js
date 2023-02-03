@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from "styled-components";
 import { useWeb3React } from '@web3-react/core';
-import * as s from "../../styles/global";
+import * as s from "../../../styles/global";
 import { FaWrench } from 'react-icons/fa';
-import { saveAppData } from '../../utils/storage';
-import { useApplicationContext } from '../../context/applicationContext';
-import { shortenAddress } from '../../utils/utils';
-import { STORAGE_NETWORK_NAME } from '../../constants';
+import { useApplicationContext } from '../../../context/applicationContext';
+import { shortenAddress } from '../../../utils/utils';
+import { STORAGE_NETWORK_NAME } from '../../../constants';
+import Main from './Main';
+import Contracts from './Contracts';
+import Interface from './Interface';
 
 const Row = styled.div`
   display: flex;
@@ -28,7 +30,7 @@ const Tab = styled.button`
   padding: 0.4rem 0.7rem;
   font-size: 1em;
   border: none;
-  background-color: ${({ active }) => (active ? "#27292e" : 'transparent')};
+  background-color: ${({ active }) => (active ? "#424149" : 'transparent')};
   color: #fff;
 
   :first-child {
@@ -47,21 +49,19 @@ const TabContent = styled.div`
 `;
 
 export default function Settings() {
-  const { library, account } = useWeb3React();
+  const { account } = useWeb3React();
   const {
-    domainSettings,
     chainName,
   } = useApplicationContext();
-  const [isLockerEnabled, setIsLockerEnabled] = useState(domainSettings?.isLockerEnabled);
 
-  const [tab, setTab] = useState('main')
+  const [tab, setTab] = useState('main');
 
   const returnTabs = () => {
     const tabs = [
       { tabKey: 'main', tabName: 'Main' },
       { tabKey: 'contracts', tabName: 'Contracts' },
       { tabKey: 'interface', tabName: 'Interface' },
-    ]
+    ];
 
     // if (chainId === STORAGE_NETWORK_ID) {
     //   tabs.push({ tabKey: 'migration', tabName: 'Migration' })
@@ -73,7 +73,7 @@ export default function Settings() {
           {info.tabName}
         </Tab>
       )
-    })
+    });
   }
 
   return (
@@ -103,13 +103,13 @@ export default function Settings() {
 
       <TabContent>
         {tab === 'main' && (
-          <>Main Settings</>
+          <Main />
         )}
         {tab === 'contracts' && (
-          <>Contracts Settings</>
+          <Contracts />
         )}
         {tab === 'interface' && (
-          <>Interface Settings</>
+          <Interface />
         )}
         {/* {tab === 'migration' && <Migration />} */}
       </TabContent>

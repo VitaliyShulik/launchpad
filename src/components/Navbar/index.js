@@ -10,7 +10,9 @@ import Loader from "../Loader";
 
 const Navigation = () => {
   const {
-    isLockerEnabled,
+    domainSettings: {
+      isLockerEnabled
+    },
     isAdmin,
     chainName,
     networkExplorer,

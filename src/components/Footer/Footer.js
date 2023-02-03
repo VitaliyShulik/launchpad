@@ -12,7 +12,9 @@ import {
 
 const Footer = () => {
   const {
-    isLockerEnabled,
+    domainSettings: {
+      isLockerEnabled,
+    },
     networkExplorer,
     IDOFactoryAddress,
     TokenLockerFactoryAddress,

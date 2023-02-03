@@ -11,7 +11,7 @@ const LongIdoList = () => {
   const [loading, setLoading] = useState(false);
 
   const { userPoolAddresses, allPools } = usePoolContext();
-  const { isLockerEnabled } = useApplicationContext();
+  const { domainSettings: { isLockerEnabled } } = useApplicationContext();
 
   // sort IDOs by start time
   userPoolAddresses.sort((a, b) => allPools[b]?.start - allPools[a]?.start);

@@ -5,8 +5,11 @@ import { useStorageContract } from './useContract';
 import { STORAGE_APP_KEY, ZERO_ADDRESS } from '../constants';
 
 const defaultSettings = () => ({
-  isLockerEnabled: true,
   admin: '',
+  projectName: '',
+  logoUrl: '',
+  disableSourceCopyright: false,
+  isLockerEnabled: true,
 });
 
 const parseSettings = (settings, chainId) => {
@@ -22,10 +25,16 @@ const parseSettings = (settings, chainId) => {
     const { [STORAGE_APP_KEY]: parsedSettings } = settingsJSON;
 
     const {
+      projectName,
+      logoUrl,
+      disableSourceCopyright,
       isLockerEnabled,
     } = parsedSettings;
 
-    if (isLockerEnabled) appSettings.isLockerEnabled = isLockerEnabled;
+    if (projectName) appSettings.projectName = projectName;
+    if (logoUrl) appSettings.logoUrl = logoUrl;
+    if (typeof disableSourceCopyright === "boolean") appSettings.disableSourceCopyright = disableSourceCopyright;
+    if (typeof isLockerEnabled === "boolean") appSettings.isLockerEnabled = isLockerEnabled;
 
   } catch (error) {
     console.group('%c Storage settings', 'color: red')

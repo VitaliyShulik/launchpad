@@ -18,8 +18,6 @@ export const ApplicationContextProvider = ({ children }) => {
   const IDOFactoryAddress = IDOFactory?.networks?.[chainId]?.address;
   const FeeTokenAddress = FeeToken?.networks?.[chainId]?.address;
 
-  const isLockerEnabled = process.env.REACT_APP_ENABLE_LOCKER === 'true';
-
   const chainName = networks[chainId]?.name;
   const baseCurrencySymbol = networks[chainId]?.baseCurrency?.symbol;
   const networkExplorer = networks[chainId]?.explorer;
@@ -141,7 +139,6 @@ export const ApplicationContextProvider = ({ children }) => {
 
   const value = {
     isAppConfigured,
-    isLockerEnabled,
 
     domain,
     isAdmin,

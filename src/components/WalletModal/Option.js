@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { IoIosCheckmarkCircleOutline } from 'react-icons/io';
 
 const InfoCard = styled.button`
-  background-color: ${({ active }) => (active ? '#3a3d47' : '#27292e')};
+  background-color: ${({ active }) => (active ? '#3a3d47' : '#424149')};
   padding: 1rem;
   outline: none;
   border-radius: 1rem;

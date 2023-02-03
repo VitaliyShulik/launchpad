@@ -12,7 +12,7 @@ const Account = () => {
   const { account } = useWeb3React();
   const [showZero, setShowZero] = useState(0);
 
-  const { isLockerEnabled } = useApplicationContext();
+  const { domainSettings: { isLockerEnabled } } = useApplicationContext();
 
   if (!account) {
     return (

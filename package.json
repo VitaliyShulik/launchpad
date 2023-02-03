@@ -74,6 +74,7 @@
     "start:prod": "env-cmd -f .env.production react-app-rewired start",
     "start:test": "env-cmd -f .env.test react-app-rewired start",
     "build:dev": "env-cmd -f .env.development react-app-rewired build",
+    "build:prod": "env-cmd -f .env.production react-app-rewired build",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",

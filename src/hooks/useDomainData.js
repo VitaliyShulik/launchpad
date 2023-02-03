@@ -12,6 +12,8 @@ const defaultSettings = () => ({
   isLockerEnabled: true,
 });
 
+const initialSettings = defaultSettings();
+
 const parseSettings = (settings, chainId) => {
   const appSettings = defaultSettings()
 
@@ -44,13 +46,13 @@ const parseSettings = (settings, chainId) => {
   }
 
   return appSettings
-}
+};
 
 export default function useDomainData() {
   const { chainId, account } = useWeb3React();
 
   const [isAdmin, setIsAdmin] = useState(false);
-  const [domainSettings, setDomainSettings] = useState(null);
+  const [domainSettings, setDomainSettings] = useState(initialSettings);
   const [isDomainDataFetching, setIsDomainDataFetching] = useState(false);
   const [isDomainDataFetched, setIsDomainDataFetched] = useState(false);
   const [domainDataTrigger, setDomainDataTrigger] = useState(false);

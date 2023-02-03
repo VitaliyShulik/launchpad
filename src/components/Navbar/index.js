@@ -11,7 +11,8 @@ import Loader from "../Loader";
 const Navigation = () => {
   const {
     domainSettings: {
-      isLockerEnabled
+      isLockerEnabled,
+      logoUrl,
     },
     isAdmin,
     chainName,
@@ -32,23 +33,7 @@ const Navigation = () => {
   return (
     <Navbar collapseOnSelect expand="lg" variant="dark" style={{ margin: 15 }}>
       <Container style={{ maxWidth: "100%" }}>
-        {!mockCompanyLogo ? (
-          <s.TextTitle style={{ fontSize: "24px" }}>
-            <s.Card
-              style={{
-                padding: 10,
-                margin: 0,
-                paddingLeft: 20,
-                paddingRight: 20,
-                fontWeight: 700,
-                color: "var(--primary)",
-              }}
-            >
-              YourTextLogo
-            </s.Card>
-          </s.TextTitle>
-        ) : <s.LogoTitle src={mockCompanyLogo} />
-        }
+        <s.LogoTitle src={logoUrl || mockCompanyLogo} />
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">

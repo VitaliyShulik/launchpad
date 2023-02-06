@@ -44,10 +44,6 @@ const Tab = styled.button`
   }
 `;
 
-const TabContent = styled.div`
-  border-radius: 1rem;
-`;
-
 export default function Settings() {
   const { account } = useWeb3React();
   const {
@@ -101,18 +97,18 @@ export default function Settings() {
 
       <Tabs>{returnTabs()}</Tabs>
 
-      <TabContent>
-        {tab === 'main' && (
-          <Main />
-        )}
-        {tab === 'contracts' && (
-          <Contracts />
-        )}
-        {tab === 'interface' && (
-          <Interface />
-        )}
-        {/* {tab === 'migration' && <Migration />} */}
-      </TabContent>
+      <s.SpacerMedium />
+
+      {tab === 'main' && (
+        <Main />
+      )}
+      {tab === 'contracts' && (
+        <Contracts />
+      )}
+      {tab === 'interface' && (
+        <Interface />
+      )}
+      {/* {tab === 'migration' && <Migration />} */}
     </>
   )
 }

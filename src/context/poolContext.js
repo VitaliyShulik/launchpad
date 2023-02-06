@@ -2,6 +2,7 @@ import { useWeb3React } from "@web3-react/core";
 import React, { createContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { utils } from "../utils";
+import { useApplicationContext } from "./applicationContext";
 
 export const PoolContext = createContext({});
 
@@ -16,22 +17,30 @@ export const PoolContextProvider = ({ children }) => {
   const contract = useSelector((state) => state.contract);
   const { account } = useWeb3React();
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      allPoolAddress.map(async (address, index) => {
-        await utils.loadPoolData(address, contract.web3, account).then((IDOPoolData) => {
-          setAllPools((p) => ({ ...p, ...{ [address]: IDOPoolData } }));
-          const { owner, userData, idoAddress } = IDOPoolData;
-          if (
-            owner?.toLowerCase() === account?.toLowerCase()
-            || (userData?.totalInvestedETH && userData?.totalInvestedETH !== "0")
-          ) setUserPoolAddresses((prevUserPoolAddresses) => [ ...prevUserPoolAddresses, idoAddress ])
-        });
-      });
-    }, 3000);
+  const {
+    domainSettings: {
+      ipfsInfuraDedicatedGateway
+    }
+  } = useApplicationContext();
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [allPoolAddress]);
+  useEffect(() => {
+    if (ipfsInfuraDedicatedGateway) {
+      const delayDebounceFn = setTimeout(() => {
+        allPoolAddress.map(async (address, index) => {
+          await utils.loadPoolData(address, contract.web3, account, ipfsInfuraDedicatedGateway).then((IDOPoolData) => {
+            setAllPools((p) => ({ ...p, ...{ [address]: IDOPoolData } }));
+            const { owner, userData, idoAddress } = IDOPoolData;
+            if (
+              owner?.toLowerCase() === account?.toLowerCase()
+              || (userData?.totalInvestedETH && userData?.totalInvestedETH !== "0")
+            ) setUserPoolAddresses((prevUserPoolAddresses) => [ ...prevUserPoolAddresses, idoAddress ])
+          });
+        });
+      }, 3000);
+
+      return () => clearTimeout(delayDebounceFn);
+    }
+  }, [allPoolAddress, ipfsInfuraDedicatedGateway]);
 
   useEffect(() => {
     setUserPoolAddresses([])

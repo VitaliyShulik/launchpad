@@ -7,8 +7,14 @@ import { saveAppData } from '../../../utils/storage';
 import { TextField, Stack, Typography, Switch } from '@mui/material';
 import * as s from "../../../styles/global";
 import styled from 'styled-components';
+import Loader from '../../../components/Loader';
+import { InjectedConnector } from '@web3-react/injected-connector';
+import { switchInjectedNetwork } from '../../../utils/utils';
 
 const ContentWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
 
   ${({ disabled }) => (disabled ? `
     cursor: not-allowed;
@@ -19,7 +25,7 @@ const ContentWrapper = styled.div`
 `
 
 export default function Interface() {
-  const { library, chainId, account } = useWeb3React();
+  const { library, chainId, account, connector } = useWeb3React();
   const {
     domain,
     domainSettings,
@@ -173,12 +179,17 @@ export default function Interface() {
     // socialLinks,
   ]);
 
+
+  const isStorageNetwork = chainId === STORAGE_NETWORK_ID;
+  const canChangeNetwork = (connector instanceof InjectedConnector);
+  const canAndShouldSwitchToStorageNetwork = canChangeNetwork && !isStorageNetwork;
+
   const [cannotSaveSettings, setCannotSaveSettings] = useState(true);
 
   useEffect(() => {
     setCannotSaveSettings(
-      chainId !== STORAGE_NETWORK_ID ||
-        !settingsChanged ||
+        (!isStorageNetwork && !canChangeNetwork) ||
+        (isStorageNetwork && !settingsChanged) ||
         !isValidLogo
         // !isValidFavicon ||
         // !isValidBackground ||
@@ -190,7 +201,8 @@ export default function Interface() {
     // isValidFavicon,
     // isValidBackground,
     // areColorsValid,
-    chainId
+    isStorageNetwork,
+    canChangeNetwork,
 ]);
 
   const saveInterfaceSettings = async () => {
@@ -235,140 +247,168 @@ export default function Interface() {
     }
   }
 
+  const switchToStorage = async () => {
+    setIsLoading(true);
+
+    try {
+      await switchInjectedNetwork(STORAGE_NETWORK_ID);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
-    <section>
-      <ContentWrapper disabled={isLoading}>
-        <TextField
-          label="Project Name"
-          value={projectName}
-          onChange={(e) => {
-            setProjectName(e.target.value);
+    <ContentWrapper disabled={isLoading}>
+      <TextField
+        label="Project Name"
+        value={projectName}
+        onChange={(e) => {
+          setProjectName(e.target.value);
+        }}
+      />
+
+      <s.SpacerSmall />
+
+      <TextField
+        label="Logo URL"
+        value={logoUrl}
+        onChange={(e) => {
+          setLogoUrl(e.target.value);
+        }}
+        error={!isValidLogo}
+      />
+
+      <s.SpacerSmall />
+
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+      >
+        <Typography>Deactivate Source Copyright</Typography>
+        <Switch
+          checked={!!disableSourceCopyright}
+          onChange={() => {
+            setDisableSourceCopyright((prevState) => !prevState);
           }}
         />
+      </Stack>
 
-        <TextField
-          label="Logo URL"
-          value={logoUrl}
-          onChange={(e) => {
-            setLogoUrl(e.target.value);
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+      >
+        <Typography>Activate Token Locker Functionality</Typography>
+        <Switch
+          checked={!!isLockerEnabled}
+          onChange={() => {
+            setIsLockerEnabled((prevState) => !prevState);
           }}
-          error={!isValidLogo}
         />
+      </Stack>
 
-        <Stack direction="row" spacing={1}>
-          <Typography>Deactivate Source Copyright</Typography>
-          <Switch
-            checked={!!disableSourceCopyright}
-            onChange={() => {
-              setDisableSourceCopyright((prevState) => !prevState);
+      {/* <OptionWrapper>
+        <TextField
+          label={`${t('faviconUrl')}`}
+          value={faviconUrl}
+          onChange={setFaviconUrl}
+          error={!isValidFavicon}
+        />
+      </OptionWrapper> */}
+
+      {/* <OptionWrapper flex>
+        <InputPanel
+          label={`${t('backgroundUrl')}`}
+          value={backgroundUrl}
+          onChange={setBackgroundUrl}
+          error={!isValidBackground}
+        />
+      </OptionWrapper> */}
+
+      {/* <OptionWrapper>
+        <MenuLinksFactory
+          title={t('navigationLinks')}
+          items={navigationLinks}
+          setItems={setNavigationLinks}
+          isValidItem={(item: LinkItem) => Boolean(validUrl.isUri(item.source))}
+        />
+      </OptionWrapper> */}
+
+      {/* <OptionWrapper>
+        <ListFactory
+          title={t('socialLinks')}
+          placeholder="https://"
+          items={socialLinks}
+          setItems={setSocialLinks}
+          isValidItem={(address) => Boolean(validUrl.isUri(address))}
+        />
+      </OptionWrapper> */}
+
+      {/* <Accordion title={t('colors')} margin="0.5rem 0">
+        <OptionWrapper margin={0.4}>
+          <ColorSelector
+            name={t('primaryColor')}
+            defaultColor={stateBrandColor}
+            onColor={(color, valid) => {
+              setBrandColorValid(valid)
+              updateColor(color, ColorType.BRAND)
             }}
           />
-        </Stack>
+        </OptionWrapper>
 
-        <Stack direction="row" spacing={1}>
-          <Typography>Activate Token Locker Functionality</Typography>
-          <Switch
-            checked={!!isLockerEnabled}
-            onChange={() => {
-              setIsLockerEnabled((prevState) => !prevState);
+        <OptionWrapper margin={0.4}>
+          <h4>{t('backgroundColor')}</h4>
+          <ColorSelector
+            name={t('light')}
+            defaultColor={backgroundColorLight}
+            onColor={(color, valid) => {
+              setBgColorLightValid(valid)
+              updateColor(color, ColorType.BACKGROUND_LIGHT)
             }}
           />
-        </Stack>
-
-        {/* <OptionWrapper>
-          <TextField
-            label={`${t('faviconUrl')}`}
-            value={faviconUrl}
-            onChange={setFaviconUrl}
-            error={!isValidFavicon}
+          <ColorSelector
+            name={t('dark')}
+            defaultColor={backgroundColorDark}
+            onColor={(color, valid) => {
+              setBgColorDarkValid(valid)
+              updateColor(color, ColorType.BACKGROUND_DARK)
+            }}
           />
-        </OptionWrapper> */}
+        </OptionWrapper>
 
-        {/* <OptionWrapper flex>
-          <InputPanel
-            label={`${t('backgroundUrl')}`}
-            value={backgroundUrl}
-            onChange={setBackgroundUrl}
-            error={!isValidBackground}
+        <OptionWrapper margin={0.5}>
+          <h4>{t('textColor')}</h4>
+          <ColorSelector
+            name={t('light')}
+            defaultColor={textColorLight}
+            onColor={(color, valid) => {
+              setTextColorLightValid(valid)
+              updateColor(color, ColorType.TEXT_COLOR_LIGHT)
+            }}
           />
-        </OptionWrapper> */}
-
-        {/* <OptionWrapper>
-          <MenuLinksFactory
-            title={t('navigationLinks')}
-            items={navigationLinks}
-            setItems={setNavigationLinks}
-            isValidItem={(item: LinkItem) => Boolean(validUrl.isUri(item.source))}
+          <ColorSelector
+            name={t('dark')}
+            defaultColor={textColorDark}
+            onColor={(color, valid) => {
+              setTextColorDarkValid(valid)
+              updateColor(color, ColorType.TEXT_COLOR_DARK)
+            }}
           />
-        </OptionWrapper> */}
+        </OptionWrapper>
+      </Accordion> */}
 
-        {/* <OptionWrapper>
-          <ListFactory
-            title={t('socialLinks')}
-            placeholder="https://"
-            items={socialLinks}
-            setItems={setSocialLinks}
-            isValidItem={(address) => Boolean(validUrl.isUri(address))}
-          />
-        </OptionWrapper> */}
-
-        {/* <Accordion title={t('colors')} margin="0.5rem 0">
-          <OptionWrapper margin={0.4}>
-            <ColorSelector
-              name={t('primaryColor')}
-              defaultColor={stateBrandColor}
-              onColor={(color, valid) => {
-                setBrandColorValid(valid)
-                updateColor(color, ColorType.BRAND)
-              }}
-            />
-          </OptionWrapper>
-
-          <OptionWrapper margin={0.4}>
-            <h4>{t('backgroundColor')}</h4>
-            <ColorSelector
-              name={t('light')}
-              defaultColor={backgroundColorLight}
-              onColor={(color, valid) => {
-                setBgColorLightValid(valid)
-                updateColor(color, ColorType.BACKGROUND_LIGHT)
-              }}
-            />
-            <ColorSelector
-              name={t('dark')}
-              defaultColor={backgroundColorDark}
-              onColor={(color, valid) => {
-                setBgColorDarkValid(valid)
-                updateColor(color, ColorType.BACKGROUND_DARK)
-              }}
-            />
-          </OptionWrapper>
-
-          <OptionWrapper margin={0.5}>
-            <h4>{t('textColor')}</h4>
-            <ColorSelector
-              name={t('light')}
-              defaultColor={textColorLight}
-              onColor={(color, valid) => {
-                setTextColorLightValid(valid)
-                updateColor(color, ColorType.TEXT_COLOR_LIGHT)
-              }}
-            />
-            <ColorSelector
-              name={t('dark')}
-              defaultColor={textColorDark}
-              onColor={(color, valid) => {
-                setTextColorDarkValid(valid)
-                updateColor(color, ColorType.TEXT_COLOR_DARK)
-              }}
-            />
-          </OptionWrapper>
-        </Accordion> */}
-
-        <s.button onClick={saveInterfaceSettings} disabled={cannotSaveSettings}>
-          {chainId === STORAGE_NETWORK_ID ? 'Save Settings' : `Switch to ${STORAGE_NETWORK_NAME}`}
-        </s.button>
-      </ContentWrapper>
-    </section>
+      <s.button
+        onClick={canAndShouldSwitchToStorageNetwork ? switchToStorage : saveInterfaceSettings}
+        disabled={cannotSaveSettings}
+      >
+        { isLoading
+          ? <Loader />
+          : isStorageNetwork
+            ? 'Save Settings'
+            : `Switch to ${STORAGE_NETWORK_NAME}`
+        }
+      </s.button>
+    </ContentWrapper>
   )
 }

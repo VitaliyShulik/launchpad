@@ -5,6 +5,10 @@ import { useStorageContract } from './useContract';
 import { STORAGE_APP_KEY, ZERO_ADDRESS } from '../constants';
 
 const defaultSettings = () => ({
+  ipfsInfuraDedicatedGateway: '', // process.env.REACT_APP_INFURA_DEDICATED_GATEWAY
+  ipfsInfuraProjectId: '', // process.env.REACT_APP_INFURA_IPFS_KEY
+  ipfsInfuraProjectSecret: '', // process.env.REACT_APP_INFURA_IPFS_SECRET
+
   admin: '',
   projectName: '',
   logoUrl: '',
@@ -14,8 +18,8 @@ const defaultSettings = () => ({
 
 const initialSettings = defaultSettings();
 
-const parseSettings = (settings, chainId) => {
-  const appSettings = defaultSettings()
+const parseSettings = (settings) => {
+  const appSettings = initialSettings;
 
   try {
     const settingsJSON = JSON.parse(settings);
@@ -27,11 +31,19 @@ const parseSettings = (settings, chainId) => {
     const { [STORAGE_APP_KEY]: parsedSettings } = settingsJSON;
 
     const {
+      ipfsInfuraDedicatedGateway,
+      ipfsInfuraProjectId,
+      ipfsInfuraProjectSecret,
+
       projectName,
       logoUrl,
       disableSourceCopyright,
       isLockerEnabled,
     } = parsedSettings;
+
+    if (ipfsInfuraDedicatedGateway) appSettings.ipfsInfuraDedicatedGateway = ipfsInfuraDedicatedGateway;
+    if (ipfsInfuraProjectId) appSettings.ipfsInfuraProjectId = ipfsInfuraProjectId;
+    if (ipfsInfuraProjectSecret) appSettings.ipfsInfuraProjectSecret = ipfsInfuraProjectSecret;
 
     if (projectName) appSettings.projectName = projectName;
     if (logoUrl) appSettings.logoUrl = logoUrl;
@@ -49,7 +61,7 @@ const parseSettings = (settings, chainId) => {
 };
 
 export default function useDomainData() {
-  const { chainId, account } = useWeb3React();
+  const { account } = useWeb3React();
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [domainSettings, setDomainSettings] = useState(initialSettings);
@@ -68,7 +80,7 @@ export default function useDomainData() {
       try {
         const { info, owner } = await storageContract.methods.getData(domain).call();
 
-        const settings = parseSettings(info || '{}', chainId || 0);
+        const settings = parseSettings(info || '{}');
 
         const admin = owner === ZERO_ADDRESS ? '' : owner;
 
@@ -82,10 +94,10 @@ export default function useDomainData() {
       }
     }
 
-    if (chainId && domain) {
+    if (storageContract && domain) {
         fetchDomainData();
     }
-  }, [chainId, domainDataTrigger]);
+  }, [domainDataTrigger, storageContract, domain]);
 
   useEffect(() => {
     if (domainSettings?.admin && account) {

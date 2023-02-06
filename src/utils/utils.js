@@ -97,14 +97,14 @@ export const isValidToken = (_tokenInfo) => {
   }
 };
 
-export const loadPoolData = async (idoAddress, web3, account) => {
+export const loadPoolData = async (idoAddress, web3, account, infuraDedicatedGateway) => {
   try {
     const idoPool = await new web3.eth.Contract(IDOPool.abi, idoAddress);
     let metadataURL = await idoPool.methods.metadataURL().call();
     let balance = await web3.eth.getBalance(idoAddress);
     let tokenAddress = await idoPool.methods.rewardToken().call();
     const token = new web3.eth.Contract(ERC20.abi, tokenAddress);
-    let metadata = await getTokenURI(metadataURL);
+    let metadata = await getTokenURI(metadataURL, infuraDedicatedGateway);
     let owner = await idoPool.methods.owner().call();
 
     const userData = await loadUserData(idoAddress, web3, account)
@@ -239,8 +239,8 @@ export const getLockerData = async (lockerAddress, web3) => {
   };
 };
 
-export function getTokenURI(uri) {
-  return fetch(getValidIPFSUrl(uri))
+export function getTokenURI(uri, infuraDedicatedGateway) {
+  return fetch(getValidIPFSUrl(uri, infuraDedicatedGateway))
     .then((response) => response.json())
     .then((responseJson) => {
       return responseJson;
@@ -250,9 +250,7 @@ export function getTokenURI(uri) {
     });
 }
 
-export function getValidImageUrl(imageUrl) {
-  const infuraDedicatedGateway = process.env.REACT_APP_INFURA_DEDICATED_GATEWAY;
-
+export function getValidImageUrl(imageUrl, infuraDedicatedGateway) {
   if (!infuraDedicatedGateway || !imageUrl) {
     console.error('The app has not "Infura Dedicated Gateway" option or imageUrl is not valid')
     return ""
@@ -264,8 +262,7 @@ export function getValidImageUrl(imageUrl) {
     : `${infuraDedicatedGateway}/ipfs/${imageUrl}`;
 }
 
-export function getValidIPFSUrl(url) {
-  const infuraDedicatedGateway = process.env.REACT_APP_INFURA_DEDICATED_GATEWAY;
+export function getValidIPFSUrl(url, infuraDedicatedGateway) {
   if (!infuraDedicatedGateway || !url) {
     console.error('The app has not "Infura Dedicated Gateway" option or url is not valid')
     return ""

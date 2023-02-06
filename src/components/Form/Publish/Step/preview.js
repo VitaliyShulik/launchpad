@@ -1,5 +1,4 @@
 import BigNumber from "bignumber.js";
-import { create } from "ipfs-http-client";
 import React, { useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { FaImage } from "react-icons/fa";
@@ -12,19 +11,7 @@ import { useApplicationContext } from "../../../../context/applicationContext";
 import { useTokenContract } from "../../../../hooks/useContract";
 import ReadMore from "../../readMore";
 import { isAddress } from "../../../../utils/utils";
-
-const projectId = process.env.REACT_APP_INFURA_IPFS_KEY;
-const projectSecret = process.env.REACT_APP_INFURA_IPFS_SECRET;
-const auth = "Basic " + Buffer.from(projectId + ":" + projectSecret).toString('base64');
-
-const ipfs = create({
-  host: "ipfs.infura.io",
-  port: 5001,
-  protocol: "https",
-  headers: {
-      authorization: auth,
-  },
-});
+import { useIPFS } from "../../../../hooks/useIPFS";
 
 export default function Preview() {
   const { account, chainId, library } = useWeb3React();
@@ -63,6 +50,8 @@ export default function Preview() {
     telegram: [telegram],
     twitter: [twitter],
   } = useStoreContext();
+
+  const ipfs = useIPFS();
 
   const tokenContract = useTokenContract(tokenAddress);
   const [IDOFactoryFee, sesIDOFactoryFee] = useState("0");

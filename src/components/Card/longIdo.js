@@ -1,8 +1,7 @@
-import BigNumber from "bignumber.js";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { usePoolContext } from "../../context/poolContext";
+import { useApplicationContext } from "../../context/applicationContext";
 import { getValidImageUrl } from "../../utils/utils";
 import * as s from "../../styles/global";
 import ProgressBar from "../Modal/ProgressBar";
@@ -11,7 +10,11 @@ import PoolCountdown from "../Utils/poolCountdown";
 import imageSolid from "../../assets/images/image-solid.png"
 
 const LongIdo = (props) => {
-  const contract = useSelector((state) => state.contract);
+  const {
+    domainSettings: {
+      ipfsInfuraDedicatedGateway
+    }
+  } = useApplicationContext();
   const [image, setImage] = useState("");
   const { idoAddress } = props;
 
@@ -19,9 +22,9 @@ const LongIdo = (props) => {
 
   useEffect(() => {
     if (idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash) {
-      setImage(getValidImageUrl(idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash));
+      setImage(getValidImageUrl(idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash, ipfsInfuraDedicatedGateway));
     }
-  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash]);
+  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash, ipfsInfuraDedicatedGateway]);
 
   if (!idoInfo) {
     return (

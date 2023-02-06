@@ -135,7 +135,10 @@ export const ApplicationContextProvider = ({ children }) => {
     TokenLockerFactoryAddress
     && IDOFactoryAddress
     && networks[chainId]?.wsrpc
-    && domainSettings?.admin;
+    && domainSettings?.admin
+    && domainSettings?.ipfsInfuraDedicatedGateway
+    && domainSettings?.ipfsInfuraProjectId
+    && domainSettings?.ipfsInfuraProjectSecret
 
   const value = {
     isAppConfigured,

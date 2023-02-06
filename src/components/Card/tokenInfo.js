@@ -7,18 +7,25 @@ import ReadMore from "../Form/readMore";
 import SocialMediaModal from "../Modal/socialmediaModal";
 
 import imageSolid from "../../assets/images/image-solid.png"
+import { useApplicationContext } from "../../context/applicationContext";
 
 const TokenInfo = (props) => {
   const [image, setImage] = useState(null);
   const { idoAddress } = props;
 
+  const {
+    domainSettings: {
+      ipfsInfuraDedicatedGateway
+    }
+  } = useApplicationContext();
+
   const idoInfo = usePoolContext().allPools[idoAddress];
 
   useEffect(() => {
     if (idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash) {
-      setImage(getValidImageUrl(idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash));
+      setImage(getValidImageUrl(idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash, ipfsInfuraDedicatedGateway));
     }
-  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash]);
+  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash, ipfsInfuraDedicatedGateway]);
 
   if (!idoInfo) {
     return null;

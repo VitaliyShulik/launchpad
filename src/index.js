@@ -49,17 +49,17 @@ ReactDOM.render(
     <Web3ReactProvider getLibrary={getLibrary}>
       <Web3ProviderNetwork getLibrary={getLibrary}>
         <Provider store={store}>
-          <StoreContextProvider>
-            <PoolContextProvider>
-              <ApplicationContextProvider>
+          <ApplicationContextProvider>
+            <StoreContextProvider>
+              <PoolContextProvider>
                 <ThemeProvider theme={theme}>
                   <Router>
                     <App />
                   </Router>
                 </ThemeProvider>
-              </ApplicationContextProvider>
-            </PoolContextProvider>
-          </StoreContextProvider>
+              </PoolContextProvider>
+            </StoreContextProvider>
+          </ApplicationContextProvider>
         </Provider>
       </Web3ProviderNetwork>
     </Web3ReactProvider>

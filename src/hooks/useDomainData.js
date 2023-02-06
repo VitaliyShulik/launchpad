@@ -5,9 +5,9 @@ import { useStorageContract } from './useContract';
 import { STORAGE_APP_KEY, ZERO_ADDRESS } from '../constants';
 
 const defaultSettings = () => ({
-  ipfsInfuraDedicatedGateway: '', // process.env.REACT_APP_INFURA_DEDICATED_GATEWAY
-  ipfsInfuraProjectId: '', // process.env.REACT_APP_INFURA_IPFS_KEY
-  ipfsInfuraProjectSecret: '', // process.env.REACT_APP_INFURA_IPFS_SECRET
+  ipfsInfuraDedicatedGateway: '',
+  ipfsInfuraProjectId: '',
+  ipfsInfuraProjectSecret: '',
 
   admin: '',
   projectName: '',

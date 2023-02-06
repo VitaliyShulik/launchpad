@@ -97,16 +97,20 @@ export default function Settings() {
 
       <Tabs>{returnTabs()}</Tabs>
 
-      <s.SpacerMedium />
-
       {tab === 'main' && (
-        <Main />
+        <>
+          <s.SpacerSmall />
+          <Main />
+        </>
       )}
       {tab === 'contracts' && (
         <Contracts />
       )}
       {tab === 'interface' && (
-        <Interface />
+        <>
+          <s.SpacerMedium />
+          <Interface />
+        </>
       )}
       {/* {tab === 'migration' && <Migration />} */}
     </>

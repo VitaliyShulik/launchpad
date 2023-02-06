@@ -4,9 +4,31 @@ import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import "../../App.css";
 import { useApplicationContext } from "../../context/applicationContext";
+import styled from 'styled-components';
 import * as s from "../../styles/global";
 import { Web3Status } from "../Web3Status";
 import Loader from "../Loader";
+import { useWeb3React } from "@web3-react/core";
+import { CURRENCY } from '../../assets/images';
+
+const NetworkCard = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const IconWrapper = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  margin-right: 0.4rem;
+  align-items: center;
+  justify-content: center;
+
+  & > img,
+  span {
+    height: ${({ size }) => (size ? size + 'px' : '24px')};
+    width: ${({ size }) => (size ? size + 'px' : '24px')};
+  }
+`;
 
 const Navigation = () => {
   const {
@@ -26,9 +48,31 @@ const Navigation = () => {
     isFeeTokenDataFetching,
   } = useApplicationContext();
 
+  const { chainId } = useWeb3React();
+
   const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
 
-  const hasFeeToken = !isFeeTokenDataFetching && FeeTokenSymbol && FeeTokenAddress
+  const hasFeeToken = !isFeeTokenDataFetching && FeeTokenSymbol && FeeTokenAddress;
+
+  const getNetworkInfo = () => {
+    if (!chainId) return null;
+
+    const networkImage = CURRENCY[chainId];
+
+    return (
+      chainName && (
+        // TODO: make some wrapped card
+        <NetworkCard title={`${chainName} network`}> 
+          {!!networkImage && (
+            <IconWrapper size={20}>
+              <img src={networkImage} alt="network logo" />
+            </IconWrapper>
+          )}
+          {chainName}
+        </NetworkCard>
+      )
+    )
+  }
 
   return (
     <Navbar collapseOnSelect expand="lg" variant="dark" style={{ margin: 15 }}>
@@ -60,7 +104,7 @@ const Navigation = () => {
             }
           </Nav>
           <Nav>
-            <Nav.Link>{chainName}</Nav.Link>
+            <Nav.Link>{getNetworkInfo()}</Nav.Link>
 
             {
               !hasFeeToken ? (

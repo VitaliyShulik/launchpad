@@ -6,7 +6,6 @@ const Home = () => {
     <s.Container ai="center">
       <s.Container ai="center">
         <s.SpacerLarge />
-        <s.SpacerLarge />
         <s.TextDescription fs={"89px"}>IDOFactory</s.TextDescription>
         <s.TextDescription style={{ textAlign: "center" }}>
           Decentralize IDO launchpad platform

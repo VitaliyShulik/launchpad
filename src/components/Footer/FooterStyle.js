@@ -1,15 +1,9 @@
 import styled from 'styled-components';
    
 export const Box = styled.div`
-  padding: 80px 0px;
   padding-top: 0;
   bottom: 0;
   width: 100%;
-  
-   
-  @media (max-width: 1000px) {
-    padding: 70px 0px;
-  }
 `;
    
 export const Container = styled.div`
@@ -53,7 +47,6 @@ export const Row = styled.div`
    
 export const FooterLink = styled.a`
   color: #fff;
-  margin-bottom: 0.5rem;
   font-size: 18px;
   text-decoration: none;
    
@@ -66,6 +59,6 @@ export const FooterLink = styled.a`
 export const Heading = styled.p`
   font-size: 24px;
   color: #fff;
-  margin-bottom: 1rem;
+  margin-bottom: 0.25rem;
   font-weight: bold;
 `;

@@ -84,8 +84,6 @@ function App() {
                       { isLockerEnabled && <Route path="/locker/:lockerAddress" element={<LockerInfo /> } /> }
                     </Routes>
                     <s.SpacerLarge />
-                    <s.SpacerLarge />
-                    <s.SpacerLarge />
                   </s.Container>
                   <Footer />
                 </s.Container>

@@ -131,14 +131,15 @@ export const ApplicationContextProvider = ({ children }) => {
   const TokenLockerFactoryContract = useLockerFactoryContract(TokenLockerFactoryAddress, true);
   const IDOFactoryContract = useIDOFactoryContract(IDOFactoryAddress, true);
 
-  const isAppConfigured =
+  const isAppConfigured = (
     TokenLockerFactoryAddress
     && IDOFactoryAddress
-    && networks[chainId]?.wsrpc
+    && domainSettings?.networks?.[chainId]?.webSocketRPC
     && domainSettings?.admin
     && domainSettings?.ipfsInfuraDedicatedGateway
     && domainSettings?.ipfsInfuraProjectId
     && domainSettings?.ipfsInfuraProjectSecret
+  );
 
   const value = {
     isAppConfigured,

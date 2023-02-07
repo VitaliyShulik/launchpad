@@ -1,6 +1,5 @@
 // log
 import Web3 from "web3";
-import { networks } from "../../constants/networksInfo";
 import IDOFactory from "../../contracts/IDOFactory.json";
 import LockerFactory from "../../contracts/TokenLockerFactory.json";
 
@@ -24,17 +23,19 @@ const fetchContractFailed = (payload) => {
   };
 };
 
-export const fetchContract = (chainId) => {
+export const fetchContract = (chainId, networks) => {
   return (dispatch) => {
     dispatch(fetchContractRequest());
 
-    const networkWS = networks[chainId].wsrpc;
+    const { webSocketRPC } = networks?.[chainId];
     const IDOFactoryNetworkData = IDOFactory.networks[chainId];
     const LockerFactoryNetworkData = LockerFactory.networks[chainId];
 
-    let web3 = new Web3(networkWS);
     try {
-      if (!networkWS || !IDOFactoryNetworkData?.address || !LockerFactoryNetworkData.address) throw Error("Network is not configured");
+      if (!webSocketRPC || !IDOFactoryNetworkData?.address || !LockerFactoryNetworkData.address) throw Error("Network is not configured");
+
+      const web3 = new Web3(webSocketRPC);
+
       const IDOFactoryContract = new web3.eth.Contract(
         IDOFactory.abi,
         IDOFactoryNetworkData.address

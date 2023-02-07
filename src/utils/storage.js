@@ -7,6 +7,14 @@ const makeBaseStructure = (data) => {
     data[STORAGE_APP_KEY] = {};
   }
 
+  if (!data[STORAGE_APP_KEY].networks) {
+    data[STORAGE_APP_KEY].networks = {}
+  }
+
+  if (!data[STORAGE_APP_KEY].contracts) {
+    data[STORAGE_APP_KEY].contracts = {}
+  }
+
   return data;
 }
 
@@ -20,6 +28,10 @@ const updateData = (oldData, newData) => {
     [STORAGE_APP_KEY]: {
       ...oldData[STORAGE_APP_KEY],
       ...newData,
+      networks: {
+        ...oldData[STORAGE_APP_KEY].networks,
+        ...newData.networks,
+      },
       contracts: {
         ...oldData[STORAGE_APP_KEY].contracts,
         ...newData.contracts,

@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { STORAGE_NETWORK_ID, STORAGE_NETWORK_NAME } from '../../../constants';
+import { STORAGE_NETWORK_ID, STORAGE_NETWORK_NAME } from '../../../../constants';
 import { useWeb3React } from '@web3-react/core';
-import { useApplicationContext } from '../../../context/applicationContext';
-import { isWebUri } from '../../../utils/url';
-import { saveAppData } from '../../../utils/storage';
-import { TextField, Typography, InputLabel, Select, MenuItem } from '@mui/material';
-import * as s from "../../../styles/global";
+import { useApplicationContext } from '../../../../context/applicationContext';
+import { isWebUri } from '../../../../utils/url';
+import { saveAppData } from '../../../../utils/storage';
+import { TextField, Typography } from '@mui/material';
+import * as s from "../../../../styles/global";
 import styled from 'styled-components';
-import Loader from '../../../components/Loader';
+import Loader from '../../../../components/Loader';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { SUPPORTED_NETWORKS, SUPPORTED_CHAIN_IDS } from '../../../connectors';
-import { switchInjectedNetwork } from '../../../utils/utils';
+import { switchInjectedNetwork } from '../../../../utils/utils';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -25,7 +24,7 @@ const ContentWrapper = styled.div`
   )};
 `
 
-export default function Main() {
+export default function IPFS() {
   const { library, chainId, account, connector } = useWeb3React();
   const {
     domain,
@@ -34,8 +33,6 @@ export default function Main() {
   } = useApplicationContext();
 
   const [isLoading, setIsLoading] = useState(false);
-
-  const [networkToSetUp, setNetworkToSetUp] = useState(SUPPORTED_CHAIN_IDS.includes(chainId) ? chainId : STORAGE_NETWORK_ID);
 
   const {
     ipfsInfuraDedicatedGateway: stateIpfsInfuraDedicatedGateway,
@@ -88,7 +85,7 @@ export default function Main() {
     canChangeNetwork,
 ]);
 
-  const saveMainSettings = async () => {
+  const saveIPFSSettings = async () => {
     setIsLoading(true);
 
     try {
@@ -107,11 +104,11 @@ export default function Main() {
           triggerDomainData();
         },
         onHash: (hash) => {
-          console.log('saveMainSettings hash: ', hash);
+          console.log('saveIPFSSettings hash: ', hash);
         },
       })
     } catch (error) {
-      console.group('%c saveMainSettings', 'color: red');
+      console.group('%c saveIPFSSettings', 'color: red');
       console.error(error);
       console.groupEnd();
     } finally {
@@ -168,35 +165,14 @@ export default function Main() {
 
       <s.SpacerSmall />
 
-      <Typography>Networks</Typography>
-
-      <s.SpacerSmall />
-
-      <InputLabel id="selectedNetworkLablel">Selected Network</InputLabel>
-      <Select
-        labelId="selectedNetworkLable"
-        id="selectedNetwork"
-        value={networkToSetUp}
-        label="Network"
-        onChange={(e) => {
-          setNetworkToSetUp(e.target.value);
-        }}
-      >
-        {SUPPORTED_CHAIN_IDS.map((chainId) => (
-          <MenuItem key={chainId} value={chainId}>{SUPPORTED_NETWORKS[chainId].name}</MenuItem>
-        ))}
-      </Select>
-
-      <s.SpacerSmall />
-
       <s.button
-        onClick={canAndShouldSwitchToStorageNetwork ? switchToStorage : saveMainSettings}
+        onClick={canAndShouldSwitchToStorageNetwork ? switchToStorage : saveIPFSSettings}
         disabled={cannotSaveSettings}
       >
         { isLoading
           ? <Loader />
           : isStorageNetwork
-            ? 'Save Settings'
+            ? 'Save Infura IPFS Settings'
             : `Switch to ${STORAGE_NETWORK_NAME}`
         }
       </s.button>

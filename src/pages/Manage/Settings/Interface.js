@@ -405,7 +405,7 @@ export default function Interface() {
         { isLoading
           ? <Loader />
           : isStorageNetwork
-            ? 'Save Settings'
+            ? 'Save Interface Settings'
             : `Switch to ${STORAGE_NETWORK_NAME}`
         }
       </s.button>

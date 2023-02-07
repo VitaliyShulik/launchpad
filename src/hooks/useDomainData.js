@@ -5,6 +5,9 @@ import { useStorageContract } from './useContract';
 import { STORAGE_APP_KEY, ZERO_ADDRESS } from '../constants';
 
 const defaultSettings = () => ({
+  contracts: {},
+  networks: {},
+
   ipfsInfuraDedicatedGateway: '',
   ipfsInfuraProjectId: '',
   ipfsInfuraProjectSecret: '',
@@ -27,10 +30,19 @@ const parseSettings = (settings) => {
     if (!settingsJSON?.[STORAGE_APP_KEY]) {
       settingsJSON[STORAGE_APP_KEY] = {};
     }
+    if (!settingsJSON[STORAGE_APP_KEY]?.contracts) {
+      settingsJSON[STORAGE_APP_KEY].contracts = {};
+    }
+    if (!settingsJSON[STORAGE_APP_KEY]?.networks) {
+      settingsJSON[STORAGE_APP_KEY].networks = {};
+    }
 
     const { [STORAGE_APP_KEY]: parsedSettings } = settingsJSON;
 
     const {
+      contracts,
+      networks,
+
       ipfsInfuraDedicatedGateway,
       ipfsInfuraProjectId,
       ipfsInfuraProjectSecret,
@@ -40,6 +52,9 @@ const parseSettings = (settings) => {
       disableSourceCopyright,
       isLockerEnabled,
     } = parsedSettings;
+
+    appSettings.contracts = contracts
+    appSettings.networks = networks
 
     if (ipfsInfuraDedicatedGateway) appSettings.ipfsInfuraDedicatedGateway = ipfsInfuraDedicatedGateway;
     if (ipfsInfuraProjectId) appSettings.ipfsInfuraProjectId = ipfsInfuraProjectId;

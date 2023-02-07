@@ -61,7 +61,9 @@ export default function Networks() {
   }, [networks, chainIdToSetUp])
 
 
-const saveNetworksData = async () => {
+  const saveNetworksData = async () => {
+    setIsLoading(true);
+
     try {
       await saveAppData({
         library,
@@ -82,11 +84,11 @@ const saveNetworksData = async () => {
         },
       })
     } catch (error) {
-    console.group('%c saveNetworksData', 'color: red');
-    console.error(error);
-    console.groupEnd();
+      console.group('%c saveNetworksData', 'color: red');
+      console.error(error);
+      console.groupEnd();
     } finally {
-    setIsLoading(false);
+      setIsLoading(false);
     }
   }
 

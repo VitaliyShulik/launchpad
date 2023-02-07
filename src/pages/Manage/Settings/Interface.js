@@ -308,6 +308,8 @@ export default function Interface() {
         />
       </Stack>
 
+      <s.SpacerSmall />
+
       {/* <OptionWrapper>
         <TextField
           label={`${t('faviconUrl')}`}

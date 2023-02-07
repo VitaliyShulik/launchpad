@@ -30,6 +30,7 @@ function App() {
     isAppConfigured,
     domainSettings: {
       networks,
+      contracts,
       isLockerEnabled
     },
     isDomainDataFetching,
@@ -38,9 +39,9 @@ function App() {
 
   useEffect(() => {
     if (chainId && isAppConfigured) {
-      dispatch(fetchContract(chainId, networks));
+      dispatch(fetchContract(chainId, networks, contracts));
     }
-  }, [dispatch, account, chainId, isAppConfigured, networks]);
+  }, [dispatch, account, chainId, isAppConfigured, networks, contracts]);
 
   return (
     <Web3ReactManager>

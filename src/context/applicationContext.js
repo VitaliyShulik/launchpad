@@ -1,9 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
 import { SUPPORTED_CHAIN_IDS } from "../connectors";
-import IDOFactory from '../contracts/IDOFactory.json';
-import FeeToken from "../contracts/FeeToken.json";
-import TokenLockerFactory from "../contracts/TokenLockerFactory.json";
 import { useTokenContract, useLockerFactoryContract, useIDOFactoryContract } from "../hooks/useContract";
 import { networks } from "../constants/networksInfo";
 import useDomainData from "../hooks/useDomainData";
@@ -13,10 +10,6 @@ export const Application = createContext({});
 export const ApplicationContextProvider = ({ children }) => {
   const { account, chainId, library, error } = useWeb3React();
 
-  // use blockchain storage state for all contracts' addresses
-  const TokenLockerFactoryAddress = TokenLockerFactory?.networks?.[chainId]?.address;
-  const IDOFactoryAddress = IDOFactory?.networks?.[chainId]?.address;
-  const FeeTokenAddress = FeeToken?.networks?.[chainId]?.address;
 
   const chainName = networks[chainId]?.name;
   const baseCurrencySymbol = networks[chainId]?.baseCurrency?.symbol;
@@ -32,6 +25,39 @@ export const ApplicationContextProvider = ({ children }) => {
     isDomainDataFetched,
     triggerDomainData,
   } = useDomainData();
+
+
+  const [FeeTokenAddress, setFeeTokenAddress] = useState(domainSettings?.contracts?.[chainId]?.FeeTokenAddress|| '');
+  const [IDOFactoryAddress, setIDOFactoryAddress] = useState(domainSettings?.contracts?.[chainId]?.IDOFactoryAddress|| '');
+  const [TokenLockerFactoryAddress, setTokenLockerFactoryAddress] = useState(domainSettings?.contracts?.[chainId]?.TokenLockerFactoryAddress || '');
+
+  const [isAppConfigured, setIsAppConfigured] = useState(Boolean(
+    domainSettings?.contracts?.[chainId]?.FeeTokenAddress
+    && domainSettings?.contracts?.[chainId]?.IDOFactoryAddress
+    && domainSettings?.contracts?.[chainId]?.TokenLockerFactoryAddress
+    && domainSettings?.networks?.[chainId]?.webSocketRPC
+    && domainSettings?.admin
+    && domainSettings?.ipfsInfuraDedicatedGateway
+    && domainSettings?.ipfsInfuraProjectId
+    && domainSettings?.ipfsInfuraProjectSecret
+  ));
+
+  useEffect(() => {
+    setFeeTokenAddress(domainSettings?.contracts?.[chainId]?.FeeTokenAddress|| '');
+    setIDOFactoryAddress(domainSettings?.contracts?.[chainId]?.IDOFactoryAddress|| '');
+    setTokenLockerFactoryAddress(domainSettings?.contracts?.[chainId]?.TokenLockerFactoryAddress || '');
+
+    setIsAppConfigured(Boolean(
+      domainSettings?.contracts?.[chainId]?.FeeTokenAddress
+      && domainSettings?.contracts?.[chainId]?.IDOFactoryAddress
+      && domainSettings?.contracts?.[chainId]?.TokenLockerFactoryAddress
+      && domainSettings?.networks?.[chainId]?.webSocketRPC
+      && domainSettings?.admin
+      && domainSettings?.ipfsInfuraDedicatedGateway
+      && domainSettings?.ipfsInfuraProjectId
+      && domainSettings?.ipfsInfuraProjectSecret
+    ))
+  }, [domainSettings, chainId])
 
   useEffect(() => {
     if (error && error instanceof UnsupportedChainIdError) {
@@ -119,7 +145,7 @@ export const ApplicationContextProvider = ({ children }) => {
       }
     }
 
-    if (account && chainId && FeeTokenContract) {
+    if (account && chainId && FeeTokenContract && IDOFactoryAddress) {
       fetchFeeTokenData();
     } else {
       setFeeTokenSymbol('');
@@ -130,16 +156,6 @@ export const ApplicationContextProvider = ({ children }) => {
 
   const TokenLockerFactoryContract = useLockerFactoryContract(TokenLockerFactoryAddress, true);
   const IDOFactoryContract = useIDOFactoryContract(IDOFactoryAddress, true);
-
-  const isAppConfigured = (
-    TokenLockerFactoryAddress
-    && IDOFactoryAddress
-    && domainSettings?.networks?.[chainId]?.webSocketRPC
-    && domainSettings?.admin
-    && domainSettings?.ipfsInfuraDedicatedGateway
-    && domainSettings?.ipfsInfuraProjectId
-    && domainSettings?.ipfsInfuraProjectSecret
-  );
 
   const value = {
     isAppConfigured,

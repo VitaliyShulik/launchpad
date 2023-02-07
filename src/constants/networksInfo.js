@@ -1,8 +1,7 @@
 export const networks = {
   1: {
     name: "Ethereum",
-    wsrpc: process.env.REACT_APP_ETH_WS_RPC,
-    rpc: `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
+    rpc: 'https://rpc.ankr.com/eth',
     chainId: 1,
     explorer: "https://etherscan.io",
     color: "#627EEA",
@@ -21,7 +20,6 @@ export const networks = {
   },
   56: {
     name: "BSC",
-    wsrpc: process.env.REACT_APP_BSC_WS_RPC,
     rpc: "https://bscrpc.com/",
     chainId: 56,
     explorer: "https://bscscan.com",
@@ -41,8 +39,7 @@ export const networks = {
   },
   5: {
     name: "Görli",
-    wsrpc: process.env.REACT_APP_GoerliETH_WS_RPC,
-    rpc: `https://goerli.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`,
+    rpc: "https://rpc.ankr.com/eth_goerli",
     chainId: 5,
     explorer: "https://goerli.etherscan.io",
     color: "#f6c343",

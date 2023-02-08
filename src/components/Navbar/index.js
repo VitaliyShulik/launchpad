@@ -10,10 +10,12 @@ import { Web3Status } from "../Web3Status";
 import Loader from "../Loader";
 import { useWeb3React } from "@web3-react/core";
 import { CURRENCY } from '../../assets/images';
+import { Paper } from "@mui/material";
 
-const NetworkCard = styled.div`
+const NetworkCard = styled(Paper)`
   display: flex;
   justify-content: center;
+  padding: 0 0.75rem 0 0.5rem;
 `;
 
 const IconWrapper = styled.div`
@@ -62,7 +64,7 @@ const Navigation = () => {
     return (
       chainName && (
         // TODO: make some wrapped card
-        <NetworkCard title={`${chainName} network`}> 
+        <NetworkCard elevation={2} title={`${chainName} network`}> 
           {!!networkImage && (
             <IconWrapper size={20}>
               <img src={networkImage} alt="network logo" />

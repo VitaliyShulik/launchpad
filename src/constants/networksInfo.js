@@ -18,25 +18,6 @@ export const networks = {
       symbol: "WETH"
     }
   },
-  56: {
-    name: "BSC",
-    rpc: "https://bscrpc.com/",
-    chainId: 56,
-    explorer: "https://bscscan.com",
-    color: "#CC9B00",
-    storage: "0xa7472f384339D37EfE505a1A71619212495A973A",
-    multicall: "0x41263cBA59EB80dC200F3E2544eda4ed6A90E76C",
-    baseCurrency: {
-      decimals: 18,
-      name: "BNB",
-      symbol: "BNB"
-    },
-    wrappedToken: {
-      address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
-      name: "Wrapped BNB",
-      symbol: "WBNB"
-    }
-  },
   5: {
     name: "Görli",
     rpc: "https://rpc.ankr.com/eth_goerli",
@@ -57,9 +38,54 @@ export const networks = {
       symbol: "WETH"
     }
   },
+  56: {
+    name: "BSC",
+    rpc: "https://bscrpc.com/",
+    chainId: 56,
+    explorer: "https://bscscan.com",
+    color: "#CC9B00",
+    storage: "0xa7472f384339D37EfE505a1A71619212495A973A",
+    multicall: "0x41263cBA59EB80dC200F3E2544eda4ed6A90E76C",
+    baseCurrency: {
+      decimals: 18,
+      name: "BNB",
+      symbol: "BNB"
+    },
+    wrappedToken: {
+      address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+      name: "Wrapped BNB",
+      symbol: "WBNB"
+    }
+  },
+  97: {
+    name: "BSC Testnet",
+    rpc: "https://data-seed-prebsc-2-s3.binance.org:8545",
+    chainId: 97,
+    explorer: "https://testnet.bscscan.com/",
+    color: "#CC9B00",
+    multicall: "0x6e5BB1a5Ad6F68A8D7D6A5e47750eC15773d6042",
+    baseCurrency: {
+      decimals: 18,
+      name: "BNB",
+      symbol: "BNB"
+    },
+    wrappedToken: {
+      address: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      name: "Wrapped BNB",
+      symbol: "WBNB"
+    }
+  },
 }
 
 export const chainRouter = {
+  1: [
+    {
+      name: "Uniswap",
+      FACTORY: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
+      WETH: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      ROUTER: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+    },
+  ],
   5: [
     {
       name: "Uniswap",
@@ -76,20 +102,12 @@ export const chainRouter = {
       ROUTER: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
     },
   ],
-  96: [
+  97: [
     {
-      name: "UniswapX DEX",
-      FACTORY: "0x4b81A5610968B79EFC5dC12CA98264DeFcd3f778",
-      WETH: "0x2E27E20Da584bE8349Db668d2C85c16fab560B20",
-      ROUTER: "0x429368f41d8a2B256EA2Dc4F3D2Ae42935010F78",
-    },
-  ],
-  3: [
-    {
-      name: "Uniswap",
-      FACTORY: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
-      WETH: "0xc778417e063141139fce010982780140aa0cd5ab",
-      ROUTER: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      name: "PancakeSwap",
+      FACTORY: "0x6725F303b657a9451d8BA641348b6761A6CC7a17",
+      WETH: "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      ROUTER: "0xD99D1c33F9fC3444f8101754aBC46c52416550D1",
     },
   ],
 };

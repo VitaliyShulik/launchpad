@@ -21,7 +21,7 @@ const Copyright = styled.p`
   ${({ pale }) => (pale ? `opacity: 0.92; font-size: 0.96em;` : '')}
 
   a {
-    color: #2568af;
+    color: var(--primary);
     text-decoration: none;
   }
 `

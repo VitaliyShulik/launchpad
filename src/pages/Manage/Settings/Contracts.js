@@ -3,7 +3,17 @@ import { STORAGE_NETWORK_ID, STORAGE_NETWORK_NAME } from '../../../constants';
 import { useWeb3React } from '@web3-react/core';
 import { useApplicationContext } from '../../../context/applicationContext';
 import { saveAppData } from '../../../utils/storage';
-import { TextField, InputLabel, Select, MenuItem } from '@mui/material';
+import {
+  TextField,
+  InputLabel,
+  Select,
+  MenuItem,
+  Accordion as AccordionMUI,
+  AccordionSummary,
+  AccordionDetails,
+  Typography,
+} from '@mui/material';
+import { FaAngleDown } from "react-icons/fa";
 import * as s from "../../../styles/global";
 import styled from 'styled-components';
 import Loader from '../../../components/Loader';
@@ -22,7 +32,11 @@ const ContentWrapper = styled.div`
     opacity: 0.6;
     ` : ''
   )};
-`
+`;
+
+const Accordion = styled(AccordionMUI)`
+
+`;
 
 export default function Contracts() {
   const { library, chainId, account, connector } = useWeb3React();
@@ -41,6 +55,12 @@ export default function Contracts() {
   const [IDOFactoryAddress, setIDOFactoryAddress] = useState(contracts?.[chainId || 0]?.IDOFactoryAddress || '');
   const [TokenLockerFactoryAddress, setTokenLockerFactoryAddress] = useState(contracts?.[chainId || 0]?.TokenLockerFactoryAddress || '');
   const [canSaveNetworksSettings, setCanSaveNetworksSettings] = useState(false);
+
+  const [hasDeployedContract, setHasDeployedContract] = useState(Boolean(
+    contracts?.[chainId || 0]?.FeeTokenAddress &&
+    contracts?.[chainId || 0]?.IDOFactoryAddress &&
+    contracts?.[chainId || 0]?.TokenLockerFactoryAddress
+  ));
 
   const isStorageNetwork = chainId === STORAGE_NETWORK_ID;
   const canChangeNetwork = (connector instanceof InjectedConnector);
@@ -73,6 +93,13 @@ export default function Contracts() {
     setFeeTokenAddress(contracts?.[chainIdToSetUp || 0]?.FeeTokenAddress || '');
     setIDOFactoryAddress(contracts?.[chainIdToSetUp || 0]?.IDOFactoryAddress || '');
     setTokenLockerFactoryAddress(contracts?.[chainIdToSetUp || 0]?.TokenLockerFactoryAddress || '');
+
+    setHasDeployedContract(Boolean(
+      contracts?.[chainIdToSetUp || 0]?.FeeTokenAddress &&
+      contracts?.[chainIdToSetUp || 0]?.IDOFactoryAddress &&
+      contracts?.[chainIdToSetUp || 0]?.TokenLockerFactoryAddress
+    ));
+
   }, [contracts, chainIdToSetUp])
 
 
@@ -138,6 +165,69 @@ export default function Contracts() {
           <MenuItem key={chainId} value={chainId}>{SUPPORTED_NETWORKS[chainId].name}</MenuItem>
         ))}
       </Select>
+
+      <s.SpacerSmall />
+
+      { chainIdToSetUp ? (
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<FaAngleDown />}
+            aria-controls="deployment-content"
+            id="deployment-header"
+          >
+            <Typography>Deployment</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            {hasDeployedContract &&
+              <s.Text small warning>
+                {
+                  `You have already deployed swap contracts.
+                  This means that if you deploy the contracts again, the previous contract addresses will be replaced by the new ones.
+                  The new contracts will not have any previously set IDOPools, Token Lockers or fee configurations`
+                }
+              </s.Text>
+            }
+            {chainIdToSetUp !== STORAGE_NETWORK_ID &&
+              <s.Text small warning>
+                {
+                  `If you deploy contracts from a network other than the ${STORAGE_NETWORK_NAME} Storage network, you need to save them manually.
+                  Switch to Storage Network, fill in the fields below and save it.
+                  You can also use existing contracts, but only if they are related to the IDOFactory app`
+                }
+              </s.Text>
+            }
+            {!hasDeployedContract && !FeeTokenAddress ? (
+              <s.Text small warning>
+                The Fee Token Address field is empty.
+              </s.Text>
+            ) : !isAddress(FeeTokenAddress) && (
+              <s.Text small error>
+                The Fee Token Address is not correct.
+              </s.Text>
+            )}
+
+            <s.Text small>
+              You are going to deploy contracts of the IDOFactory application. You have to confirm these transactions:
+              <br />
+              1. Deploy IDOFactory contract
+              <br />
+              2. Deploy TokenLockerFactory contract
+            </s.Text>
+
+            <s.button
+              fullWidth
+              onClick={() => console.log('deploy contracts')}
+              disabled={false}
+            >
+              { isLoading ? <Loader /> : 'Deploy contracts' }
+            </s.button>
+          </AccordionDetails>
+        </Accordion>
+      ) : (
+        <s.Text small warning>
+          Please, select the Network
+        </s.Text>
+      )}
 
       <s.SpacerSmall />
 

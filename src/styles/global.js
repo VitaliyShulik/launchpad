@@ -182,6 +182,37 @@ export const LogoTitle = styled.img`
   margin-right: 1rem;
 `;
 
+export const Text = styled.div`
+  margin: 0.6rem 0;
+  font-size: 1.2rem;
+  line-height: 1.5rem;
+  word-break: break-word;
+
+  ${({ small }) =>
+    small ? 'font-size: 0.8rem;' : ''
+  }
+
+  ${({ medium }) =>
+    medium ? 'font-size: 1rem;' : ''
+  }
+
+  ${({ warning }) =>
+    warning ? `padding: .6rem; border-radius: .3rem; background-color: var(--warning);` : ''
+  }
+
+  ${({ success }) =>
+    success ? `padding: .6rem; border-radius: .3rem; background-color: var(--success);` : ''
+  }
+
+  ${({ error }) =>
+    error ? `padding: .6rem; border-radius: .3rem; background-color: var(--error);` : ''
+  }
+
+  :first-child {
+    margin-top: 0;
+  }
+`;
+
 export const TextTitle = styled.p`
   color: var(--text);
   width: ${({ fullWidth }) => (fullWidth ? "100%" : "none")};
@@ -308,6 +339,11 @@ export const button = styled.button`
   padding: 5px 20px;
   border-radius: 20px;
   color: ${({ secondary }) => (secondary ? "var(--secondary-color)" : "var(--card)")};
+
+  ${({ fullWidth }) =>
+    fullWidth ? 'width: 100%;' : ''
+  }
+
   :disabled {
     background-color: transparent;
     box-shadow: none;

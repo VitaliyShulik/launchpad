@@ -11,19 +11,6 @@ import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import Loader from '../../components/Loader';
 import { saveAppData } from '../../utils/storage';
 
-const Text = styled.div`
-  margin: 0.6rem 0;
-  font-size: 1.2rem;
-  line-height: 1.5rem;
-  word-break: break-word;
-  ${({ warning }) =>
-    warning ? `padding: .6rem; border-radius: .3rem; background-color: var(--warning);` : ''}
-
-  :first-child {
-    margin-top: 0;
-  }
-`;
-
 const Span = styled.span`
   ${({ block }) =>
     block
@@ -117,18 +104,18 @@ export default function Greetings() {
         <FaRegHandPeace size="2.4rem" className="icon" />
       </s.IconWrapper>
 
-      <Text>
+      <s.Text>
         <s.Title>Hello! Let's connect this domain to your wallet address</s.Title>
         Set your address as the owner of this domain: <Span bold>{domain}</Span>?
         <Span block bold>
           {account}
         </Span>
         Only this address can access and change app settings.
-      </Text>
+      </s.Text>
 
-      <Text warning>If you want to change the address, switch to another address. If you can't switch, just disconnect your wallet and connect it to the new address.</Text>
+      <s.Text warning>If you want to change the address, switch to another address. If you can't switch, just disconnect your wallet and connect it to the new address.</s.Text>
 
-      {!onStorageNetwork && <Text warning>You have to be on {STORAGE_NETWORK_NAME}</Text>}
+      {!onStorageNetwork && <s.Text warning>You have to be on {STORAGE_NETWORK_NAME}</s.Text>}
 
       <ButtonBlock>
         <ActionButton disabled={isSavingDomainOwner} secondary onClick={deactivate}>Disconnect</ActionButton>

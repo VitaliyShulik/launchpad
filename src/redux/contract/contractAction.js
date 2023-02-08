@@ -27,8 +27,9 @@ export const fetchContract = (chainId, networks, contracts) => {
   return (dispatch) => {
     dispatch(fetchContractRequest());
 
-    const { webSocketRPC } = networks?.[chainId];
-    const { IDOFactoryAddress, TokenLockerFactoryAddress } = contracts?.[chainId];
+    const webSocketRPC = networks?.[chainId]?.webSocketRPC;
+    const IDOFactoryAddress = contracts?.[chainId]?.IDOFactoryAddress;
+    const TokenLockerFactoryAddress = contracts?.[chainId]?.TokenLockerFactoryAddress;
 
     try {
       if (!webSocketRPC || !IDOFactoryAddress || !TokenLockerFactoryAddress) throw Error("Network is not configured");

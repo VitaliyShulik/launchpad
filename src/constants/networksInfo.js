@@ -70,10 +70,10 @@ export const chainRouter = {
   ],
   56: [
     {
-      name: "Pancakeswap",
-      FACTORY: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
-      WETH: "0xc778417e063141139fce010982780140aa0cd5ab",
-      ROUTER: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D",
+      name: "PancakeSwap",
+      FACTORY: "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73",
+      WETH: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+      ROUTER: "0x10ED43C718714eb63d5aA57B78B54704E256024E",
     },
   ],
   96: [

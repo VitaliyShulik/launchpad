@@ -5,7 +5,7 @@ import { FaImage } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useStoreContext } from "../../../../context/store";
 import * as s from "../../../../styles/global";
-import { chainRouter } from "../../../../utils/chainInfo";
+import { chainRouter } from "../../../../constants/networksInfo";
 import SocialMediaModal from "../../../Modal/socialmediaModal";
 import { useApplicationContext } from "../../../../context/applicationContext";
 import { useTokenContract } from "../../../../hooks/useContract";
@@ -99,7 +99,7 @@ export default function Preview() {
     }
 
     fetchIDOFactoryFee();
-  }, []);
+  }, [IDOFactoryContract]);
 
   const pinJSONToIPFS = async (JSONBody) => {
     try {

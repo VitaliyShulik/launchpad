@@ -4,8 +4,7 @@ import { Contract } from '@ethersproject/contracts';
 import ERC20 from "../contracts/ERC20.json";
 import IDOPool from "../contracts/IDOPool.json";
 import Locker from "../contracts/TokenLocker.json";
-import { chainRouter } from "./chainInfo";
-import { networks } from '../constants/networksInfo';
+import { networks, chainRouter } from '../constants/networksInfo';
 import { ZERO_ADDRESS } from '../constants';
 
 export function randomIntFromInterval(min, max) {

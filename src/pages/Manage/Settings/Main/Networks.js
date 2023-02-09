@@ -106,7 +106,7 @@ export default function Networks() {
 
   return (
     <ContentWrapper disabled={isLoading}>
-      <Typography>Networks</Typography>
+      <Typography variant="h6">Networks</Typography>
 
       <s.SpacerSmall />
 

@@ -130,7 +130,7 @@ export default function IPFS() {
 
   return (
     <ContentWrapper disabled={isLoading}>
-      <Typography>Infura IPFS</Typography>
+      <Typography variant="h6">Infura IPFS</Typography>
 
       <s.SpacerSmall />
 

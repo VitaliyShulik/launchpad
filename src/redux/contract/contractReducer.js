@@ -1,7 +1,7 @@
 const initialState = {
   loading: false,
   IDOFactory: null,
-  LockerFactory: null,
+  TokenLockerFactory: null,
   web3: null,
   error: false,
   errorMsg: "",
@@ -20,7 +20,7 @@ const contractReducer = (state = initialState, action) => {
         loading: false,
         onsale: action.payload.onsale,
         IDOFactory: action.payload.IDOFactory,
-        LockerFactory: action.payload.LockerFactory,
+        TokenLockerFactory: action.payload.TokenLockerFactory,
         web3: action.payload.web3,
       };
     case "CHECK_CONTRACT_FAILED":

@@ -17,6 +17,8 @@ export const PoolContextProvider = ({ children }) => {
   const contract = useSelector((state) => state.contract);
   const { account } = useWeb3React();
 
+  // TODO: reset timeouts, all pools and lockers data after change chainId
+
   const {
     domainSettings: {
       ipfsInfuraDedicatedGateway
@@ -93,11 +95,11 @@ export const PoolContextProvider = ({ children }) => {
   }, [dispatch, contract]);
 
   useEffect(async () => {
-    if (!contract.LockerFactory) {
+    if (!contract.TokenLockerFactory) {
       return null;
     }
 
-    contract.LockerFactory.events.LockerCreated(
+    contract.TokenLockerFactory.events.LockerCreated(
       {
         fromBlock: 0,
       },

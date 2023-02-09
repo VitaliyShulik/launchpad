@@ -1,7 +1,7 @@
 // log
 import Web3 from "web3";
 import IDOFactory from "../../contracts/IDOFactory.json";
-import LockerFactory from "../../contracts/TokenLockerFactory.json";
+import TokenLockerFactory from "../../contracts/TokenLockerFactory.json";
 
 const fetchContractRequest = () => {
   return {
@@ -41,13 +41,13 @@ export const fetchContract = (chainId, networks, contracts) => {
         IDOFactoryAddress
       );
       const LockerFactoryContract = new web3.eth.Contract(
-        LockerFactory.abi,
+        TokenLockerFactory.abi,
         TokenLockerFactoryAddress
       );
       dispatch(
         fetchContractSuccess({
           IDOFactory: IDOFactoryContract,
-          LockerFactory: LockerFactoryContract,
+          TokenLockerFactory: LockerFactoryContract,
           web3,
         })
       );

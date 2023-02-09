@@ -1,107 +1,100 @@
+import TokenLockerFactory from '../contracts/TokenLockerFactory.json';
+import IDOFactory from '../contracts/IDOFactory.json';
+
 export const getContractInstance = (web3, address, abi) => {
   return new web3.eth.Contract(abi, address)
 }
 
-// const deployContract = async (params) => {
-//   const { abi, byteCode, library, onDeploy = () => {}, onHash = () => {}, deployArguments } = params
+const deployContract = async (params) => {
+  const { abi, byteCode, library, onDeploy = () => {}, onHash = () => {}, deployArguments } = params;
 
-//   let contract
-//   let accounts
+  let contract;
+  let accounts;
 
-//   try {
-//     const web3 = getWeb3Library(library.provider)
+  try {
+    const { web3 } = library;
 
-//     contract = new web3.eth.Contract(abi)
-//     //@ts-ignore
-//     accounts = await window.ethereum.request({ method: 'eth_accounts' })
+    contract = new web3.eth.Contract(abi);
 
-//     const transaction = contract.deploy({
-//       data: byteCode,
-//       arguments: deployArguments,
-//     })
+    accounts = await window.ethereum.request({ method: 'eth_accounts' });
 
-//     const gasLimit = await transaction.estimateGas({ from: accounts[0] })
-//     const gasPrice = await web3.eth.getGasPrice()
+    const transaction = contract.deploy({
+      data: byteCode,
+      arguments: deployArguments,
+    });
 
-//     return await transaction
-//       .send({
-//         from: accounts[0],
-//         gas: gasLimit,
-//         gasPrice,
-//       })
-//       .on('transactionHash', (hash: string) => onHash(hash))
-//       .on('receipt', (receipt: any) => onDeploy(receipt))
-//       .on('error', (error: any) => console.error(error))
-//   } catch (error) {
-//     throw error
-//   }
-// }
+    const gasLimit = await transaction.estimateGas({ from: accounts[0] });
+    const gasPrice = await web3.eth.getGasPrice();
 
-// export const deployFactory = async (params: any) => {
-//   const { library, onHash, admin, devFeeAdmin } = params
-//   const { abi, bytecode } = Factory
+    return await transaction
+      .send({
+        from: accounts[0],
+        gas: gasLimit,
+        gasPrice,
+      })
+      .on('transactionHash', (hash) => onHash(hash))
+      .on('receipt', (receipt) => onDeploy(receipt))
+      .on('error', (error) => console.error(error));
+  } catch (error) {
+    throw error;
+  }
+}
 
-//   return deployContract({
-//     abi,
-//     byteCode: bytecode,
-//     deployArguments: [admin, devFeeAdmin],
-//     library,
-//     onHash,
-//   })
-// }
+export const deployIDOFactory = async ({ library, onHash, FeeTokenAddress }) => {
+  const { abi, bytecode } = IDOFactory;
 
-// export const deployRouter = async (params: any) => {
-//   const { library, factory, onHash, wrappedToken } = params
-//   const { abi, bytecode } = RouterV2
+  return deployContract({
+    abi,
+    byteCode: bytecode,
+    deployArguments: [FeeTokenAddress, "0", "0"],
+    library,
+    onHash,
+  });
+}
 
-//   return deployContract({
-//     abi,
-//     byteCode: bytecode,
-//     deployArguments: [factory, wrappedToken],
-//     library,
-//     onHash,
-//   })
-// }
+export const deployLockerFactory = async ({ library, onHash }) => {
+  const { abi, bytecode } = TokenLockerFactory;
 
-// export const deploySwapContracts = async (params: {
-//   admin: string
-//   chainId: number
-//   library: Web3Provider
-//   wrappedToken: string
-//   devFeeAdmin: string
-//   onFactoryHash?: (hash: string) => void
-//   onRouterHash?: (hash: string) => void
-//   onSuccessfulDeploy?: (params: { chainId: number; factory: string; router: string }) => void
-// }) => {
-//   const { admin, chainId, library, wrappedToken, devFeeAdmin, onFactoryHash, onRouterHash, onSuccessfulDeploy } = params
+  return deployContract({
+    abi,
+    byteCode: bytecode,
+    deployArguments: [],
+    library,
+    onHash,
+  });
+}
 
-//   try {
-//     const factory = await deployFactory({
-//       onHash: onFactoryHash,
-//       library,
-//       admin,
-//       devFeeAdmin,
-//     })
+export const deployLaunchpadContracts = async ({
+  chainId,
+  library,
+  FeeTokenAddress,
+  onIDOFactoryHash,
+  onLockerFactoryHash,
+  onSuccessfulDeploy
+}) => {
 
-//     if (factory) {
-//       const router = await deployRouter({
-//         onHash: onRouterHash,
-//         library,
-//         factory: factory.options.address,
-//         wrappedToken,
-//       })
+  try {
+    const IDOFactory = await deployIDOFactory({
+      onHash: onIDOFactoryHash,
+      library,
+      FeeTokenAddress,
+    });
 
-//       if (typeof onSuccessfulDeploy === 'function') {
-//         onSuccessfulDeploy({
-//           chainId,
-//           factory: factory.options.address,
-//           router: router.options.address,
-//         })
-//       }
-//     } else {
-//       throw new Error('No factory contract')
-//     }
-//   } catch (error) {
-//     throw error
-//   }
-// }
+    const LockerFactory = await deployLockerFactory({
+      onHash: onLockerFactoryHash,
+      library,
+    });
+
+    if (typeof onSuccessfulDeploy === 'function') {
+      onSuccessfulDeploy({
+        chainId,
+        FeeTokenAddress,
+        IDOFactoryAddress: IDOFactory.options.address,
+        TokenLockerFactoryAddress: LockerFactory.options.address,
+      });
+    }
+
+  } catch (error) {
+    throw error;
+  }
+}

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import Web3 from 'web3';
-import LockerFactory from '../contracts/TokenLockerFactory.json';
+import TokenLockerFactory from '../contracts/TokenLockerFactory.json';
 import Locker from "../contracts/TokenLocker.json";
 import IDOFactory from '../contracts/IDOFactory.json';
 import IDOPool from "../contracts/IDOPool.json";
@@ -44,7 +44,7 @@ function useContract(address, ABI, withSignerIfPossible = true) {
 }
 
 export function useLockerFactoryContract(address, withSignerIfPossible) {
-  return useContract(address, LockerFactory.abi, withSignerIfPossible)
+  return useContract(address, TokenLockerFactory.abi, withSignerIfPossible)
 }
 
 export function useLockerContract(address, withSignerIfPossible) {

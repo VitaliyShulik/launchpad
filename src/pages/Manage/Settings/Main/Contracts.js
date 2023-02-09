@@ -1,8 +1,16 @@
 import { useState, useEffect } from 'react';
-import { STORAGE_NETWORK_ID, STORAGE_NETWORK_NAME } from '../../../../constants';
 import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
+
 import { useApplicationContext } from '../../../../context/applicationContext';
+import { STORAGE_NETWORK_ID, STORAGE_NETWORK_NAME } from '../../../../constants';
+import { SUPPORTED_NETWORKS, SUPPORTED_CHAIN_IDS } from '../../../../connectors';
+import { isAddress, switchInjectedNetwork } from '../../../../utils/utils';
+import { deployLaunchpadContracts } from '../../../../utils/contract';
 import { saveAppData } from '../../../../utils/storage';
+
+import styled from 'styled-components';
+import { FaAngleDown } from "react-icons/fa";
 import {
   TextField,
   InputLabel,
@@ -12,14 +20,11 @@ import {
   AccordionSummary,
   AccordionDetails,
   Typography,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
-import { FaAngleDown } from "react-icons/fa";
 import * as s from "../../../../styles/global";
-import styled from 'styled-components';
 import Loader from '../../../../components/Loader';
-import { InjectedConnector } from '@web3-react/injected-connector';
-import { SUPPORTED_NETWORKS, SUPPORTED_CHAIN_IDS } from '../../../../connectors';
-import { isAddress, switchInjectedNetwork } from '../../../../utils/utils';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -62,20 +67,31 @@ export default function Contracts() {
     contracts?.[chainId || 0]?.TokenLockerFactoryAddress
   ));
 
+  const [isRedeployAllowed, setIsRedeployAllowed] = useState(false);
+  const [isChainIdForDeploying, setIsChainIdForDeploying] = useState(chainId === chainIdToSetUp);
+  const [isDeployingContracts, setIsDeployingContracts] = useState(false);
+  const [canDeploySwapContracts, setCanDeploySwapContracts] = useState(
+    !isDeployingContracts &&
+    FeeTokenAddress &&
+    isAddress(FeeTokenAddress) &&
+    (chainIdToSetUp === chainId) &&
+    (!hasDeployedContract || (hasDeployedContract && isRedeployAllowed))
+  );
+
   const isStorageNetwork = chainId === STORAGE_NETWORK_ID;
   const canChangeNetwork = (connector instanceof InjectedConnector);
 
   useEffect(() => {
     const isDifferentContracts = (
-      FeeTokenAddress.toLowerCase() !== contracts?.[chainIdToSetUp || 0]?.FeeTokenAddress?.toLowerCase() ||
-      IDOFactoryAddress.toLowerCase() !== contracts?.[chainIdToSetUp || 0]?.IDOFactoryAddress?.toLowerCase() ||
-      TokenLockerFactoryAddress.toLowerCase() !== contracts?.[chainIdToSetUp || 0]?.TokenLockerFactoryAddress?.toLowerCase()
+      FeeTokenAddress?.toLowerCase() !== contracts?.[chainIdToSetUp || 0]?.FeeTokenAddress?.toLowerCase() ||
+      IDOFactoryAddress?.toLowerCase() !== contracts?.[chainIdToSetUp || 0]?.IDOFactoryAddress?.toLowerCase() ||
+      TokenLockerFactoryAddress?.toLowerCase() !== contracts?.[chainIdToSetUp || 0]?.TokenLockerFactoryAddress?.toLowerCase()
     );
 
     const isSameContractAddresses = (
-      FeeTokenAddress.toLowerCase() === IDOFactoryAddress.toLowerCase() ||
-      FeeTokenAddress.toLowerCase() === TokenLockerFactoryAddress.toLowerCase() ||
-      IDOFactoryAddress.toLowerCase() === TokenLockerFactoryAddress.toLowerCase()
+      FeeTokenAddress?.toLowerCase() === IDOFactoryAddress?.toLowerCase() ||
+      FeeTokenAddress?.toLowerCase() === TokenLockerFactoryAddress?.toLowerCase() ||
+      IDOFactoryAddress?.toLowerCase() === TokenLockerFactoryAddress?.toLowerCase()
     );
 
     setCanSaveNetworksSettings(
@@ -100,7 +116,23 @@ export default function Contracts() {
       contracts?.[chainIdToSetUp || 0]?.TokenLockerFactoryAddress
     ));
 
-  }, [contracts, chainIdToSetUp])
+    setIsRedeployAllowed(false);
+
+  }, [contracts, chainIdToSetUp]);
+
+
+  useEffect(() => {
+    setCanDeploySwapContracts(
+      !isDeployingContracts &&
+      FeeTokenAddress &&
+      isAddress(FeeTokenAddress) &&
+      (!hasDeployedContract || (hasDeployedContract && isRedeployAllowed))
+    )
+  }, [isDeployingContracts, FeeTokenAddress, hasDeployedContract, isRedeployAllowed]);
+
+  useEffect(() => {
+    setIsChainIdForDeploying(chainId === chainIdToSetUp);
+  }, [chainId, chainIdToSetUp]);
 
 
   const saveContractsData = async () => {
@@ -135,11 +167,11 @@ export default function Contracts() {
     }
   }
 
-  const switchToStorage = async () => {
+  const switchToInjectedNetwork = async (chainId) => {
     setIsLoading(true);
 
     try {
-      await switchInjectedNetwork(STORAGE_NETWORK_ID);
+      await switchInjectedNetwork(chainId);
     } catch (error) {
       console.error(error);
     } finally {
@@ -147,8 +179,49 @@ export default function Contracts() {
     }
   }
 
+  const onContractsDeployment = async () => {
+    if (!chainId) return
+
+    setIsDeployingContracts(true)
+
+    try {
+      await deployLaunchpadContracts({
+        chainId: chainIdToSetUp,
+        library,
+        FeeTokenAddress,
+        onIDOFactoryHash: (hash) => {
+          console.log('onIDOFactoryHash: ', hash)
+        },
+        onLockerFactoryHash: (hash) => {
+          console.log('onLockerFactoryHash: ', hash)
+        },
+        onSuccessfulDeploy: async ({ chainId, FeeTokenAddress, IDOFactoryAddress, TokenLockerFactoryAddress }) => {
+          console.log('deployLaunchpadContracts onSuccessfulDeploy', {
+            chainId,
+            FeeTokenAddress,
+            IDOFactoryAddress,
+            TokenLockerFactoryAddress
+          });
+          setFeeTokenAddress(FeeTokenAddress);
+          setIDOFactoryAddress(IDOFactoryAddress);
+          setTokenLockerFactoryAddress(TokenLockerFactoryAddress);
+
+          triggerDomainData();
+
+          // TODO: save addresses to the local storage and offer set these after switch at setting up network
+        },
+      })
+    } catch (error) {
+      console.group('%c onContractsDeployment', 'color: red');
+      console.error(error);
+      console.groupEnd();
+    } finally {
+      setIsDeployingContracts(false);
+    }
+  }
+
   return (
-    <ContentWrapper disabled={isLoading}>
+    <ContentWrapper disabled={isLoading || isDeployingContracts}>
       <Typography variant="h6">Contracts</Typography>
 
       <s.SpacerSmall />
@@ -181,13 +254,25 @@ export default function Contracts() {
           </AccordionSummary>
           <AccordionDetails>
             {hasDeployedContract &&
-              <s.Text small warning>
-                {
-                  `You have already deployed swap contracts.
-                  This means that if you deploy the contracts again, the previous contract addresses will be replaced by the new ones.
-                  The new contracts will not have any previously set IDOPools, Token Lockers or fee configurations`
-                }
-              </s.Text>
+              <>
+                <s.Text small warning>
+                  {
+                    `You have already deployed swap contracts.
+                    This means that if you deploy the contracts again, the previous contract addresses will be replaced by the new ones.
+                    The new contracts will not have any previously set IDOPools, Token Lockers or fee configurations`
+                  }
+                </s.Text>
+
+                <FormControlLabel
+                  control={<Checkbox
+                    checked={isRedeployAllowed}
+                    onChange={() => {
+                      setIsRedeployAllowed((prevState) => !prevState);
+                    }}
+                  />}
+                  label="Allow re-deploy"
+                />
+              </>
             }
             {chainIdToSetUp !== STORAGE_NETWORK_ID &&
               <s.Text small warning>
@@ -216,13 +301,25 @@ export default function Contracts() {
               2. Deploy TokenLockerFactory contract
             </s.Text>
 
-            <s.button
-              fullWidth
-              onClick={() => console.log('deploy contracts')}
-              disabled={false}
-            >
-              { isLoading ? <Loader /> : 'Deploy contracts' }
-            </s.button>
+            {
+              isChainIdForDeploying ? (
+                <s.button
+                  fullWidth
+                  onClick={onContractsDeployment}
+                  disabled={!canDeploySwapContracts}
+                >
+                  { isDeployingContracts ? <Loader /> : 'Deploy contracts' }
+                </s.button>
+              ) : (
+                <s.button
+                  fullWidth
+                  onClick={() => switchToInjectedNetwork(chainIdToSetUp)}
+                  disabled={!canChangeNetwork}
+                >
+                  { isLoading ? <Loader /> : `Switch to ${SUPPORTED_NETWORKS[chainIdToSetUp].name}` }
+                </s.button>
+              )
+            }
           </AccordionDetails>
         </Accordion>
       ) : (
@@ -276,7 +373,7 @@ export default function Contracts() {
           </s.button>
         ) : (
           <s.button
-            onClick={switchToStorage}
+            onClick={() => switchToInjectedNetwork(STORAGE_NETWORK_ID)}
             disabled={!canChangeNetwork}
           >
             { isLoading ? <Loader /> : `Switch to ${STORAGE_NETWORK_NAME}` }

@@ -6,7 +6,6 @@ import * as s from "../../styles/global";
 import { useApplicationContext } from "../../context/applicationContext";
 import {
   Box,
-  Column,
   Container,
   FooterLink,
   Heading,
@@ -30,6 +29,7 @@ const Footer = () => {
   const {
     domainSettings: {
       projectName,
+      socialLinks,
       isLockerEnabled,
       disableSourceCopyright,
     },
@@ -37,7 +37,6 @@ const Footer = () => {
     IDOFactoryAddress,
     TokenLockerFactoryAddress,
   } = useApplicationContext();
-
 
   const year = new Date().getFullYear()
   const copyright = `© ${projectName} ${year}`
@@ -92,33 +91,15 @@ const Footer = () => {
         <s.SpacerMedium />
 
         <Row jc="space-evenly" >
-          <SocialIcon
-            network="email"
-            url={`mailto:support@onout.org?subject=${projectName || 'IDOFactory'}&body=Hello, write you from ${projectName || 'IDOFactory'} app...`}
-            target="_blank"
-            bgColor="#fff"
-            fgColor="#000000"
-          />
-          <SocialIcon
-            network="telegram"
-            url="https://t.me/swaponline"
-            target="_blank"
-            bgColor="#fff"
-            fgColor="#000000"
-          />
-          <SocialIcon
-            network="discord"
-            url="https://discord.gg/ukkgCUsU5c"
-            target="_blank"
-            bgColor="#fff"
-            fgColor="#000000"
-          />
-          <SocialIcon
-            url="https://tools.onout.org/"
-            target="_blank"
-            bgColor="#fff"
-            fgColor="#000000"
-          />
+          {socialLinks?.length > 0 && socialLinks.map((link, i) => (
+            <SocialIcon
+              key={i}
+              url={link}
+              target="_blank"
+              bgColor="#fff"
+              fgColor="#000000"
+            />
+          ))}
         </Row>
 
         <s.SpacerMedium />

@@ -4,6 +4,8 @@ import { getCurrentDomain } from '../utils/utils';
 import { useStorageContract } from './useContract';
 import { STORAGE_APP_KEY, ZERO_ADDRESS } from '../constants';
 
+const isValidArray = (arr) => Array.isArray(arr) && !!arr.length
+
 const defaultSettings = () => ({
   contracts: {},
   networks: {},
@@ -15,6 +17,7 @@ const defaultSettings = () => ({
   admin: '',
   projectName: '',
   logoUrl: '',
+  socialLinks: [],
   disableSourceCopyright: false,
   isLockerEnabled: true,
 });
@@ -49,6 +52,7 @@ const parseSettings = (settings) => {
 
       projectName,
       logoUrl,
+      socialLinks,
       disableSourceCopyright,
       isLockerEnabled,
     } = parsedSettings;
@@ -61,7 +65,8 @@ const parseSettings = (settings) => {
     if (ipfsInfuraProjectSecret) appSettings.ipfsInfuraProjectSecret = ipfsInfuraProjectSecret;
 
     if (projectName) appSettings.projectName = projectName;
-    if (logoUrl) appSettings.logoUrl = logoUrl;
+    if (logoUrl) appSettings.logoUrl = logoUrl
+    if (isValidArray(socialLinks)) appSettings.socialLinks = socialLinks;
     if (typeof disableSourceCopyright === "boolean") appSettings.disableSourceCopyright = disableSourceCopyright;
     if (typeof isLockerEnabled === "boolean") appSettings.isLockerEnabled = isLockerEnabled;
 

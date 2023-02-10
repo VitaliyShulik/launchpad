@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
-import { STORAGE_NETWORK_ID, STORAGE_NETWORK_NAME } from '../../../constants';
+import { STORAGE_NETWORK_ID, STORAGE_NETWORK_NAME } from '../../../../constants';
 import { useWeb3React } from '@web3-react/core';
-import { useApplicationContext } from '../../../context/applicationContext';
-import { isWebUri } from '../../../utils/url';
-import { saveAppData } from '../../../utils/storage';
+import { useApplicationContext } from '../../../../context/applicationContext';
+import { isWebUri } from '../../../../utils/url';
+import { saveAppData } from '../../../../utils/storage';
 import { TextField, Stack, Typography, Switch } from '@mui/material';
-import * as s from "../../../styles/global";
+import * as s from "../../../../styles/global";
 import styled from 'styled-components';
-import Loader from '../../../components/Loader';
+import Loader from '../../../../components/Loader';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { switchInjectedNetwork } from '../../../utils/utils';
+import { switchInjectedNetwork } from '../../../../utils/utils';
+import SocialLinks from './SocialLinks';
 
 const ContentWrapper = styled.div`
   display: flex;
@@ -47,7 +48,7 @@ export default function Interface() {
     // textColorDark: stateTextColorDark,
     // textColorLight: stateTextColorLight,
     // navigationLinks: stateNavigationLinks,
-    // socialLinks: stateSocialLinks,
+    socialLinks: stateSocialLinks,
   } = domainSettings;
 
   const [projectName, setProjectName] = useState(stateProjectName);
@@ -124,7 +125,7 @@ export default function Interface() {
 //   }, [brandColorValid, bgColorDarkValid, bgColorLightValid, textColorDarkValid, textColorLightValid])
 
 //   const [navigationLinks, setNavigationLinks] = useState(stateNavigationLinks)
-//   const [socialLinks, setSocialLinks] = useState(stateSocialLinks)
+  const [socialLinks, setSocialLinks] = useState(stateSocialLinks)
 
   const currentStrSettings = JSON.stringify({
     projectName: stateProjectName,
@@ -139,7 +140,7 @@ export default function Interface() {
     // textColorDark: stateTextColorDark,
     // textColorLight: stateTextColorLight,
     // navigationLinks: stateNavigationLinks,
-    // socialLinks: stateSocialLinks,
+    socialLinks: stateSocialLinks,
   });
 
   const [settingsChanged, setSettingsChanged] = useState(false);
@@ -158,7 +159,7 @@ export default function Interface() {
     //   textColorDark,
     //   textColorLight,
     //   navigationLinks,
-    //   socialLinks,
+      socialLinks,
     });
 
     setSettingsChanged(newStrSettings !== currentStrSettings);
@@ -176,7 +177,7 @@ export default function Interface() {
     // textColorDark,
     // textColorLight,
     // navigationLinks,
-    // socialLinks,
+    socialLinks,
   ]);
 
 
@@ -223,7 +224,7 @@ export default function Interface() {
         // textColorDark,
         // textColorLight,
         // navigationLinks,
-        // socialLinks,
+        socialLinks,
       };
 
       await saveAppData({
@@ -282,6 +283,13 @@ export default function Interface() {
 
       <s.SpacerSmall />
 
+      <SocialLinks
+        socialLinks={socialLinks}
+        setSocialLinks={setSocialLinks}
+      />
+
+      <s.SpacerSmall />
+
       <Stack
         direction="row"
         justifyContent="space-between"
@@ -334,16 +342,6 @@ export default function Interface() {
           items={navigationLinks}
           setItems={setNavigationLinks}
           isValidItem={(item: LinkItem) => Boolean(validUrl.isUri(item.source))}
-        />
-      </OptionWrapper> */}
-
-      {/* <OptionWrapper>
-        <ListFactory
-          title={t('socialLinks')}
-          placeholder="https://"
-          items={socialLinks}
-          setItems={setSocialLinks}
-          isValidItem={(address) => Boolean(validUrl.isUri(address))}
         />
       </OptionWrapper> */}
 

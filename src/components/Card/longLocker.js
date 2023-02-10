@@ -1,14 +1,11 @@
 import BigNumber from "bignumber.js";
-import React, { useState } from "react";
+import React from "react";
 import Countdown from "react-countdown";
-import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
 
 const LongLocker = (props) => {
-  const contract = useSelector((state) => state.contract);
-  const [image, setImage] = useState("");
   const { lockerAddress } = props;
   const lockerInfo = usePoolContext().allLocker[lockerAddress];
 

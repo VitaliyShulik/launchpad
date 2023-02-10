@@ -199,8 +199,8 @@ const Options = styled.div`
   max-height: 23rem;
   padding: 0.6rem;
   border-radius: 0.8rem;
-  border: 1px solid #1d1f24;
-  box-shadow: inset 0 0 0.2rem #1d1f24;
+  border: 1px solid #232227;
+  box-shadow: inset 0 0 0.2rem #232227;
 
   ${({ disabled }) => (disabled ? 'pointer-events: none; opacity: 0.6' : '')};
 `;

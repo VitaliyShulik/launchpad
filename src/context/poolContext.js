@@ -2,6 +2,7 @@ import { useWeb3React } from "@web3-react/core";
 import React, { createContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { utils } from "../utils";
+import { useApplicationContext } from "./applicationContext";
 
 export const PoolContext = createContext({});
 
@@ -9,29 +10,41 @@ export const PoolContextProvider = ({ children }) => {
   const [allPoolAddress, setAllPoolAddress] = useState([]);
   const [userPoolAddresses, setUserPoolAddresses] = useState([]);
   const [allPools, setAllPools] = useState({});
+  const [IDOCreatedEvent, setIDOCreatedEvent] = useState(null);
+
   const [allLockerAddress, setAllLockerAddress] = useState([]);
   const [userLockersAddresses, setUserLockersAddresses] = useState([]);
   const [allLocker, setAllLocker] = useState({});
+  const [lockerCreatedEvent, setLockerCreatedEvent] = useState(null);
+
   const dispatch = useDispatch();
   const contract = useSelector((state) => state.contract);
   const { account } = useWeb3React();
 
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      allPoolAddress.map(async (address, index) => {
-        await utils.loadPoolData(address, contract.web3, account).then((IDOPoolData) => {
-          setAllPools((p) => ({ ...p, ...{ [address]: IDOPoolData } }));
-          const { owner, userData, idoAddress } = IDOPoolData;
-          if (
-            owner?.toLowerCase() === account?.toLowerCase()
-            || (userData?.totalInvestedETH && userData?.totalInvestedETH !== "0")
-          ) setUserPoolAddresses((prevUserPoolAddresses) => [ ...prevUserPoolAddresses, idoAddress ])
-        });
-      });
-    }, 3000);
+  const {
+    domainSettings: {
+      ipfsInfuraDedicatedGateway
+    }
+  } = useApplicationContext();
 
-    return () => clearTimeout(delayDebounceFn);
-  }, [allPoolAddress]);
+  useEffect(() => {
+    if (ipfsInfuraDedicatedGateway) {
+      const delayDebounceFn = setTimeout(() => {
+        allPoolAddress.map(async (address, index) => {
+          await utils.loadPoolData(address, contract.web3, account, ipfsInfuraDedicatedGateway).then((IDOPoolData) => {
+            setAllPools((p) => ({ ...p, ...{ [address]: IDOPoolData } }));
+            const { owner, userData, idoAddress } = IDOPoolData;
+            if (
+              owner?.toLowerCase() === account?.toLowerCase()
+              || (userData?.totalInvestedETH && userData?.totalInvestedETH !== "0")
+            ) setUserPoolAddresses((prevUserPoolAddresses) => [ ...prevUserPoolAddresses, idoAddress ])
+          });
+        });
+      }, 500);
+
+      return () => clearTimeout(delayDebounceFn);
+    }
+  }, [allPoolAddress, ipfsInfuraDedicatedGateway]);
 
   useEffect(() => {
     setUserPoolAddresses([])
@@ -49,7 +62,7 @@ export const PoolContextProvider = ({ children }) => {
 
         });
       });
-    }, 3000);
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [account])
@@ -61,42 +74,58 @@ export const PoolContextProvider = ({ children }) => {
           setAllLocker((p) => ({ ...p, ...{ [address]: e } }));
         });
       });
-    }, 3000);
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [allLockerAddress]);
 
-  useEffect(async () => {
-    if (!contract.IDOFactory) {
+  useEffect(() => {
+    if (!contract?.IDOFactory) {
       return null;
     }
 
-    contract.IDOFactory.events.IDOCreated(
-      {
-        fromBlock: 0,
-      },
-      async function (error, event) {
-        if (event) {
-          setAllPoolAddress((p) => [...p, event.returnValues.idoPool]);
+    if (IDOCreatedEvent) {
+      IDOCreatedEvent.unsubscribe();
+      setAllPools([]);
+      setUserPoolAddresses([]);
+    }
+
+    setIDOCreatedEvent(
+      contract.IDOFactory.events.IDOCreated(
+        {
+          fromBlock: 0,
+        },
+        function (error, event) {
+          if (event) {
+            setAllPoolAddress((p) => [...p, event.returnValues.idoPool]);
+          }
         }
-      }
+      )
     );
   }, [dispatch, contract]);
 
-  useEffect(async () => {
-    if (!contract.LockerFactory) {
+  useEffect(() => {
+    if (!contract.TokenLockerFactory) {
       return null;
     }
 
-    contract.LockerFactory.events.LockerCreated(
-      {
-        fromBlock: 0,
-      },
-      async function (error, event) {
-        if (event) {
-          setAllLockerAddress((p) => [...p, event.returnValues.lockerAddress]);
+    if (lockerCreatedEvent) {
+      lockerCreatedEvent.unsubscribe();
+      setAllLockerAddress([]);
+      setUserLockersAddresses([]);
+    }
+
+    setLockerCreatedEvent(
+      contract.TokenLockerFactory.events.LockerCreated(
+        {
+          fromBlock: 0,
+        },
+        function (error, event) {
+          if (event) {
+            setAllLockerAddress((p) => [...p, event.returnValues.lockerAddress]);
+          }
         }
-      }
+      )
     );
   }, [dispatch, contract]);
 
@@ -111,7 +140,7 @@ export const PoolContextProvider = ({ children }) => {
         ) setUserLockersAddresses((prevUserLockersAddresses) => [ ...prevUserLockersAddresses, lockerAddress ])
 
       });
-    }, 3000);
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [account, allLocker])

@@ -4,12 +4,41 @@ import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import "../../App.css";
 import { useApplicationContext } from "../../context/applicationContext";
+import styled from 'styled-components';
 import * as s from "../../styles/global";
 import { Web3Status } from "../Web3Status";
 import Loader from "../Loader";
+import { useWeb3React } from "@web3-react/core";
+import { CURRENCY } from '../../assets/images';
+import { Paper } from "@mui/material";
+
+const NetworkCard = styled(Paper)`
+  display: flex;
+  justify-content: center;
+  padding: 0 0.75rem 0 0.5rem;
+`;
+
+const IconWrapper = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  margin-right: 0.4rem;
+  align-items: center;
+  justify-content: center;
+
+  & > img,
+  span {
+    height: ${({ size }) => (size ? size + 'px' : '24px')};
+    width: ${({ size }) => (size ? size + 'px' : '24px')};
+  }
+`;
 
 const Navigation = () => {
   const {
+    domainSettings: {
+      isLockerEnabled,
+      logoUrl,
+    },
+    isAdmin,
     chainName,
     networkExplorer,
     baseCurrencySymbol,
@@ -21,30 +50,36 @@ const Navigation = () => {
     isFeeTokenDataFetching,
   } = useApplicationContext();
 
+  const { chainId } = useWeb3React();
+
   const mockCompanyLogo = 'https://wallet.wpmix.net/wp-content/uploads/2020/07/yourlogohere.png';
 
-  const hasFeeToken = !isFeeTokenDataFetching && FeeTokenSymbol && FeeTokenAddress
+  const hasFeeToken = !isFeeTokenDataFetching && FeeTokenSymbol && FeeTokenAddress;
+
+  const getNetworkInfo = () => {
+    if (!chainId) return null;
+
+    const networkImage = CURRENCY[chainId];
+
+    return (
+      chainName && (
+        // TODO: make some wrapped card
+        <NetworkCard elevation={2} title={`${chainName} network`}> 
+          {!!networkImage && (
+            <IconWrapper size={20}>
+              <img src={networkImage} alt="network logo" />
+            </IconWrapper>
+          )}
+          {chainName}
+        </NetworkCard>
+      )
+    )
+  }
 
   return (
     <Navbar collapseOnSelect expand="lg" variant="dark" style={{ margin: 15 }}>
       <Container style={{ maxWidth: "100%" }}>
-        {!mockCompanyLogo ? (
-          <s.TextTitle style={{ fontSize: "24px" }}>
-            <s.Card
-              style={{
-                padding: 10,
-                margin: 0,
-                paddingLeft: 20,
-                paddingRight: 20,
-                fontWeight: 700,
-                color: "var(--primary)",
-              }}
-            >
-              YourTextLogo
-            </s.Card>
-          </s.TextTitle>
-        ) : <s.LogoTitle src={mockCompanyLogo} />
-        }
+        <s.LogoTitle src={logoUrl || mockCompanyLogo} />
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
@@ -55,7 +90,7 @@ const Navigation = () => {
               <Nav.Link>Launchpad</Nav.Link>
             </LinkContainer>
             {
-              process.env.REACT_APP_ENABLE_LOCKER === 'true' &&
+              isLockerEnabled &&
               <LinkContainer to="/locker">
                 <Nav.Link>Locker</Nav.Link>
               </LinkContainer>
@@ -63,9 +98,15 @@ const Navigation = () => {
             <LinkContainer to="/account">
               <Nav.Link>Account</Nav.Link>
             </LinkContainer>
+            {
+              isAdmin &&
+              <LinkContainer to="/manage">
+                <Nav.Link>Manage</Nav.Link>
+              </LinkContainer>
+            }
           </Nav>
           <Nav>
-            <Nav.Link>{chainName}</Nav.Link>
+            <Nav.Link>{getNetworkInfo()}</Nav.Link>
 
             {
               !hasFeeToken ? (

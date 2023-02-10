@@ -1,15 +1,17 @@
 import React, { useState } from "react";
+import { useApplicationContext } from "../../context/applicationContext";
 import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import LongIdo from "../Card/longIdo";
 import PoolRenderer from "../Card/poolRenderer";
 
-const LongIdoList = (props) => {
+const LongIdoList = () => {
   const [limit, setLimit] = useState(5);
   const [loading, setLoading] = useState(false);
 
   const { userPoolAddresses, allPools } = usePoolContext();
+  const { domainSettings: { isLockerEnabled } } = useApplicationContext();
 
   // sort IDOs by start time
   userPoolAddresses.sort((a, b) => allPools[b]?.start - allPools[a]?.start);
@@ -23,7 +25,7 @@ const LongIdoList = (props) => {
       <s.Container ai="center">
 
       {
-        process.env.REACT_APP_ENABLE_LOCKER === 'true' ?
+        isLockerEnabled ?
         <s.Container
           jc="space-around"
           style={{ flexWrap: "wrap", marginTop: 20 }}

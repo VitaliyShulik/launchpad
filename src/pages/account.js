@@ -5,11 +5,14 @@ import CreateLaunchpad from "../components/Button/createLaunchpad";
 import CreateLocker from "../components/Button/createLocker";
 import LockerList from "../components/Modal/lockerList";
 import LongIdoList from "../components/Modal/longIdoList";
+import { useApplicationContext } from "../context/applicationContext";
 import * as s from "../styles/global";
 
 const Account = () => {
   const { account } = useWeb3React();
   const [showZero, setShowZero] = useState(0);
+
+  const { domainSettings: { isLockerEnabled } } = useApplicationContext();
 
   if (!account) {
     return (
@@ -40,7 +43,7 @@ const Account = () => {
         </s.Container>
 
         {
-          process.env.REACT_APP_ENABLE_LOCKER === 'true' &&
+          isLockerEnabled &&
           <s.Container flex={1}>
             <s.Container fd="row" ai="center" jc="space-between">
               <s.TextTitle style={{ flex: 1, whiteSpace: "nowrap", margin: 20 }}>

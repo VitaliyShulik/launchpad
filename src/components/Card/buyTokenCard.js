@@ -60,7 +60,7 @@ const BuyTokenCard = (props) => {
   const claimToken = async () => {
     setLoading(true); // TODO: add action loader to the appropriate button
     try {
-      const tx = IDOPoolContract.claim({
+      const tx = await IDOPoolContract.claim({
         from: account,
       });
 
@@ -79,7 +79,7 @@ const BuyTokenCard = (props) => {
   const refund = async () => {
     setLoading(true); // TODO: add action loader to the appropriate button
     try {
-      const tx = IDOPoolContract.refund({
+      const tx = await IDOPoolContract.refund({
         from: account,
       });
 

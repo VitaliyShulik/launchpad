@@ -37,10 +37,7 @@ export function Web3Status() {
         {account == null ? (
           <s.button
             onClick={() => {
-              console.log('Connect');
-              console.log('Open wallet modal');
               setIsWaleltModalOpen(true);
-            //   toggleWalletModal();
             }}
           >
             CONNECT

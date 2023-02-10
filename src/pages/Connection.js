@@ -1,53 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { FaWallet } from 'react-icons/fa';
-import { useWeb3React } from '@web3-react/core';
 // import { networks } from '../constants/networksInfo';
 import { SUPPORTED_NETWORKS, SUPPORTED_CHAIN_IDS } from '../connectors';
 import { Web3Status } from '../components/Web3Status';
 import * as s from "../styles/global";
+import { useApplicationContext } from '../context/applicationContext';
 // import Panel from './Panel'
 // import { ApplicationModal, setOpenModal } from '../state/application/actions'
 // import { useAppState } from 'state/application/hooks'
 // import { useDispatch } from 'react-redux'
 // import useWordpressInfo from 'hooks/useWordpressInfo'
-
-
-const Wrapper = styled.section`
-  width: 100%;
-  padding: 6vh 0 3rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow-y: auto;
-  overflow-x: hidden;
-  z-index: 1;
-`;
-
-const BodyWrapper = styled.div`
-  position: relative;
-  max-width: 30rem;
-  width: 100%;
-  border-radius: 1.2rem;
-  box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px, rgba(0, 0, 0, 0.04) 0px 16px 24px,
-  rgba(0, 0, 0, 0.01) 0px 24px 32px;
-
-  background-color: #1d1f24;
-
-  @media (max-width: 540px) {
-    width: 90%;
-  };
-`;
-
-const ContentWrapper = styled.div`
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.8rem;
-`;
 
 const WalletIconWrapper = styled.div`
   padding: 0.6rem;
@@ -89,38 +52,15 @@ const SupportedNetworksList = styled.ul`
 
 // const unavailableOrZeroAddr = value => !value || value === ZERO_ADDRESS;
 
-export default function Connection({
-    // domainData,
-    isAvailableNetwork,
-    // setDomainDataTrigger
-  }) {
+export default function Connection() {
   const {
-    active,
-    // chainId,
-    // account
-  } = useWeb3React();
+    isAvailableNetwork,
+  } = useApplicationContext();
 
 //   const wordpressData = useWordpressInfo()
 //   const dispatch = useDispatch();
 //   const { admin, factory, router } = useAppState()
 
-  const [needToConfigure, setNeedToConfigure] = useState(false);
-
-  useEffect(() => {
-    if (
-      active && false
-    //   && (!domainData || unavailableOrZeroAddr(admin) || unavailableOrZeroAddr(factory) || unavailableOrZeroAddr(router))
-    ) {
-      setNeedToConfigure(true);
-    }
-  }, [active]);
-
-  useEffect(() => {
-    if (isAvailableNetwork && !needToConfigure) {
-        console.log('Open Connection Modal');
-    //   dispatch(setOpenModal(ApplicationModal.WALLET))
-    }
-  }, [isAvailableNetwork, needToConfigure]);
 
 //   const [changeAllowed, setChangeAllowed] = useState(false)
 
@@ -135,9 +75,9 @@ export default function Connection({
 //   }, [needToConfigure, wordpressData, account, admin])
 
   return (
-    <Wrapper>
+    <s.Wrapper>
       {!isAvailableNetwork ? (
-        <BodyWrapper>
+        <s.BodyWrapper>
           <SupportedNetworksWrapper>
             {
             // chainId && wordpressData?.wpNetworkIds?.length && !wordpressData.wpNetworkIds.includes(chainId) ? (
@@ -178,22 +118,10 @@ export default function Connection({
               </>
             )}
           </SupportedNetworksWrapper>
-        </BodyWrapper>
-      ) : needToConfigure ? (
-        <>
-          {/* {changeAllowed ? (
-            <Panel setDomainDataTrigger={setDomainDataTrigger} />
-          ) : ( */}
-            {(<BodyWrapper>
-              <SupportedNetworksWrapper>
-                <h3>The app isn't ready yet</h3>
-              </SupportedNetworksWrapper>
-            </BodyWrapper>
-          )}
-        </>
+        </s.BodyWrapper>
       ) : (
-        <BodyWrapper>
-          <ContentWrapper>
+        <s.BodyWrapper>
+          <s.ContentWrapper>
             <WalletIconWrapper>
               <FaWallet size="2.4rem" className="icon" />
             </WalletIconWrapper>
@@ -201,9 +129,9 @@ export default function Connection({
             <NetworkStatus>
               <Web3Status />
             </NetworkStatus>
-          </ContentWrapper>
-        </BodyWrapper>
+          </s.ContentWrapper>
+        </s.BodyWrapper>
       )}
-    </Wrapper>
+    </s.Wrapper>
   );
 }

@@ -30,7 +30,10 @@ const PoolRenderer = (props) => {
   } = props;
 
   const {
-    baseCurrencySymbol
+    baseCurrencySymbol,
+    domainSettings: {
+      ipfsInfuraDedicatedGateway
+    },
   } = useApplicationContext();
 
   const card = useRef(null);
@@ -40,9 +43,9 @@ const PoolRenderer = (props) => {
 
   useEffect(() => {
     if (idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash) {
-      setImage(getValidImageUrl(idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash));
+      setImage(getValidImageUrl(idoInfo?.metadata?.image || idoInfo?.metadata?.imageHash, ipfsInfuraDedicatedGateway));
     }
-  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash]);
+  }, [idoInfo, idoInfo.metadata.image, idoInfo.metadata.imageHash, ipfsInfuraDedicatedGateway]);
 
   // if (!utils.isValidPool(idoInfo) || !idoInfo) {
   //   return (

@@ -110,7 +110,7 @@ export default function useDomainData() {
     }
 
     if (storageContract && domain) {
-        fetchDomainData();
+      fetchDomainData();
     }
   }, [domainDataTrigger, storageContract, domain]);
 

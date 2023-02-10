@@ -6,7 +6,12 @@ import { useApplicationContext } from '../../../../context/applicationContext';
 import { STORAGE_NETWORK_ID, STORAGE_NETWORK_NAME } from '../../../../constants';
 import { SUPPORTED_NETWORKS, SUPPORTED_CHAIN_IDS } from '../../../../connectors';
 import { isAddress, switchInjectedNetwork } from '../../../../utils/utils';
-import { deployLaunchpadContracts } from '../../../../utils/contract';
+import {
+  deployLaunchpadContracts,
+  getDeployedLaunchpadContracts,
+  setDeployedLaunchpadContracts,
+  removeDeployedLaunchpadContracts
+} from '../../../../utils/contract';
 import { saveAppData } from '../../../../utils/storage';
 
 import styled from 'styled-components';
@@ -55,11 +60,14 @@ export default function Contracts() {
 
   const [isLoading, setIsLoading] = useState(false);
 
+
   const [chainIdToSetUp, setChainIdToSetUp] = useState((chainId && !!contracts?.[chainId || 0]) ? chainId : '');
-  const [FeeTokenAddress, setFeeTokenAddress] = useState(contracts?.[chainId || 0]?.FeeTokenAddress || '');
-  const [IDOFactoryAddress, setIDOFactoryAddress] = useState(contracts?.[chainId || 0]?.IDOFactoryAddress || '');
-  const [TokenLockerFactoryAddress, setTokenLockerFactoryAddress] = useState(contracts?.[chainId || 0]?.TokenLockerFactoryAddress || '');
-  const [canSaveNetworksSettings, setCanSaveNetworksSettings] = useState(false);
+
+  useEffect(() => {
+    setIsChainIdForDeploying(chainId === chainIdToSetUp);
+  }, [chainId, chainIdToSetUp]);
+
+  const [isRedeployAllowed, setIsRedeployAllowed] = useState(false);
 
   const [hasDeployedContract, setHasDeployedContract] = useState(Boolean(
     contracts?.[chainId || 0]?.FeeTokenAddress &&
@@ -67,19 +75,114 @@ export default function Contracts() {
     contracts?.[chainId || 0]?.TokenLockerFactoryAddress
   ));
 
-  const [isRedeployAllowed, setIsRedeployAllowed] = useState(false);
-  const [isChainIdForDeploying, setIsChainIdForDeploying] = useState(chainId === chainIdToSetUp);
-  const [isDeployingContracts, setIsDeployingContracts] = useState(false);
-  const [canDeploySwapContracts, setCanDeploySwapContracts] = useState(
-    !isDeployingContracts &&
-    FeeTokenAddress &&
-    isAddress(FeeTokenAddress) &&
-    (chainIdToSetUp === chainId) &&
-    (!hasDeployedContract || (hasDeployedContract && isRedeployAllowed))
+  const [deployedLocalContracts, setDeployedLocalContracts] = useState(getDeployedLaunchpadContracts()?.[chainId])
+  const [hasDeployedLocalContract, setHasDeployedLocalContract] = useState(Boolean(
+    deployedLocalContracts &&
+    deployedLocalContracts.FeeTokenAddress &&
+    deployedLocalContracts.IDOFactoryAddress &&
+    deployedLocalContracts.TokenLockerFactoryAddress
+  ));
+
+  const [FeeTokenAddress, setFeeTokenAddress] = useState(
+    hasDeployedContract ?
+      contracts[chainId || 0].FeeTokenAddress :
+      hasDeployedLocalContract ?
+        deployedLocalContracts.FeeTokenAddress :
+        ''
+  );
+  const [IDOFactoryAddress, setIDOFactoryAddress] = useState(
+    hasDeployedContract ?
+      contracts[chainId || 0].IDOFactoryAddress :
+      hasDeployedLocalContract ?
+        deployedLocalContracts.IDOFactoryAddress :
+        ''
+  );
+  const [TokenLockerFactoryAddress, setTokenLockerFactoryAddress] = useState(
+    hasDeployedContract ?
+      contracts[chainId || 0].TokenLockerFactoryAddress :
+      hasDeployedLocalContract ?
+        deployedLocalContracts.TokenLockerFactoryAddress :
+        ''
   );
 
+  const [hasDiffrentRedeployedContracts, setHasDiffrentRedeployedContract] = useState(Boolean(
+    hasDeployedContract && hasDeployedLocalContract && (
+      deployedLocalContracts.FeeTokenAddress !== contracts?.[chainId || 0]?.FeeTokenAddress ||
+      deployedLocalContracts.IDOFactoryAddress !== contracts?.[chainId || 0]?.IDOFactoryAddress ||
+      deployedLocalContracts.TokenLockerFactoryAddress !== contracts?.[chainId || 0]?.TokenLockerFactoryAddress
+    )
+  ));
+
+  useEffect(() => {
+    setIsRedeployAllowed(false);
+
+    const hasDeployedContract = Boolean(
+      contracts?.[chainIdToSetUp || 0]?.FeeTokenAddress &&
+      contracts?.[chainIdToSetUp || 0]?.IDOFactoryAddress &&
+      contracts?.[chainIdToSetUp || 0]?.TokenLockerFactoryAddress
+    );
+    setHasDeployedContract(hasDeployedContract);
+
+    const deployedLocalContracts = getDeployedLaunchpadContracts()?.[chainIdToSetUp];
+    setDeployedLocalContracts(deployedLocalContracts);
+
+    const hasDeployedLocalContract = Boolean(
+      deployedLocalContracts &&
+      deployedLocalContracts.FeeTokenAddress &&
+      deployedLocalContracts.IDOFactoryAddress &&
+      deployedLocalContracts.TokenLockerFactoryAddress
+    );
+    setHasDeployedLocalContract(hasDeployedLocalContract);
+
+    setFeeTokenAddress(
+      hasDeployedContract ?
+        contracts[chainIdToSetUp || 0].FeeTokenAddress :
+        hasDeployedLocalContract ?
+          deployedLocalContracts.FeeTokenAddress :
+          ''
+    );
+    setIDOFactoryAddress(
+      hasDeployedContract ?
+        contracts[chainIdToSetUp || 0].IDOFactoryAddress :
+        hasDeployedLocalContract ?
+          deployedLocalContracts.IDOFactoryAddress :
+          ''
+    );
+    setTokenLockerFactoryAddress(
+      hasDeployedContract ?
+        contracts[chainIdToSetUp || 0].TokenLockerFactoryAddress :
+        hasDeployedLocalContract ?
+          deployedLocalContracts.TokenLockerFactoryAddress :
+          ''
+    );
+
+    setHasDiffrentRedeployedContract(Boolean(
+      hasDeployedContract && hasDeployedLocalContract && (
+        deployedLocalContracts.FeeTokenAddress !== contracts[chainIdToSetUp || 0].FeeTokenAddress ||
+        deployedLocalContracts.IDOFactoryAddress !== contracts[chainIdToSetUp || 0].IDOFactoryAddress ||
+        deployedLocalContracts.TokenLockerFactoryAddress !== contracts[chainIdToSetUp || 0].TokenLockerFactoryAddress
+      )
+    ));
+
+  }, [contracts, chainIdToSetUp]);
+
+
   const isStorageNetwork = chainId === STORAGE_NETWORK_ID;
-  const canChangeNetwork = (connector instanceof InjectedConnector);
+  const [canSaveNetworksSettings, setCanSaveNetworksSettings] = useState(false);
+
+  const [isUsingDeployedLocalContracts, setIsUsingDeployedLocalContracts] = useState(Boolean(
+    deployedLocalContracts?.FeeTokenAddress === FeeTokenAddress &&
+    deployedLocalContracts?.IDOFactoryAddress === IDOFactoryAddress &&
+    deployedLocalContracts?.TokenLockerFactoryAddress === TokenLockerFactoryAddress
+  ));
+
+  useEffect(() => {
+    setIsUsingDeployedLocalContracts(Boolean(
+      deployedLocalContracts?.FeeTokenAddress === FeeTokenAddress &&
+      deployedLocalContracts?.IDOFactoryAddress === IDOFactoryAddress &&
+      deployedLocalContracts?.TokenLockerFactoryAddress === TokenLockerFactoryAddress
+    ));
+  }, [deployedLocalContracts, FeeTokenAddress, IDOFactoryAddress, TokenLockerFactoryAddress]);
 
   useEffect(() => {
     const isDifferentContracts = (
@@ -105,21 +208,16 @@ export default function Contracts() {
     );
   }, [contracts, FeeTokenAddress, IDOFactoryAddress, TokenLockerFactoryAddress, chainIdToSetUp, isStorageNetwork]);
 
-  useEffect(() => {
-    setFeeTokenAddress(contracts?.[chainIdToSetUp || 0]?.FeeTokenAddress || '');
-    setIDOFactoryAddress(contracts?.[chainIdToSetUp || 0]?.IDOFactoryAddress || '');
-    setTokenLockerFactoryAddress(contracts?.[chainIdToSetUp || 0]?.TokenLockerFactoryAddress || '');
-
-    setHasDeployedContract(Boolean(
-      contracts?.[chainIdToSetUp || 0]?.FeeTokenAddress &&
-      contracts?.[chainIdToSetUp || 0]?.IDOFactoryAddress &&
-      contracts?.[chainIdToSetUp || 0]?.TokenLockerFactoryAddress
-    ));
-
-    setIsRedeployAllowed(false);
-
-  }, [contracts, chainIdToSetUp]);
-
+  const [isChainIdForDeploying, setIsChainIdForDeploying] = useState(chainId === chainIdToSetUp);
+  const [isDeployingContracts, setIsDeployingContracts] = useState(false);
+  const [canDeploySwapContracts, setCanDeploySwapContracts] = useState(
+    !isDeployingContracts &&
+    FeeTokenAddress &&
+    isAddress(FeeTokenAddress) &&
+    (chainIdToSetUp === chainId) &&
+    (!hasDeployedContract || (hasDeployedContract && isRedeployAllowed))
+  );
+  const canChangeNetwork = (connector instanceof InjectedConnector);
 
   useEffect(() => {
     setCanDeploySwapContracts(
@@ -129,11 +227,6 @@ export default function Contracts() {
       (!hasDeployedContract || (hasDeployedContract && isRedeployAllowed))
     )
   }, [isDeployingContracts, FeeTokenAddress, hasDeployedContract, isRedeployAllowed]);
-
-  useEffect(() => {
-    setIsChainIdForDeploying(chainId === chainIdToSetUp);
-  }, [chainId, chainIdToSetUp]);
-
 
   const saveContractsData = async () => {
     setIsLoading(true);
@@ -152,8 +245,9 @@ export default function Contracts() {
           },
         },
         onReceipt: () => {
-            triggerDomainData();
-          },
+          removeDeployedLaunchpadContracts(chainIdToSetUp);
+          triggerDomainData();
+        },
         onHash: (hash) => {
           console.log('saveContractsData hash: ', hash);
         },
@@ -202,13 +296,14 @@ export default function Contracts() {
             IDOFactoryAddress,
             TokenLockerFactoryAddress
           });
+
           setFeeTokenAddress(FeeTokenAddress);
           setIDOFactoryAddress(IDOFactoryAddress);
           setTokenLockerFactoryAddress(TokenLockerFactoryAddress);
 
-          triggerDomainData();
+          setDeployedLaunchpadContracts({ chainId, FeeTokenAddress, IDOFactoryAddress, TokenLockerFactoryAddress });
 
-          // TODO: save addresses to the local storage and offer set these after switch at setting up network
+          triggerDomainData();
         },
       })
     } catch (error) {
@@ -218,6 +313,12 @@ export default function Contracts() {
     } finally {
       setIsDeployingContracts(false);
     }
+  }
+
+  const useDeployedLocalContracts = () => {
+    setFeeTokenAddress(deployedLocalContracts?.FeeTokenAddress || '');
+    setIDOFactoryAddress(deployedLocalContracts?.IDOFactoryAddress || '');
+    setTokenLockerFactoryAddress(deployedLocalContracts?.TokenLockerFactoryAddress || '');
   }
 
   return (
@@ -327,6 +428,20 @@ export default function Contracts() {
           Please, select the Network
         </s.Text>
       )}
+
+      {
+        !isUsingDeployedLocalContracts && hasDiffrentRedeployedContracts && (
+          <>
+            <s.SpacerSmall />
+            <s.button
+              secondary
+              onClick={useDeployedLocalContracts}
+            >
+              {hasDeployedContract ? 'Use re-Deployed Contracts' : 'Use Deployed Contracts'}
+            </s.button>
+          </>
+        )
+      }
 
       <s.SpacerSmall />
 

@@ -98,3 +98,28 @@ export const deployLaunchpadContracts = async ({
     throw error;
   }
 }
+
+export const getDeployedLaunchpadContracts = () => JSON.parse(localStorage.getItem("deployedLaunchpadContracts")) || null;
+
+export const setDeployedLaunchpadContracts = ({ chainId, FeeTokenAddress, IDOFactoryAddress, TokenLockerFactoryAddress }) => {
+
+  const deployedLaunchpadContracts = getDeployedLaunchpadContracts();
+
+  localStorage.setItem("deployedLaunchpadContracts", JSON.stringify({
+    ...deployedLaunchpadContracts,
+    [chainId]: {
+      FeeTokenAddress,
+      IDOFactoryAddress,
+      TokenLockerFactoryAddress
+    }
+  }));
+}
+
+export const removeDeployedLaunchpadContracts = (chainId) => {
+  const deployedLaunchpadContracts = getDeployedLaunchpadContracts();
+
+  localStorage.setItem("deployedLaunchpadContracts", JSON.stringify({
+    ...deployedLaunchpadContracts,
+    [chainId]: null
+  }));
+}

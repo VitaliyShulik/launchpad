@@ -145,14 +145,14 @@ export const ApplicationContextProvider = ({ children }) => {
       }
     }
 
-    if (account && chainId && FeeTokenContract && IDOFactoryAddress) {
+    if (account && FeeTokenContract && IDOFactoryAddress) {
       fetchFeeTokenData();
     } else {
       setFeeTokenSymbol('');
       setFeeTokenBalance(0);
       setFeeTokenApproveToFactory(0);
     }
-  }, [account, chainId, FeeTokenContract, IDOFactoryAddress, shouldUpdateAccountData]);
+  }, [account, FeeTokenContract, IDOFactoryAddress, shouldUpdateAccountData]);
 
   const TokenLockerFactoryContract = useLockerFactoryContract(TokenLockerFactoryAddress, true);
   const IDOFactoryContract = useIDOFactoryContract(IDOFactoryAddress, true);

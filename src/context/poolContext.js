@@ -10,14 +10,16 @@ export const PoolContextProvider = ({ children }) => {
   const [allPoolAddress, setAllPoolAddress] = useState([]);
   const [userPoolAddresses, setUserPoolAddresses] = useState([]);
   const [allPools, setAllPools] = useState({});
+  const [IDOCreatedEvent, setIDOCreatedEvent] = useState(null);
+
   const [allLockerAddress, setAllLockerAddress] = useState([]);
   const [userLockersAddresses, setUserLockersAddresses] = useState([]);
   const [allLocker, setAllLocker] = useState({});
+  const [lockerCreatedEvent, setLockerCreatedEvent] = useState(null);
+
   const dispatch = useDispatch();
   const contract = useSelector((state) => state.contract);
   const { account } = useWeb3React();
-
-  // TODO: reset timeouts, all pools and lockers data after change chainId
 
   const {
     domainSettings: {
@@ -38,7 +40,7 @@ export const PoolContextProvider = ({ children }) => {
             ) setUserPoolAddresses((prevUserPoolAddresses) => [ ...prevUserPoolAddresses, idoAddress ])
           });
         });
-      }, 3000);
+      }, 500);
 
       return () => clearTimeout(delayDebounceFn);
     }
@@ -60,7 +62,7 @@ export const PoolContextProvider = ({ children }) => {
 
         });
       });
-    }, 3000);
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [account])
@@ -72,42 +74,58 @@ export const PoolContextProvider = ({ children }) => {
           setAllLocker((p) => ({ ...p, ...{ [address]: e } }));
         });
       });
-    }, 3000);
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [allLockerAddress]);
 
-  useEffect(async () => {
-    if (!contract.IDOFactory) {
+  useEffect(() => {
+    if (!contract?.IDOFactory) {
       return null;
     }
 
-    contract.IDOFactory.events.IDOCreated(
-      {
-        fromBlock: 0,
-      },
-      async function (error, event) {
-        if (event) {
-          setAllPoolAddress((p) => [...p, event.returnValues.idoPool]);
+    if (IDOCreatedEvent) {
+      IDOCreatedEvent.unsubscribe();
+      setAllPools([]);
+      setUserPoolAddresses([]);
+    }
+
+    setIDOCreatedEvent(
+      contract.IDOFactory.events.IDOCreated(
+        {
+          fromBlock: 0,
+        },
+        function (error, event) {
+          if (event) {
+            setAllPoolAddress((p) => [...p, event.returnValues.idoPool]);
+          }
         }
-      }
+      )
     );
   }, [dispatch, contract]);
 
-  useEffect(async () => {
+  useEffect(() => {
     if (!contract.TokenLockerFactory) {
       return null;
     }
 
-    contract.TokenLockerFactory.events.LockerCreated(
-      {
-        fromBlock: 0,
-      },
-      async function (error, event) {
-        if (event) {
-          setAllLockerAddress((p) => [...p, event.returnValues.lockerAddress]);
+    if (lockerCreatedEvent) {
+      lockerCreatedEvent.unsubscribe();
+      setAllLockerAddress([]);
+      setUserLockersAddresses([]);
+    }
+
+    setLockerCreatedEvent(
+      contract.TokenLockerFactory.events.LockerCreated(
+        {
+          fromBlock: 0,
+        },
+        function (error, event) {
+          if (event) {
+            setAllLockerAddress((p) => [...p, event.returnValues.lockerAddress]);
+          }
         }
-      }
+      )
     );
   }, [dispatch, contract]);
 
@@ -122,7 +140,7 @@ export const PoolContextProvider = ({ children }) => {
         ) setUserLockersAddresses((prevUserLockersAddresses) => [ ...prevUserLockersAddresses, lockerAddress ])
 
       });
-    }, 3000);
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [account, allLocker])

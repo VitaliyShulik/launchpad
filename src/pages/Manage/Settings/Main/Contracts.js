@@ -85,23 +85,23 @@ export default function Contracts() {
 
   const [FeeTokenAddress, setFeeTokenAddress] = useState(
     hasDeployedContract ?
-      contracts[chainId || 0].FeeTokenAddress :
+      contracts?.[chainId || 0]?.FeeTokenAddress :
       hasDeployedLocalContract ?
-        deployedLocalContracts.FeeTokenAddress :
+        deployedLocalContracts?.FeeTokenAddress :
         ''
   );
   const [IDOFactoryAddress, setIDOFactoryAddress] = useState(
     hasDeployedContract ?
-      contracts[chainId || 0].IDOFactoryAddress :
+      contracts?.[chainId || 0]?.IDOFactoryAddress :
       hasDeployedLocalContract ?
-        deployedLocalContracts.IDOFactoryAddress :
+        deployedLocalContracts?.IDOFactoryAddress :
         ''
   );
   const [TokenLockerFactoryAddress, setTokenLockerFactoryAddress] = useState(
     hasDeployedContract ?
-      contracts[chainId || 0].TokenLockerFactoryAddress :
+      contracts?.[chainId || 0]?.TokenLockerFactoryAddress :
       hasDeployedLocalContract ?
-        deployedLocalContracts.TokenLockerFactoryAddress :
+        deployedLocalContracts?.TokenLockerFactoryAddress :
         ''
   );
 
@@ -136,23 +136,23 @@ export default function Contracts() {
 
     setFeeTokenAddress(
       hasDeployedContract ?
-        contracts[chainIdToSetUp || 0].FeeTokenAddress :
+        contracts?.[chainIdToSetUp || 0]?.FeeTokenAddress :
         hasDeployedLocalContract ?
-          deployedLocalContracts.FeeTokenAddress :
+          deployedLocalContracts?.FeeTokenAddress :
           ''
     );
     setIDOFactoryAddress(
       hasDeployedContract ?
-        contracts[chainIdToSetUp || 0].IDOFactoryAddress :
+        contracts?.[chainIdToSetUp || 0]?.IDOFactoryAddress :
         hasDeployedLocalContract ?
-          deployedLocalContracts.IDOFactoryAddress :
+          deployedLocalContracts?.IDOFactoryAddress :
           ''
     );
     setTokenLockerFactoryAddress(
       hasDeployedContract ?
-        contracts[chainIdToSetUp || 0].TokenLockerFactoryAddress :
+        contracts?.[chainIdToSetUp || 0]?.TokenLockerFactoryAddress :
         hasDeployedLocalContract ?
-          deployedLocalContracts.TokenLockerFactoryAddress :
+          deployedLocalContracts?.TokenLockerFactoryAddress :
           ''
     );
 

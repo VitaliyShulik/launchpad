@@ -189,11 +189,14 @@ export const getTokenData = async (tokenAddress, web3) => {
   let tokenDecimals = await token.methods.decimals().call();
   let totalSupply = await token.methods.totalSupply().call();
   return {
-    tokenAddress: tokenAddress,
-    tokenName: tokenName,
-    tokenDecimals: tokenDecimals,
-    tokenSymbol: tokenSymbol,
-    totalSupply: totalSupply,
+    tokenAddress,
+    tokenName,
+    tokenDecimals,
+    tokenSymbol,
+    totalSupply,
+    tokenDenominator: BigNumber(10).pow(
+      BigNumber(parseInt(tokenDecimals))
+    ),
   };
 };
 

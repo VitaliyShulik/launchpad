@@ -89,7 +89,13 @@ contract IDOFactory is Ownable {
                 _metadataURL
             );
 
-        uint256 transferAmount = getTokenAmount(_finInfo.hardCap, _finInfo.tokenPrice) + getTokenAmount(_finInfo.hardCap * _finInfo.lpInterestRate / 100, _finInfo.listingPrice);
+        uint8 tokenDecimals = _rewardToken.decimals();
+
+        uint256 transferAmount = getTokenAmount(_finInfo.hardCap, _finInfo.tokenPrice, tokenDecimals);
+
+        if (_finInfo.lpInterestRate > 0 && _finInfo.listingPrice > 0) {
+            transferAmount += getTokenAmount(_finInfo.hardCap * _finInfo.lpInterestRate / 100, _finInfo.listingPrice, tokenDecimals);
+        }
 
         idoPool.transferOwnership(msg.sender);
 
@@ -128,20 +134,12 @@ contract IDOFactory is Ownable {
         }
     }
 
-    function getTokenAmount(uint256 _ethAmount, uint256 _rate)
+    function getTokenAmount(uint256 ethAmount, uint256 oneTokenInWei, uint8 decimals)
         internal
-        view
+        pure
         returns (uint256)
     {
-        return _ethAmount.mul(_rate).div(10 ** 18);
-    }
-
-    function getTokenAmount(uint256 ethAmount, uint8 decimals, uint256 price)
-        internal
-        view
-        returns (uint256)
-    {
-        return ethAmount.mul(10**decimals).div(price);
+        return (ethAmount / oneTokenInWei) * 10**decimals;
     }
 
     function isContract(address _addr) private view returns (bool) {

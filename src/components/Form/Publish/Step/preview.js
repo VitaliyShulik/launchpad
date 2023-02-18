@@ -13,6 +13,8 @@ import ReadMore from "../../readMore";
 import { isAddress } from "../../../../utils/utils";
 import { useIPFS } from "../../../../hooks/useIPFS";
 
+const ETHER = BigNumber(10).pow(18);
+
 export default function Preview() {
   const { account, chainId, library } = useWeb3React();
   const {
@@ -64,14 +66,12 @@ export default function Preview() {
   const listingRateBN = BigNumber(isAddLiquidityEnabled ? listingRate : 0);
   const lp = BigNumber(isAddLiquidityEnabled ? liquidityPercentage : 0);
 
-  const requiredToken = tokenRateBN
-    .times(hardCapBN)
-    .plus(hardCapBN.times(lp).dividedBy(100).times(listingRateBN))
-    .times(
-      BigNumber(10).pow(
-        BigNumber(parseInt(tokenInfo.tokenDecimals))
-      )
-    );
+  const oneTokenInWei = ETHER.div(tokenRateBN);
+  const oneListingTokeninWei = ETHER.div(listingRateBN);
+
+  const requiredToken = ETHER.times(hardCapBN).div(oneTokenInWei)
+    .plus(ETHER.times(hardCapBN).div(oneListingTokeninWei).times(lp).dividedBy(100))
+    .times(tokenInfo.tokenDenominator);
 
   useEffect(() => {
     const checkTokenApproval = async () => {
@@ -150,21 +150,20 @@ export default function Preview() {
       const tokenURI = ipfsResonse.ipfsHash;
 
       const rewardToken = tokenAddress;
-      const tokenRateWei = library.web3.utils.toWei(tokenRate);
-      const listingRateWei = library.web3.utils.toWei(isAddLiquidityEnabled ? listingRate : "0");
+
       const finInfo = [
-        tokenRateWei,
-        library.web3.utils.toWei(softCap),
-        library.web3.utils.toWei(hardCap),
-        library.web3.utils.toWei(minETH),
-        library.web3.utils.toWei(maxETH),
-        listingRateWei,
+        `0x${oneTokenInWei.toString(16)}`,
+        `0x${ETHER.times(softCap).toString(16)}`,
+        `0x${ETHER.times(hardCap).toString(16)}`,
+        `0x${ETHER.times(minETH).toString(16)}`,
+        `0x${ETHER.times(maxETH).toString(16)}`,
+        listingRateBN.gt(0) ? `0x${oneListingTokeninWei.toString(16)}` : 0,
         parseInt(isAddLiquidityEnabled ? liquidityPercentage : 0),
       ];
       const timestamps = [
-        BigNumber(start.getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
-        BigNumber(end.getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
-        BigNumber(unlock.getTime()).div(1000).decimalPlaces(0, 1).toNumber(),
+        `0x${BigNumber(start.getTime()).div(1000).decimalPlaces(0, 1).toString(16)}`,
+        `0x${BigNumber(end.getTime()).div(1000).decimalPlaces(0, 1).toString(16)}`,
+        `0x${BigNumber(unlock.getTime()).div(1000).decimalPlaces(0, 1).toString(16)}`,
       ];
       const dexInfo = [
         chainRouter[chainId][0].ROUTER,
@@ -277,7 +276,7 @@ export default function Preview() {
       <s.TextID>Total supply</s.TextID>
       <s.TextDescription>
         {BigNumber(tokenInfo.totalSupply)
-          .dividedBy(10 ** tokenInfo.tokenDecimals)
+          .dividedBy(tokenInfo.tokenDenominator)
           .toFormat(0) +
           " $" +
           tokenInfo.tokenSymbol}
@@ -358,17 +357,13 @@ export default function Preview() {
       <s.TextDescription fullWidth style={{ color: "var(--primary)" }}>
         {"Required " +
           requiredToken
-            .dividedBy(
-              BigNumber(10).pow(
-                BigNumber(parseInt(tokenInfo.tokenDecimals))
-              )
-            )
+            .dividedBy(tokenInfo.tokenDenominator)
             .toFormat() +
           " $" +
           tokenInfo.tokenSymbol}
       </s.TextDescription>
       <s.Container ai="center">
-        {BigNumber(FeeTokenApproveToFactory).lt(BigNumber(IDOFactoryFee)) ? (
+        {BigNumber(FeeTokenApproveToFactory?.toString?.()).lt(BigNumber(IDOFactoryFee?.toString?.())) ? (
           <s.button
             style={{ marginTop: 20 }}
             disabled={loading}
@@ -379,7 +374,7 @@ export default function Preview() {
           >
             {loading ? ". . ." : `APPROVE ${FeeTokenSymbol}`}
           </s.button>
-        ) : BigNumber(tokenApprove).lt(BigNumber(requiredToken)) ? (
+        ) : BigNumber(tokenApprove?.toString?.()).lt(BigNumber(requiredToken?.toString?.())) ? (
           <s.button
             style={{ marginTop: 20 }}
             disabled={loading}

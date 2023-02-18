@@ -16,12 +16,12 @@ contract IDOPool is Ownable, ReentrancyGuard {
     using SafeERC20 for ERC20;
 
     struct FinInfo {
-        uint256 tokenPrice;
+        uint256 tokenPrice; // one token in WEI
         uint256 softCap;
         uint256 hardCap;
         uint256 minEthPayment;
         uint256 maxEthPayment;
-        uint256 listingPrice;
+        uint256 listingPrice; // one token in WEI
         uint256 lpInterestRate;
     }
 
@@ -119,7 +119,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
         UserInfo storage user = userInfo[msg.sender];
         require(user.totalInvestedETH.add(msg.value) <= finInfo.maxEthPayment, "More then max amount");
 
-        uint256 tokenAmount = getTokenAmount(msg.value);
+        uint256 tokenAmount = getTokenAmount(msg.value, finInfo.tokenPrice);
 
         totalInvestedETH = totalInvestedETH.add(msg.value);
         tokensForDistribution = tokensForDistribution.add(tokenAmount);
@@ -192,7 +192,7 @@ contract IDOPool is Ownable, ReentrancyGuard {
             uint256 ethForLP = (balance * finInfo.lpInterestRate)/100;
             uint256 ethWithdraw = balance - ethForLP;
 
-            uint256 tokenAmount = getListingAmount(ethForLP);
+            uint256 tokenAmount = getTokenAmount(ethForLP, finInfo.listingPrice);
 
             // Add Liquidity ETH
             IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(dexInfo.router);
@@ -257,20 +257,12 @@ contract IDOPool is Ownable, ReentrancyGuard {
         rewardToken.safeTransfer(msg.sender, balance);
     }
 
-    function getTokenAmount(uint256 ethAmount)
+    function getTokenAmount(uint256 ethAmount, uint256 oneTokenInWei)
         internal
         view
         returns (uint256)
     {
-        return ethAmount.mul(finInfo.tokenPrice).div(10**decimals);
-    }
-
-    function getListingAmount(uint256 ethAmount)
-        internal
-        view
-        returns (uint256)
-    {
-        return ethAmount.mul(finInfo.listingPrice).div(10**decimals);
+        return (ethAmount / oneTokenInWei) * 10**decimals;
     }
 
     /**

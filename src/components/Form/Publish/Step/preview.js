@@ -65,8 +65,8 @@ export default function Preview() {
   const listingRateBN = BigNumber(isAddLiquidityEnabled ? listingRate : 0);
   const lp = BigNumber(isAddLiquidityEnabled ? liquidityPercentage : 0);
 
-  const oneTokenInWei = ETHER.div(tokenRateBN);
-  const oneListingTokeninWei = ETHER.div(listingRateBN);
+  const oneTokenInWei = ETHER.div(tokenRateBN).integerValue(BigNumber.ROUND_CEIL);
+  const oneListingTokeninWei = ETHER.div(listingRateBN).integerValue(BigNumber.ROUND_CEIL);
 
   const requiredToken = ETHER.times(hardCapBN).div(oneTokenInWei)
     .plus(ETHER.times(hardCapBN).div(oneListingTokeninWei).times(lp).dividedBy(100))
@@ -286,7 +286,7 @@ export default function Preview() {
         {"1 $" +
           baseCurrencySymbol +
           " -> " +
-          tokenRateBN.toFormat(2) +
+          ETHER.div(oneTokenInWei) +
           " $" +
           tokenInfo.tokenSymbol}
       </s.TextDescription>
@@ -346,7 +346,7 @@ export default function Preview() {
             {"1 $" +
               baseCurrencySymbol +
               " -> " +
-              BigNumber(listingRate).toFormat(2) +
+              ETHER.div(oneListingTokeninWei) +
               " $" +
               tokenInfo.tokenSymbol}
           </s.TextDescription>

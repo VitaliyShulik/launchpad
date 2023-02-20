@@ -236,10 +236,9 @@ const BuyTokenCard = (props) => {
       </s.Container>
       <s.SpacerSmall />
       <s.TextID>You will recieve</s.TextID>
-      {BigNumber(idoInfo.tokenRate)
-        .dividedBy(BigNumber(10).pow(BigNumber(idoInfo.tokenDecimals)))
-        .times(BigNumber(library.web3.utils.fromWei(price)))
-        .toFormat(2)}
+      {
+        BigNumber(price).div(idoInfo.tokenRate).toFormat(2)
+      }
       {" $" + idoInfo.tokenSymbol}
     </s.Card>
   );

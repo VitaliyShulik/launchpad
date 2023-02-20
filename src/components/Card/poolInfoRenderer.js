@@ -2,6 +2,7 @@ import { useWeb3React } from "@web3-react/core";
 import BigNumber from "bignumber.js";
 import React from "react";
 import { Badge } from "react-bootstrap";
+import { ETHER } from "../../constants";
 import { useApplicationContext } from "../../context/applicationContext";
 import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
@@ -56,13 +57,13 @@ const PoolInfoRenderer = (props) => {
         <s.SpacerSmall />
         <s.Container fd="row" jc="space-between">
           <s.TextID fw="700">Token rate</s.TextID>
-          {library.web3.utils.fromWei(idoInfo.tokenRate) + " $" + idoInfo.tokenSymbol}
+          {`${ETHER.div(idoInfo.tokenRate)} ${idoInfo.tokenSymbol}/${baseCurrencySymbol}`}
         </s.Container>
         <s.SpacerSmall />
         {
           isAddLiquidityEnabled && <s.Container fd="row" jc="space-between">
             <s.TextID fw="700">Listing rate</s.TextID>
-            {library.web3.utils.fromWei(idoInfo.listingRate) + " $" + idoInfo.tokenSymbol}
+            {`${ETHER.div(idoInfo.listingRate)} ${idoInfo.tokenSymbol}/${baseCurrencySymbol}`}
           </s.Container>
         }
         <s.SpacerSmall />

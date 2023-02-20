@@ -1,8 +1,8 @@
-import { TextField } from "@mui/material";
+import { TextField, InputAdornment } from "@mui/material";
 import React from "react";
 
 export default function NumberField(props) {
-  const { label, onChange, value } = props;
+  const { label, onChange, value, adornment } = props;
   return (
     <TextField
       fullWidth
@@ -13,6 +13,9 @@ export default function NumberField(props) {
       value={value}
       label={label}
       onChange={onChange}
+      InputProps={{
+        endAdornment: <InputAdornment position="end">{adornment || ''}</InputAdornment>,
+      }}
     />
   );
 }

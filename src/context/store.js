@@ -56,6 +56,14 @@ export const StoreContextProvider = ({ children }) => {
       formIsValid = false;
       errors["softCap"] = "Soft cap cannot less than Hard cap";
     }
+    if (BigNumber(minETH).gt(BigNumber(softCap))) {
+      formIsValid = false;
+      errors["minETH"] = "Minimum buy cannot greater than Soft cap";
+    }
+    if (BigNumber(maxETH).gt(BigNumber(hardCap))) {
+      formIsValid = false;
+      errors["maxETH"] = "Maximum buy cannot greater than Hard cap";
+    }
     if (BigNumber(minETH).gte(BigNumber(maxETH))) {
       formIsValid = false;
       errors["minETH"] = "Minimum buy cannot less than Maximum buy";

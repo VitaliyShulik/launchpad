@@ -1,4 +1,4 @@
-
+import BigNumber from "bignumber.js";
 import { injected, newWalletConnect, newWalletlink } from '../connectors';
 import { networks } from '../constants/networksInfo';
 
@@ -58,3 +58,5 @@ export const SUPPORTED_WALLETS = {
 export const NetworkContextName = 'NETWORK';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+export const ETHER = BigNumber(10).pow(18);

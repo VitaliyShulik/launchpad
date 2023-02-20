@@ -12,8 +12,7 @@ import { useTokenContract } from "../../../../hooks/useContract";
 import ReadMore from "../../readMore";
 import { isAddress } from "../../../../utils/utils";
 import { useIPFS } from "../../../../hooks/useIPFS";
-
-const ETHER = BigNumber(10).pow(18);
+import { ETHER } from "../../../../constants";
 
 export default function Preview() {
   const { account, chainId, library } = useWeb3React();

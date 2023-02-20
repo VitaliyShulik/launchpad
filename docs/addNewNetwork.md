@@ -20,6 +20,9 @@
       // aggregates results from multiple contract constant function calls
       // https://github.com/makerdao/multicall
       multicall: "0x41263cBA59EB80dC200F3E2544eda4ed6A90E76C",
+      // optionally, subscribe to the launchpad contract events from a designated block, such as the contract creation block
+      // this allows for the exclusion of extraneous blocks, and only obtaining the latest information in order to promptly display Pools.
+      fromBlock: 0,
       // native currency config
       baseCurrency: {
         decimals: 18,

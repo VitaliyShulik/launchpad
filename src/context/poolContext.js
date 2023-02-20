@@ -1,6 +1,7 @@
 import { useWeb3React } from "@web3-react/core";
 import React, { createContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { networks } from "../constants/networksInfo";
 import { utils } from "../utils";
 import { useApplicationContext } from "./applicationContext";
 
@@ -19,7 +20,7 @@ export const PoolContextProvider = ({ children }) => {
 
   const dispatch = useDispatch();
   const contract = useSelector((state) => state.contract);
-  const { account } = useWeb3React();
+  const { account, chainId } = useWeb3React();
 
   const {
     domainSettings: {
@@ -93,7 +94,7 @@ export const PoolContextProvider = ({ children }) => {
     setIDOCreatedEvent(
       contract.IDOFactory.events.IDOCreated(
         {
-          fromBlock: 0,
+          fromBlock: networks?.[chainId]?.fromBlock || 0,
         },
         function (error, event) {
           if (event) {
@@ -118,7 +119,7 @@ export const PoolContextProvider = ({ children }) => {
     setLockerCreatedEvent(
       contract.TokenLockerFactory.events.LockerCreated(
         {
-          fromBlock: 0,
+          fromBlock: networks?.[chainId]?.fromBlock || 0,
         },
         function (error, event) {
           if (event) {

@@ -7,6 +7,7 @@ export const networks = {
     color: "#627EEA",
     multicall: "0xeefBa1e63905eF1D7ACbA5a8513c70307C1cE441",
     ENSRegistry: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+    fromBlock: 16669000,
     baseCurrency: {
       decimals: 18,
       name: "ETH",
@@ -27,6 +28,7 @@ export const networks = {
     storage: "0x171a664f12672a61E4e948BC7Fd38eB34b64a15b",
     multicall: "0xFD4e092227e876dD8F2d036FA8fEB23F8A7F94ca",
     ENSRegistry: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+    fromBlock: 8385000,
     baseCurrency: {
       decimals: 18,
       name: "ETH",
@@ -46,6 +48,7 @@ export const networks = {
     color: "#CC9B00",
     storage: "0xa7472f384339D37EfE505a1A71619212495A973A",
     multicall: "0x41263cBA59EB80dC200F3E2544eda4ed6A90E76C",
+    fromBlock: 25800000,
     baseCurrency: {
       decimals: 18,
       name: "BNB",
@@ -64,6 +67,7 @@ export const networks = {
     explorer: "https://testnet.bscscan.com/",
     color: "#CC9B00",
     multicall: "0x6e5BB1a5Ad6F68A8D7D6A5e47750eC15773d6042",
+    fromBlock: 27113000,
     baseCurrency: {
       decimals: 18,
       name: "BNB",

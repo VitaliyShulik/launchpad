@@ -1,7 +1,7 @@
 import { withStyles } from "@material-ui/core/styles";
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import TextField from "@mui/material/TextField";
+import { TextField, InputAdornment} from "@mui/material";
 import BigNumber from "bignumber.js";
 import React, { useEffect, useState } from "react";
 import { Badge } from "react-bootstrap";
@@ -239,6 +239,9 @@ const LockTokenForm = () => {
         fullWidth
         id="amount"
         label="Lock amount"
+        InputProps={{
+          endAdornment: <InputAdornment position="end">{tokenSymbol || ''}</InputAdornment>,
+        }}
         onWheel={(e) => {
           e.target.blur();
         }}

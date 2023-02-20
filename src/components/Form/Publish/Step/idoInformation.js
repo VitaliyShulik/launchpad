@@ -31,6 +31,7 @@ export default function IDOInfo() {
       <NumberField
         value={BigNumber(context.tokenRate[0]).toFixed()}
         label={"Token rate"}
+        adornment={context.tokenInformation?.[0]?.tokenSymbol}
         onChange={async (e) => {
           e.preventDefault();
           let val = BigNumber(e.target.value).absoluteValue().toFixed(18);
@@ -48,6 +49,7 @@ export default function IDOInfo() {
           <NumberField
             value={BigNumber(context.softCap[0]).toFixed()}
             label={"Soft Cap"}
+            adornment={baseCurrencySymbol}
             onChange={(e) => {
               e.preventDefault();
               let val = BigNumber(e.target.value).absoluteValue().toFixed(18);
@@ -63,6 +65,7 @@ export default function IDOInfo() {
           <NumberField
             value={BigNumber(context.hardCap[0]).toFixed()}
             label={"Hard Cap"}
+            adornment={baseCurrencySymbol}
             onChange={(e) => {
               e.preventDefault();
               let val = BigNumber(e.target.value).absoluteValue().toFixed(18);
@@ -103,6 +106,7 @@ export default function IDOInfo() {
           <NumberField
             value={BigNumber(context.minETH[0]).toFixed()}
             label={"Minimum Buy"}
+            adornment={baseCurrencySymbol}
             onChange={(e) => {
               e.preventDefault();
               let val = BigNumber(e.target.value).absoluteValue().toFixed(18);
@@ -118,6 +122,7 @@ export default function IDOInfo() {
           <NumberField
             value={BigNumber(context.maxETH[0]).toFixed()}
             label={"Maximum Buy"}
+            adornment={baseCurrencySymbol}
             onChange={(e) => {
               e.preventDefault();
               let val = BigNumber(e.target.value).absoluteValue().toFixed(18);
@@ -162,6 +167,7 @@ export default function IDOInfo() {
           <NumberField
             value={BigNumber(context.listingRate[0]).toFixed()}
             label={"Listing Rate"}
+            adornment={context.tokenInformation?.[0]?.tokenSymbol}
             onChange={(e) => {
               e.preventDefault();
               let val = BigNumber(e.target.value).absoluteValue().toFixed(18);

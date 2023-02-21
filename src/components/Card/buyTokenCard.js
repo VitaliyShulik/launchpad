@@ -1,4 +1,3 @@
-import { TextField } from "@mui/material";
 import { useWeb3React } from "@web3-react/core";
 import BigNumber from "bignumber.js";
 import React, { useState } from "react";
@@ -8,12 +7,14 @@ import { usePoolContext } from "../../context/poolContext";
 import { useIDOPoolContract } from "../../hooks/useContract";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
+import { NumberField } from "../FormField";
 import ProgressBar from "../Modal/ProgressBar";
 import PoolCountdown from "../Utils/poolCountdown";
 
 const BuyTokenCard = (props) => {
   const { account, library } = useWeb3React();
-  const [price, setPrice] = useState("0");
+  const [ethAmount, setEthAmount] = useState("0");
+  const [tokensToBuy, setTokensToBuy] = useState(0);
   const [loading, setLoading] = useState(false);
   const { idoAddress } = props;
   const {
@@ -37,12 +38,12 @@ const BuyTokenCard = (props) => {
     return <s.TextDescription fullWidth>Loading</s.TextDescription>;
   }
 
-  const buyToken = async (amount) => {
+  const buyToken = async () => {
     setLoading(true); // TODO: add action loader to the appropriate button
     try {
       const tx = await IDOPoolContract.pay({
         from: account,
-        value: amount,
+        value: ethAmount,
       });
 
       const receipt = await tx.wait();
@@ -97,6 +98,15 @@ const BuyTokenCard = (props) => {
 
   const isStarted = parseInt(idoInfo.start) < (parseInt(Date.now() / 1000));
   const hasEnded = parseInt(idoInfo.end) < (parseInt(Date.now() / 1000));
+  const reachSoftCap = BigNumber(idoInfo.totalInvestedETH).gte(BigNumber(idoInfo.softCap));
+
+  const willhMaxAmountOverflow = BigNumber(ethAmount).gt(
+    BigNumber(idoInfo.max).minus(BigNumber(idoInfo.userData.totalInvestedETH))
+  );
+  const reachMaxAmount = BigNumber(idoInfo.max).lte(
+    BigNumber(idoInfo.userData.totalInvestedETH)
+  );
+  const lessThanMinAmount = BigNumber(ethAmount).lt(BigNumber(idoInfo.min));
 
   return (
     <s.Card
@@ -136,7 +146,7 @@ const BuyTokenCard = (props) => {
           <s.TextDescription>
             {BigNumber(idoInfo.userData.debt)
               .dividedBy(10 ** idoInfo.tokenDecimals)
-              .toFixed(2) +
+              .toString() +
               " $" +
               idoInfo.tokenSymbol}
           </s.TextDescription>
@@ -144,7 +154,8 @@ const BuyTokenCard = (props) => {
         <s.Container flex={1}>
           <s.button
             disabled={
-              Date.now() / 1000 < BigNumber(idoInfo.end) ||
+              !hasEnded ||
+              (hasEnded && !reachSoftCap) ||
               BigNumber(idoInfo.userData.debt).lte(0)
             }
             onClick={(e) => {
@@ -189,45 +200,38 @@ const BuyTokenCard = (props) => {
       <s.SpacerMedium />
       <s.Container fd="row" ai="center" jc="space-between">
         <s.Container flex={4} style={{ marginRight: 20 }}>
-          <TextField
-            fullWidth
-            label={"Buy with " + baseCurrencySymbol}
-            type={"tel"}
+          <NumberField
+            value={tokensToBuy}
+            label={"Tokens amount"}
+            adornment={idoInfo.tokenSymbol}
             onChange={(e) => {
               e.preventDefault();
-              let val = BigNumber(e.target.value).absoluteValue().toFixed();
+              let val = BigNumber(e.target.value).toFixed(0);
               if (!isNaN(val)) {
-                setPrice(library.web3.utils.toWei(val));
+                setTokensToBuy(val);
+                setEthAmount(
+                  BigNumber(idoInfo.tokenRate).times(val)
+                );
               } else {
-                setPrice("0");
+                setTokensToBuy(0);
+                setEthAmount("0");
               }
             }}
-          ></TextField>
+          />
         </s.Container>
         <s.Container flex={1} ai="flex-end">
           <s.button
             disabled={
-              BigNumber(price).gt(
-                BigNumber(idoInfo.max).minus(
-                  BigNumber(idoInfo.userData.totalInvestedETH)
-                )
-              ) ||
-              BigNumber(idoInfo.max).lte(
-                BigNumber(idoInfo.userData.totalInvestedETH)
-              ) ||
-              BigNumber(price).lt(BigNumber(idoInfo.min)) ||
-              BigNumber(price)
-                .dividedBy(BigNumber(idoInfo.price))
-                .times(BigNumber(10 ** idoInfo.tokenDecimals))
-                .plus(BigNumber(idoInfo.toDistributed))
-                .gt(BigNumber(idoInfo.maxDistributed)) ||
-              price == "0" ||
               hasEnded ||
-              !isStarted
+              !isStarted ||
+              tokensToBuy === 0 ||
+              willhMaxAmountOverflow ||
+              reachMaxAmount ||
+              lessThanMinAmount
             }
             onClick={(e) => {
               e.preventDefault();
-              buyToken(price);
+              buyToken();
             }}
           >
             BUY
@@ -235,11 +239,14 @@ const BuyTokenCard = (props) => {
         </s.Container>
       </s.Container>
       <s.SpacerSmall />
-      <s.TextID>You will recieve</s.TextID>
-      {
-        BigNumber(price).div(idoInfo.tokenRate).toFormat(2)
-      }
-      {" $" + idoInfo.tokenSymbol}
+
+      <s.Container fd="row" jc="space-between" ai="center"  style={{ wordBreak: "break-all" }} >
+        <s.TextID>You will spend</s.TextID>
+        { (ethAmount ? library.web3.utils.fromWei(ethAmount.toString(16)) : 0) +
+            " " +
+            baseCurrencySymbol
+        }
+      </s.Container>
     </s.Card>
   );
 };

@@ -48,7 +48,7 @@ export const networks = {
     color: "#CC9B00",
     storage: "0xa7472f384339D37EfE505a1A71619212495A973A",
     multicall: "0x41263cBA59EB80dC200F3E2544eda4ed6A90E76C",
-    fromBlock: 25800000,
+    fromBlock: 25825000,
     baseCurrency: {
       decimals: 18,
       name: "BNB",

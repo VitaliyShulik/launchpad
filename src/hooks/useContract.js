@@ -8,7 +8,7 @@ import STORAGE from '../contracts/Storage.json';
 import ERC20 from '../contracts/ERC20.json';
 import { STORAGE_NETWORK_ID } from '../constants';
 import { networks } from '../constants/networksInfo';
-import { getContract } from '../utils/utils';
+import { getContract, isAddress } from '../utils/utils';
 import { useActiveWeb3React } from './index';
 
 export function useStorageContract() {
@@ -33,7 +33,7 @@ function useContract(address, ABI, withSignerIfPossible = true) {
   const { library, account } = useActiveWeb3React()
 
   return useMemo(() => {
-    if (!address || !ABI || !library) return null
+    if (!address || !isAddress(address) || !ABI || !library) return null
     try {
       return getContract(address, ABI, library, withSignerIfPossible && account ? account : undefined)
     } catch (error) {

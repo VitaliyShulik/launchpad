@@ -1,8 +1,10 @@
+import { Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { usePoolContext } from "../../context/poolContext";
 import * as s from "../../styles/global";
 import { utils } from "../../utils";
 import PoolRenderer from "../Card/poolRenderer";
+import Loader from "../Loader";
 
 const IDOList = (props) => {
   const [limit, setLimit] = useState(5);
@@ -23,7 +25,11 @@ const IDOList = (props) => {
   };
 
   if (!poolKeys.length || !allPools) {
-    return <s.TextDescription fullWidth>Loading</s.TextDescription>;
+    return <s.Container ai="center">
+      <s.SpacerSmall />
+      <Loader size="2rem" />
+      <Typography>Wait for pools' data to load... This may take more than 30 seconds.</Typography>
+    </s.Container>;
   }
 
   return (

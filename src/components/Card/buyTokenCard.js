@@ -43,7 +43,7 @@ const BuyTokenCard = (props) => {
     try {
       const tx = await IDOPoolContract.pay({
         from: account,
-        value: ethAmount,
+        value: `0x${ethAmount.toString(16)}`,
       });
 
       const receipt = await tx.wait();
